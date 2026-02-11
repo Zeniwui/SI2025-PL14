@@ -1,4 +1,4 @@
-package giis.demo.util;
+package si.pl14.util;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.*;

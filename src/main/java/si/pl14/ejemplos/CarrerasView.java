@@ -1,4 +1,4 @@
-package giis.demo.tkrun;
+package si.pl14.ejemplos;
 
 import javax.swing.JFrame;
 import net.miginfocom.swing.MigLayout;

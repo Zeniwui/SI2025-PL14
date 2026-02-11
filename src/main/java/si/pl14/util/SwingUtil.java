@@ -1,4 +1,4 @@
-package giis.demo.util;
+package si.pl14.util;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;

@@ -1,4 +1,4 @@
-package giis.demo.util;
+package si.pl14.util;
 
 /**
  * Excepcion producida por la aplicacion antes situaciones que no deberian ocurrir pero que son controladas
