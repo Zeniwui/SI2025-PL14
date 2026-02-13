@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS Reservas (
     id_socio INT,                     
     id_actividad INT,                   
     
-    estado VARCHAR(20),
+    estado_pago VARCHAR(20),
     fecha_reserva DATETIME DEFAULT CURRENT_TIMESTAMP, -- Para el resguardo
     
     FOREIGN KEY (id_instalacion) REFERENCES Instalaciones(id_instalacion),

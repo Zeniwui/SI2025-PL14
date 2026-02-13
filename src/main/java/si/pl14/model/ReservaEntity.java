@@ -10,7 +10,7 @@ public class ReservaEntity {
 	private Integer idSocio;
 	private Integer idActividad;
 	
-	private String estado;
+	private String estadoPago;
 	private String fechaReserva;
 	
 	public int getIdReserva() {
@@ -55,11 +55,11 @@ public class ReservaEntity {
 	public void setIdActividad(Integer idActividad) {
 		this.idActividad = idActividad;
 	}
-	public String getEstado() {
-		return estado;
+	public String getEstadoPago() {
+		return estadoPago;
 	}
-	public void setEstado(String estado) {
-		this.estado = estado;
+	public void setEstadoPago(String estado) {
+		this.estadoPago = estado;
 	}
 	public String getFechaReserva() {
 		return fechaReserva;
