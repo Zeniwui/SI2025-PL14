@@ -11,6 +11,7 @@ public class ActividadEntity {
     private double precioSocio;
     private double precioNoSocio;
     private int idPeriodo;
+    //el horario tiene id de actividad
     
 	public int getIdActividad() {
 		return idActividad;
