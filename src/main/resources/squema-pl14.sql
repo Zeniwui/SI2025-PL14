@@ -70,3 +70,20 @@ CREATE TABLE IF NOT EXISTS Actividades (
     FOREIGN KEY (id_instalacion) REFERENCES Instalaciones(id_instalacion),
     FOREIGN KEY (id_periodo) REFERENCES PeriodosInscripcion(id_periodo)
 );
+
+-- Tabla para los horarios de las actividades (para definir el patrón semanal)
+CREATE TABLE IF NOT EXISTS Horarios (
+    id_horario INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_actividad INTEGER NOT NULL,
+    dia_semana VARCHAR(15) NOT NULL,
+    hora_inicio TIME NOT NULL,
+    hora_fin TIME NOT NULL,
+    
+    -- Relación con la tabla Actividades
+    FOREIGN KEY (id_actividad) REFERENCES Actividades(id_actividad)
+        ON DELETE CASCADE,
+
+    -- Validaciones de integridad
+    CONSTRAINT check_dias CHECK (dia_semana IN ('Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo')),
+    CONSTRAINT check_horas CHECK (hora_fin > hora_inicio)
+);
