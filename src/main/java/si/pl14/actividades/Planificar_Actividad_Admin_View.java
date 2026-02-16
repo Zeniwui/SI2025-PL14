@@ -24,14 +24,24 @@ public class Planificar_Actividad_Admin_View extends JFrame {
 	private JButton btnCrear;
 
 	public static void main(String[] args) {
-		EventQueue.invokeLater(() -> {
-			try {
-				Planificar_Actividad_Admin_View frame = new Planificar_Actividad_Admin_View();
-				frame.setVisible(true);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		});
+		/*
+		 * EventQueue.invokeLater(() -> { try { Planificar_Actividad_Admin_View frame =
+		 * new Planificar_Actividad_Admin_View(); frame.setVisible(true); } catch
+		 * (Exception e) { e.printStackTrace(); } });
+		 */
+
+		// Cambio el main a ver si ahora funciona
+
+		// MVC
+		Planificar_Actividad_Admin_View vista = new Planificar_Actividad_Admin_View();
+		Planificar_Actividad_Model modelo = new Planificar_Actividad_Model();
+		Planificar_Actividad_Controller controlador = new Planificar_Actividad_Controller(modelo, vista);
+
+		// inicio controlador con el metofo
+		controlador.initController();
+
+		// hago visible aunque sea redundante
+		vista.setVisible(true);
 	}
 
 	public Planificar_Actividad_Admin_View() {
@@ -153,7 +163,7 @@ public class Planificar_Actividad_Admin_View extends JFrame {
 
 	public String getDescripcion() {
 		return txtrDescripcion.getText();
-	} // Cambia txtrDescripcion a atributo de clase si no lo es
+	}
 
 	public String getAforo() {
 		return txtAforo.getText();
@@ -178,6 +188,4 @@ public class Planificar_Actividad_Admin_View extends JFrame {
 	public JButton getBtnCrear() {
 		return btnCrear;
 	}
-	// Nota: Deberás añadir getters para los JComboBox si necesitas capturar el ID
-	// de instalación o periodo
 }

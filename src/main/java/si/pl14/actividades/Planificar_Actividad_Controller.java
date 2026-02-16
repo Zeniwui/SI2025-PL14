@@ -15,7 +15,7 @@ public class Planificar_Actividad_Controller {
 
     public void initController() {
         // boton crear
-        view.getBtnCrear().addActionListener(e -> SwingUtil.exceptionWrapper(() -> crearActividad()));
+        view.getBtnCrear().addActionListener(e -> crearActividad());
     }
 
     public void initView() {
