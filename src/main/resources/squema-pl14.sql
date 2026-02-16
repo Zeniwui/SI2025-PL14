@@ -32,27 +32,6 @@ CREATE TABLE IF NOT EXISTS Instalaciones (
     coste_hora REAL NOT NULL
 );
 
--- Tabla para reservas
-CREATE TABLE IF NOT EXISTS Reservas (
-    id_reserva INTEGER PRIMARY KEY AUTOINCREMENT,
-    id_instalacion INT NOT NULL,
-    fecha DATE NOT NULL,                -- Formato (dia-mes-año)
-    hora_inicio INT NOT NULL,           
-    hora_fin INT NOT NULL,              
-    
-    id_socio INT,                     
-    id_actividad INT,                   
-    
-    estado VARCHAR(20),
-    fecha_reserva DATETIME DEFAULT CURRENT_TIMESTAMP, -- Para el resguardo
-    
-    FOREIGN KEY (id_instalacion) REFERENCES Instalaciones(id_instalacion),
-    FOREIGN KEY (id_socio) REFERENCES Socios(id_socio),
-    FOREIGN KEY (id_actividad) REFERENCES Actividades(id_actividad),
-    
-    UNIQUE(id_instalacion, fecha, hora_inicio)
-);
-
 -- Tabla para las actividades
 CREATE TABLE IF NOT EXISTS Actividades (
     id_actividad INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -71,19 +50,55 @@ CREATE TABLE IF NOT EXISTS Actividades (
     FOREIGN KEY (id_periodo) REFERENCES PeriodosInscripcion(id_periodo)
 );
 
--- Tabla para los horarios de las actividades (para definir el patrón semanal)
+-- Tabla para reservas (tanto reservas de socios, como las reservas de instalaciones debidas a actividades)
+CREATE TABLE IF NOT EXISTS Reservas (
+
+    id_reserva INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_instalacion INTEGER NOT NULL,
+    fecha DATE NOT NULL,				-- Formato (dd/mm/aaaa)
+    hora_inicio TIME NOT NULL,
+    hora_fin TIME NOT NULL,
+
+    -- Si la reserva es para un socio, se llena id_socio
+    -- Si es reserva es por una actividad, se llena id_actividad
+    id_socio INTEGER NULL,
+    id_actividad INTEGER NULL,
+
+    coste_reserva DECIMAL(10, 2) DEFAULT 0,
+
+    -- Estado del pago: 'Pendiente', 'Pagado', 'Anulado', 'Cuota'
+    estado_pago VARCHAR(20) DEFAULT 'Pendiente',
+    
+    -- Forma de pago: 'Tarjeta', 'Efectivo', 'Cuota_Mensual'
+    metodo_pago VARCHAR(20),
+
+    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP, -- Para el resguardo
+
+    FOREIGN KEY (id_instalacion) REFERENCES Instalaciones(id_instalacion),
+    
+    -- Si eliminamos un socio, mantenemos el histórico poniendo NULL
+    FOREIGN KEY (id_socio) REFERENCES Socios(id_socio) ON DELETE SET NULL,
+    
+    -- Si eliminamos una actividad, borramos sus reservas futuras automáticamente.
+    FOREIGN KEY (id_actividad) REFERENCES Actividades(id_actividad) ON DELETE CASCADE,
+
+    -- No se puede terminar antes de empezar
+    CONSTRAINT chk_horas_validas CHECK (hora_fin > hora_inicio),
+
+    -- Garantiza que una reserva no pueda pertenecer a un socio y a una actividad a la vez.
+    CONSTRAINT chk_origen_unico CHECK (
+        (id_socio IS NOT NULL AND id_actividad IS NULL) OR  -- Caso: Reserva de Socio
+        (id_socio IS NULL AND id_actividad IS NOT NULL)	    -- Caso: Clase de Actividad
+    )
+);
+
 CREATE TABLE IF NOT EXISTS Horarios (
     id_horario INTEGER PRIMARY KEY AUTOINCREMENT,
     id_actividad INTEGER NOT NULL,
-    dia_semana VARCHAR(15) NOT NULL,
+    dia_semana VARCHAR(15) NOT NULL, -- 'Lunes', 'Martes'...
     hora_inicio TIME NOT NULL,
     hora_fin TIME NOT NULL,
     
-    -- Relación con la tabla Actividades
-    FOREIGN KEY (id_actividad) REFERENCES Actividades(id_actividad)
-        ON DELETE CASCADE,
-
-    -- Validaciones de integridad
-    CONSTRAINT check_dias CHECK (dia_semana IN ('Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo')),
-    CONSTRAINT check_horas CHECK (hora_fin > hora_inicio)
+    FOREIGN KEY (id_actividad) REFERENCES Actividades(id_actividad) ON DELETE CASCADE
 );
+
