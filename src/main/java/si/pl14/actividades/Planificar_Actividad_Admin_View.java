@@ -21,7 +21,7 @@ public class Planificar_Actividad_Admin_View extends JFrame {
 	private JTextField txtCuotaNoSocio;
 	private JTable tableHorario;
 	private JTextField txtrDescripcion;
-	private JButton btnCrear;
+	private JButton btnCrear = new JButton("CREAR"); //fuera del main para ver si ahora funciona
 
 	public static void main(String[] args) {
 		/*
@@ -149,7 +149,7 @@ public class Planificar_Actividad_Admin_View extends JFrame {
 		contentPane.add(new JLabel("€/mes")).setBounds(470, 330, 50, 25);
 
 		// --- BOTÓN CREAR ---
-		JButton btnCrear = new JButton("CREAR");
+		//JButton btnCrear = new JButton("CREAR");
 		btnCrear.setFont(new Font("Tahoma", Font.BOLD, 14));
 		btnCrear.setBackground(new Color(200, 200, 200));
 		btnCrear.setBounds(250, 450, 150, 40);
