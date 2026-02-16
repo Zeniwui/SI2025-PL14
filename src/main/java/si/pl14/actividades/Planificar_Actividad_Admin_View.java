@@ -20,7 +20,7 @@ public class Planificar_Actividad_Admin_View extends JFrame {
 	private JTextField txtCuotaSocio;
 	private JTextField txtCuotaNoSocio;
 	private JTable tableHorario;
-	private JTextField txtrDescripcion;
+	private JTextArea txtrDescripcion;
 	private JButton btnCrear = new JButton("CREAR"); //fuera del main para ver si ahora funciona
 
 	public static void main(String[] args) {
