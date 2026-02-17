@@ -20,6 +20,7 @@ public class ReservaView {
     private JSpinner spinHoraInicio;
     private JSpinner spinHoraFin;
     private JButton btnComprobar;
+    private JLabel lblInformacion;
     private JRadioButton rdbtnPagoInmediato;
     private JRadioButton rdbtnCuotaMensual;
     private ButtonGroup grupoPago;
@@ -43,7 +44,7 @@ public class ReservaView {
         frame = new JFrame();
         frame.setTitle("Reservas Instalación - Socio");
         frame.setName("ReservaView");
-        frame.setBounds(100, 100, 800, 600); 
+        frame.setBounds(100, 100, 800, 800); 
         frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         frame.getContentPane().setBackground(COLOR_FONDO);
         
@@ -117,7 +118,7 @@ public class ReservaView {
 
         JScrollPane scrollPane = new JScrollPane(txtResumen);
         scrollPane.setBorder(null); 
-        cardPanel.add(scrollPane, "cell 0 3, grow, hmin 100");
+        cardPanel.add(scrollPane, "cell 0 3, grow, hmin 100, w :100%:");
 
         // ==========================================
         // SECCIÓN DERECHA
@@ -139,8 +140,7 @@ public class ReservaView {
             }
         });
 
-        cardPanel.add(lblFechaSeleccionada, "cell 1 1, flowy, aligny top, gapbottom 20");        // ----------------------------------------
-
+        cardPanel.add(lblFechaSeleccionada, "cell 1 1, flowy, aligny top, gapbottom 20");       
         // -- Horarios --
         JLabel lblHorario = createLabel("Horario Disponible");
         cardPanel.add(lblHorario, "cell 1 1, flowy, aligny top, gapbottom 10");
@@ -159,12 +159,18 @@ public class ReservaView {
         panelHoras.add(spinHoraFin, "w 60!");
         
         cardPanel.add(panelHoras, "cell 1 1, aligny top, wrap");
+        
+        lblInformacion = new JLabel();
+        lblInformacion.setForeground(Color.red);
+        cardPanel.add(lblInformacion, "cell 1 1, flowy, wrap");
 
+        /*
         // Botón Comprobar
         btnComprobar = new JButton("Comprobar Disponibilidad");
         btnComprobar.setName("btnComprobar");
         styleButton(btnComprobar, COLOR_PRIMARIO, Color.WHITE);
         cardPanel.add(btnComprobar, "cell 1 1, aligny top, gapy 10, growx");
+        */
 
         // -- Pago --
         JLabel lblPago = createLabel("Método de Pago");
@@ -247,10 +253,13 @@ public class ReservaView {
     public int getHoraInicio() { return (int) this.spinHoraInicio.getValue(); }
     public int getHoraFin() { return (int) this.spinHoraFin.getValue(); }
     public JButton getBtnComprobar() { return this.btnComprobar; }
+    public JLabel getLblInformacion() { return this.lblInformacion; }
+    public void setTextoInformacion(String mensaje) { this.lblInformacion.setText(mensaje); }
     public JButton getBtnCancelar() { return this.btnCancelar; }
     public JButton getBtnReservar() { return this.btnReservar; }
     public boolean esPagoInmediato() { return this.rdbtnPagoInmediato.isSelected(); }
     public boolean esPagoCuota() { return this.rdbtnCuotaMensual.isSelected(); }
+    public JTextArea getTextoResumen() { return this.txtResumen; }
     public void setTextoResumen(String mensaje) { this.txtResumen.setText(mensaje); }
     public JLabel getLblFechaSeleccionada() { return lblFechaSeleccionada; }
 }
