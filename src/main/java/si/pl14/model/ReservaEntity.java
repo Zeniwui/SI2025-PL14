@@ -10,8 +10,10 @@ public class ReservaEntity {
 	private Integer idSocio;
 	private Integer idActividad;
 	
+	private float costeReserva;
 	private String estadoPago;
-	private String fechaReserva;
+	private String metodoPago;
+	private String fechaCreacion;
 	
 	public int getIdReserva() {
 		return idReserva;
@@ -55,16 +57,29 @@ public class ReservaEntity {
 	public void setIdActividad(Integer idActividad) {
 		this.idActividad = idActividad;
 	}
+	public float getCosteReserva() {
+		return costeReserva;
+	}
+	public void setCosteReserva(float costeReserva) {
+		this.costeReserva = costeReserva;
+	}
 	public String getEstadoPago() {
 		return estadoPago;
 	}
-	public void setEstadoPago(String estado) {
-		this.estadoPago = estado;
+	public void setEstadoPago(String estadoPago) {
+		this.estadoPago = estadoPago;
 	}
-	public String getFechaReserva() {
-		return fechaReserva;
+	public String getMetodoPago() {
+		return metodoPago;
 	}
-	public void setFechaReserva(String fechaReserva) {
-		this.fechaReserva = fechaReserva;
+	public void setMetodoPago(String metodoPago) {
+		this.metodoPago = metodoPago;
 	}
+	public String getFechaCreacion() {
+		return fechaCreacion;
+	}
+	public void setFechaCreacion(String fechaCreacion) {
+		this.fechaCreacion = fechaCreacion;
+	}
+
 }
