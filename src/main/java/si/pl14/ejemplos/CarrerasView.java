@@ -108,7 +108,7 @@ public class CarrerasView {
 		tableDetallePanel.setPreferredSize(new Dimension(300, 95));
 		frame.getContentPane().add(tableDetallePanel, "cell 0 10");
 	}
-
+	
 	//Getters y Setters anyadidos para acceso desde el controlador (repersentacion compacta)
 	public JFrame getFrame() { return this.frame; }
 	public String getFechaHoy()  { return this.txtFechaHoy.getText(); }
