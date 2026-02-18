@@ -18,9 +18,19 @@ public class ReservaModel {
 	public List<InstalacionEntity> getListaInstalaciones() {
 		
 		//SQL para conseguir todas las filas de la tabla Instalaciones
-		String sql = "SELECT  * FROM Instalaciones";
+		String sql = "SELECT id_instalacion AS idInstalacion, " + 
+                "nombre, tipo, " +
+                "coste_hora AS costeHora " + 
+                "FROM Instalaciones";
 		
 		return db.executeQueryPojo(InstalacionEntity.class, sql);
+	}
+	
+	public List<Object[]> getListaInstalacionesArray() {
+		
+		String sql = "SELECT  * FROM Instalaciones";
+		
+		return db.executeQueryArray(sql);
 	}
 	
 	/*
@@ -28,7 +38,7 @@ public class ReservaModel {
 	 */
 	public boolean estaAlCorriente(int idSocio) {
 		
-		String sql = "SELECT estado_pagos FROM Socios WHERE id_socio = ?";
+		String sql = "SELECT estado_pagos AS estadoPagos FROM Socios WHERE id_socio = ?";
 		
 		List<SocioEntity> socios = db.executeQueryPojo(SocioEntity.class, sql, idSocio);
 		
@@ -39,8 +49,18 @@ public class ReservaModel {
 	 * Obtiene las reservas que hay en una fecha determinada, en una instalación
 	 */
 	public List<ReservaEntity> getReservasEnFecha(String fecha, int idInstalacion) {
-		String sql = "SELECT * FROM Reservas WHERE fecha = ?"
-				+ " AND id_instalacion = ?";
+		String sql = "SELECT " +
+                "id_reserva AS idReserva, " +
+                "id_instalacion AS idInstalacion, " +
+                "id_socio AS idSocio, " +
+                "fecha, " +
+                "CAST(strftime('%H', hora_inicio) AS INTEGER) AS horaInicio, " +
+                "CAST(strftime('%H', hora_fin) AS INTEGER) AS horaFin, " +
+                "coste_reserva AS costeReserva, " +
+                "estado_pago AS estadoPago, " +
+                "metodo_pago AS metodoPago " +
+                "FROM Reservas " +
+                "WHERE fecha = ? AND id_instalacion = ?";
 		
 		return db.executeQueryPojo(ReservaEntity.class, sql, fecha, idInstalacion);
 	}
@@ -63,17 +83,17 @@ public class ReservaModel {
 	/*
 	 * Obtiene el precio de reservar una instalacion el número de horas dicho
 	 */
-	public float getPrecioReserva(ReservaEntity reserva) {
-		String sql = "SELECT coste_hora FROM Instalaciones WHERE id_instalacion = ?";
+	public float getPrecioReserva(int idInstalacion, int horaInicio, int horaFin) {
+		String sql = "SELECT coste_hora AS costeHora FROM Instalaciones WHERE id_instalacion = ?";
 		
-		List<InstalacionEntity> instalaciones = db.executeQueryPojo(InstalacionEntity.class, sql, reserva.getIdInstalacion());
+		List<InstalacionEntity> instalaciones = db.executeQueryPojo(InstalacionEntity.class, sql, idInstalacion);
 		
 		if (instalaciones.isEmpty()) {
 			System.err.println("Error en getPrecioReserva()");
-			throw new ApplicationException("La instalación no existe: " + reserva.getIdInstalacion());
+			throw new ApplicationException("La instalación no existe: " + idInstalacion);
 		}
 		
-		int horasReservas = reserva.getHoraFin() - reserva.getHoraInicio();
+		int horasReservas = horaFin - horaInicio;
 		
 		return horasReservas * instalaciones.get(0).getCosteHora();
 	}
@@ -82,16 +102,21 @@ public class ReservaModel {
 	 * Realiza la reserva y la guarda en la base de datos
 	 */
 	public void realizarReserva(ReservaEntity reserva) {
-	    String sql = "INSERT INTO Reservas (id_instalacion, id_socio, fecha, hora_inicio, hora_fin, estado_pago) " +
-	                 "VALUES (?, ?, ?, ?, ?, ?)";
+		String sql = "INSERT INTO Reservas (id_instalacion, fecha, hora_inicio, hora_fin, id_socio, coste_reserva, estado_pago, metodo_pago) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+	    
+	    String horaInicioStr = String.format("%02d:00", reserva.getHoraInicio());
+	    String horaFinStr = String.format("%02d:00", reserva.getHoraFin());
 
 	    db.executeUpdate(sql, 
 	        reserva.getIdInstalacion(),
-	        reserva.getIdSocio(),
 	        reserva.getFecha(),
-	        reserva.getHoraInicio(),
-	        reserva.getHoraFin(),
-	        reserva.getEstadoPago()
+	        horaInicioStr,
+	        horaFinStr,
+	        reserva.getIdSocio(),
+	        reserva.getCosteReserva(),
+	        reserva.getEstadoPago(),
+	        reserva.getMetodoPago()
 	    );
 	}
 	
@@ -103,11 +128,11 @@ public class ReservaModel {
 		String resguardo = "--- RESGUARDO DE RESERVA ---" +
 				"\n Instalación ID: " + reserva.getIdInstalacion() +
 				"\n Para socio: " + reserva.getIdSocio() +
-				"\n Par la fecha: " + reserva.getFecha() +
+				"\n Para la fecha: " + reserva.getFecha() +
 				"\n Hora inicio: " + reserva.getHoraInicio() +
 				"\n Hora fin: " + reserva.getHoraFin() + 
-				"\n Precio reserva: " + getPrecioReserva(reserva) + 
-				"\n Pâgado: " + reserva.getEstadoPago();
+				"\n Precio reserva: " + reserva.getCosteReserva() + "€" + 
+				"\n Método pago: " + reserva.getMetodoPago();
 		
 		return resguardo;
 	}
