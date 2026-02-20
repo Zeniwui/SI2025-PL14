@@ -1,6 +1,9 @@
 package si.pl14.reservas;
 
-import java.awt.Color;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -19,6 +22,7 @@ public class ReservaController {
 	
 	private final int ID_SOCIO_ACTUAL = 1;
 	private final int HORAS_MAXIMAS_SEGUIDAS = 2;
+	private final int DIAS_MAXIMOS_ANTELACION = 30;
 	
 	public ReservaController(ReservaModel m, ReservaView v) {
 		model = m;
@@ -29,6 +33,17 @@ public class ReservaController {
 	
 	public void initView() {
 		this.getInstalaciones();
+		
+		Date hoy = new Date();
+	    
+	    Calendar cal = Calendar.getInstance();
+	    cal.setTime(hoy);
+	    cal.add(Calendar.DAY_OF_MONTH, DIAS_MAXIMOS_ANTELACION); 
+	    Date fechaMaxima = cal.getTime();
+	    
+	    view.getCalendarFecha().setMinSelectableDate(hoy);
+	    view.getCalendarFecha().setMaxSelectableDate(fechaMaxima);
+		
 		view.getFrame().setVisible(true);
 	}
 	
@@ -78,6 +93,12 @@ public class ReservaController {
 	private void realizarReserva() {
 		Date fechaDate = view.getCalendarFecha().getDate();
 		
+		LocalDate fechaSeleccionadaLocal = fechaDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate hoy = LocalDate.now();
+        
+        // Calculamos la diferencia en días para verificar que no se pueda reservar con mayor antelación que la descrita
+        long diasAntelacion = ChronoUnit.DAYS.between(hoy, fechaSeleccionadaLocal);
+		
 		String fechaSeleccionada = Util.dateToIsoString(fechaDate);
 		
 		InstalacionEntity instalacionSeleccionada = (InstalacionEntity) view.getCbInstalaciones().getSelectedItem();
@@ -100,6 +121,10 @@ public class ReservaController {
 		
 		if (!model.estaAlCorriente(ID_SOCIO_ACTUAL)) {
 			view.setTextoInformacion("SOCIO CON PAGOS PENDIENTES. NO PUEDE RESERVAR");
+		} else if (diasAntelacion < 0) {
+			view.setTextoInformacion("NO SE PUEDE RESERVAR EN FECHAS PASADAS");
+		} else if (diasAntelacion > DIAS_MAXIMOS_ANTELACION) {
+			view.setTextoInformacion("SÓLO SE PUEDE RESERVAR CON " + DIAS_MAXIMOS_ANTELACION + " DÍAS DE ANTELACIÓN");
 		} else if (horaFinSeleccionada <= horaInicioSeleccionada)  {
 			view.setTextoInformacion("LA HORA DE INICIO DEBE SER ANTERIOR A LA HORA DE FIN");
 		} else if ((horaFinSeleccionada - horaInicioSeleccionada) > HORAS_MAXIMAS_SEGUIDAS) {
