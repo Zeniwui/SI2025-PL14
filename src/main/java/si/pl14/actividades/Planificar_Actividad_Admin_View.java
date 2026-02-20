@@ -12,15 +12,15 @@ import java.awt.Font;
 public class Planificar_Actividad_Admin_View extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-	private JPanel contentPane;
-	private JTextField txtNombre;
-	private JTextField txtAforo;
-	private JTextField txtFechaInicio;
-	private JTextField txtFechaFin;
-	private JTextField txtCuotaSocio;
-	private JTextField txtCuotaNoSocio;
-	private JTable tableHorario;
-	private JTextArea txtrDescripcion;
+	private JPanel contentPane = new JPanel();
+	private JTextField txtNombre = new JTextField();
+	private JTextField txtAforo = new JTextField();
+	private JTextField txtFechaInicio = new JTextField();
+	private JTextField txtFechaFin = new JTextField();
+	private JTextField txtCuotaSocio = new JTextField();
+	private JTextField txtCuotaNoSocio = new JTextField();
+	private JTable tableHorario = new JTable();
+	private JTextArea txtrDescripcion = new JTextArea();
 	private JButton btnCrear = new JButton("CREAR"); //fuera del main para ver si ahora funciona
 
 	public static void main(String[] args) {
@@ -99,16 +99,16 @@ public class Planificar_Actividad_Admin_View extends JFrame {
 		lblPeriodo.setBounds(20, 250, 120, 14);
 		contentPane.add(lblPeriodo);
 
-		txtFechaInicio = new JTextField("10/06/24");
-		txtFechaInicio.setBounds(20, 270, 80, 25);
+		txtFechaInicio = new JTextField("AAAA-MM-DD");
+		txtFechaInicio.setBounds(20, 270, 120, 25);
 		contentPane.add(txtFechaInicio);
 
-		txtFechaFin = new JTextField("30/08/24");
-		txtFechaFin.setBounds(110, 270, 80, 25);
+		txtFechaFin = new JTextField("AAAA-MM-DD");
+		txtFechaFin.setBounds(20, 300, 120, 25);
 		contentPane.add(txtFechaFin);
 
 		JComboBox<String> cbPeriodoInscripcion = new JComboBox<>(new String[] { "Periodo de verano", "Periodo anual" });
-		cbPeriodoInscripcion.setBounds(20, 310, 170, 25);
+		cbPeriodoInscripcion.setBounds(20, 330, 170, 25);
 		contentPane.add(cbPeriodoInscripcion);
 
 		// --- TIPO ACTIVIDAD E INSTALACIÓN ---
