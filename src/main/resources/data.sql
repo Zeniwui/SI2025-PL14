@@ -1,10 +1,22 @@
 -- Aquí añadiremos datos iniciales a la base de datos
 
--- Este es el ejemplo inicial de la plantilla (ver como referencia)
-delete from carreras;
-insert into carreras(id,inicio,fin,fecha,descr) values 
-	(100,'2016-10-05','2016-10-25','2016-11-09','finalizada'),
-	(101,'2016-10-05','2016-10-25','2016-11-10','en fase 3'),
-	(102,'2016-11-05','2016-11-09','2016-11-20','en fase 2'),
-	(103,'2016-11-10','2016-11-15','2016-11-21','en fase 1'),
-	(104,'2016-11-11','2016-11-15','2016-11-22','antes inscripcion');
+-- Datos iniciales para Instalaciones
+INSERT INTO Instalaciones (nombre, tipo, coste_hora) VALUES ('Pista de Tenis 1', 'Exterior', 10.0);
+INSERT INTO Instalaciones (nombre, tipo, coste_hora) VALUES ('Piscina Climatizada', 'Interior', 15.5);
+INSERT INTO Instalaciones (nombre, tipo, coste_hora) VALUES ('Sala de Musculación', 'Interior', 5.0);
+INSERT INTO Instalaciones (nombre, tipo, coste_hora) VALUES ('Cancha de Baloncesto', 'Exterior', 8.0);
+
+-- Datos iniciales para Periodos de Inscripción
+-- Formato de fecha estándar: YYYY-MM-DD
+INSERT INTO PeriodosInscripcion (nombre, inicio_socios, fin_socios, fin_no_socios) 
+VALUES ('Temporada Verano', '2024-06-01', '2024-06-15', '2024-08-30');
+
+INSERT INTO PeriodosInscripcion (nombre, inicio_socios, fin_socios, fin_no_socios) 
+VALUES ('Temporada Invierno', '2024-10-01', '2024-10-15', '2024-12-20');
+
+-- Datos para Usuarios y Socios (opcional, para pruebas de reservas)
+INSERT INTO Usuarios (dni, nombre, apellidos, telefono, email) 
+VALUES ('12345678A', 'Juan', 'Pérez García', 600123456, 'juan.perez@email.com');
+
+INSERT INTO Socios (id_socio, dni, contrasena, estado_pagos) 
+VALUES (1, '12345678A', 'password123', 'Al Corriente');

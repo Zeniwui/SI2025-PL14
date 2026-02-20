@@ -1,4 +1,3 @@
--- Tabla base para todos los usuarios
 CREATE TABLE IF NOT EXISTS Usuarios (
     dni VARCHAR(20) PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
@@ -7,7 +6,6 @@ CREATE TABLE IF NOT EXISTS Usuarios (
     email VARCHAR(100) NOT NULL
 );
 
--- Tabla para los socios
 CREATE TABLE IF NOT EXISTS Socios (
     id_socio INTEGER PRIMARY KEY,
     dni VARCHAR(20) NOT NULL,
@@ -24,7 +22,6 @@ CREATE TABLE IF NOT EXISTS PeriodosInscripcion (
     fin_no_socios DATE NOT NULL
 );
 
--- Tabla para las instalaciones del centro
 CREATE TABLE IF NOT EXISTS Instalaciones (
     id_instalacion INTEGER PRIMARY KEY AUTOINCREMENT,
     nombre VARCHAR(50) NOT NULL,
@@ -32,28 +29,6 @@ CREATE TABLE IF NOT EXISTS Instalaciones (
     coste_hora REAL NOT NULL
 );
 
--- Tabla para reservas
-CREATE TABLE IF NOT EXISTS Reservas (
-    id_reserva INTEGER PRIMARY KEY AUTOINCREMENT,
-    id_instalacion INT NOT NULL,
-    fecha DATE NOT NULL,                -- Formato (dia-mes-año)
-    hora_inicio INT NOT NULL,           
-    hora_fin INT NOT NULL,              
-    
-    id_socio INT,                     
-    id_actividad INT,                   
-    
-    estado VARCHAR(20),
-    fecha_reserva DATETIME DEFAULT CURRENT_TIMESTAMP, -- Para el resguardo
-    
-    FOREIGN KEY (id_instalacion) REFERENCES Instalaciones(id_instalacion),
-    FOREIGN KEY (id_socio) REFERENCES Socios(id_socio),
-    FOREIGN KEY (id_actividad) REFERENCES Actividades(id_actividad),
-    
-    UNIQUE(id_instalacion, fecha, hora_inicio)
-);
-
--- Tabla para las actividades
 CREATE TABLE IF NOT EXISTS Actividades (
     id_actividad INTEGER PRIMARY KEY AUTOINCREMENT,
     nombre VARCHAR(100) NOT NULL,
@@ -70,3 +45,52 @@ CREATE TABLE IF NOT EXISTS Actividades (
     FOREIGN KEY (id_instalacion) REFERENCES Instalaciones(id_instalacion),
     FOREIGN KEY (id_periodo) REFERENCES PeriodosInscripcion(id_periodo)
 );
+
+CREATE TABLE IF NOT EXISTS Reservas (
+
+    id_reserva INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_instalacion INTEGER NOT NULL,
+    fecha DATE NOT NULL,				
+    hora_inicio TIME NOT NULL,
+    hora_fin TIME NOT NULL,
+
+
+    id_socio INTEGER NULL,
+    id_actividad INTEGER NULL,
+
+    coste_reserva DECIMAL(10, 2) DEFAULT 0,
+
+
+    estado_pago VARCHAR(20) DEFAULT 'Pendiente',
+    
+    metodo_pago VARCHAR(20),
+
+    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (id_instalacion) REFERENCES Instalaciones(id_instalacion),
+    
+    FOREIGN KEY (id_socio) REFERENCES Socios(id_socio) ON DELETE SET NULL,
+    
+    FOREIGN KEY (id_actividad) REFERENCES Actividades(id_actividad) ON DELETE CASCADE,
+
+    CONSTRAINT chk_horas_validas CHECK (hora_fin > hora_inicio),
+
+    CONSTRAINT chk_origen_unico CHECK (
+        (id_socio IS NOT NULL AND id_actividad IS NULL) OR  
+        (id_socio IS NULL AND id_actividad IS NOT NULL)	    
+    )
+);
+
+CREATE TABLE IF NOT EXISTS Horarios (
+    id_horario INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_actividad INTEGER NOT NULL,
+    dia_semana VARCHAR(15) NOT NULL, 
+    hora_inicio TIME NOT NULL,
+    hora_fin TIME NOT NULL,
+    
+    FOREIGN KEY (id_actividad) REFERENCES Actividades(id_actividad) ON DELETE CASCADE
+);
+
+
+
+
