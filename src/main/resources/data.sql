@@ -1,10 +1,43 @@
 -- Aquí añadiremos datos iniciales a la base de datos
 
--- Este es el ejemplo inicial de la plantilla (ver como referencia)
-delete from carreras;
-insert into carreras(id,inicio,fin,fecha,descr) values 
-	(100,'2016-10-05','2016-10-25','2016-11-09','finalizada'),
-	(101,'2016-10-05','2016-10-25','2016-11-10','en fase 3'),
-	(102,'2016-11-05','2016-11-09','2016-11-20','en fase 2'),
-	(103,'2016-11-10','2016-11-15','2016-11-21','en fase 1'),
-	(104,'2016-11-11','2016-11-15','2016-11-22','antes inscripcion');
+-- 1. Insertar Usuarios
+INSERT INTO Usuarios (dni, nombre, apellidos, telefono, email) VALUES 
+('12345678A', 'Juan', 'Pérez García', 600111222, 'juan.perez@email.com'),
+('87654321B', 'María', 'López Martínez', 600333444, 'maria.lopez@email.com'),
+('11223344C', 'Carlos', 'Ruiz Sánchez', 600555666, 'carlos.ruiz@email.com');
+
+-- 2. Insertar Socios
+INSERT INTO Socios (id_socio, dni, contrasena, estado_pagos) VALUES 
+(1, '12345678A', 'pass123', 'Al Corriente'),
+(2, '87654321B', 'securePass', 'Pendiente');
+
+-- 3. Insertar Instalaciones
+INSERT INTO Instalaciones (id_instalacion, nombre, tipo, coste_hora) VALUES 
+(1, 'Pista de Tenis 1', 'Exterior', 10.00),
+(2, 'Pista de Pádel 1', 'Cristal', 12.00),
+(3, 'Pista de Pádel 2', 'Muro', 10.00),
+(4, 'Sala Polivalente', 'Interior', 15.00);
+
+-- 4. Periodos y Actividades
+INSERT INTO PeriodosInscripcion (id_periodo, nombre, inicio_socios, fin_socios, fin_no_socios) VALUES 
+(1, 'Temporada 2026', '2026-01-01', '2026-12-31', '2026-12-31');
+
+-- Actividad: Yoga los Lunes de 09:00 a 10:00 en Sala Polivalente
+INSERT INTO Actividades (id_actividad, nombre, descripcion, id_instalacion, aforo, fecha_inicio, fecha_fin, precio_socio, precio_no_socio, id_periodo) VALUES 
+(1, 'Yoga Mañanas', 'Clase de Yoga', 4, 20, '2026-01-01', '2026-12-31', 20.00, 30.00, 1);
+
+INSERT INTO Horarios (id_actividad, dia_semana, hora_inicio, hora_fin) VALUES 
+(1, 'Lunes', '09:00', '10:00');
+
+-- 5. Insertar reservas (Para probar disponibilidad)
+-- María ha reservado la Pista de Tenis 1 de 10:00 a 11:00
+INSERT INTO Reservas (id_instalacion, fecha, hora_inicio, hora_fin, id_socio, id_actividad, coste_reserva, estado_pago, metodo_pago) VALUES 
+(1, '2026-02-20', '10:00', '11:00', 2, NULL, 10.00, 'Pagado', 'Tarjeta');
+
+-- María ha reservado Pista de Pádel 1 de 18:00 a 19:30
+INSERT INTO Reservas (id_instalacion, fecha, hora_inicio, hora_fin, id_socio, id_actividad, coste_reserva, estado_pago, metodo_pago) VALUES 
+(2, '2026-02-20', '18:00', '19:30', 2, NULL, 18.00, 'Pendiente', 'Cuota_Mensual');
+
+-- Reserva automática por la clase de Yoga el Lunes 23/02/2026 de 09:00 a 10:00
+INSERT INTO Reservas (id_instalacion, fecha, hora_inicio, hora_fin, id_socio, id_actividad, estado_pago, metodo_pago) VALUES 
+(4, '2026-02-23', '09:00', '10:00', NULL, 1, NULL, NULL);

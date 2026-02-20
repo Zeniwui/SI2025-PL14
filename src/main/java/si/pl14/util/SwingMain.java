@@ -1,14 +1,16 @@
 package si.pl14.util;
 
 import java.awt.EventQueue;
-import javax.swing.JFrame;
-
-import si.pl14.ejemplos.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import javax.swing.JFrame;
+
+import si.pl14.reservas.ReservaController;
+import si.pl14.reservas.ReservaModel;
+import si.pl14.reservas.ReservaView;
 
 /**
  * Punto de entrada principal que incluye botones para la ejecucion de las pantallas 
@@ -56,8 +58,13 @@ public class SwingMain {
 		JButton btnEjecutarTkrun = new JButton("Ejecutar giis.demo.tkrun");
 		btnEjecutarTkrun.addActionListener(new ActionListener() { //NOSONAR codigo autogenerado
 			public void actionPerformed(ActionEvent e) {
-				CarrerasController controller=new CarrerasController(new CarrerasModel(), new CarrerasView());
+				
+				/*CarrerasController controller=new CarrerasController(new CarrerasModel(), new CarrerasView());
 				controller.initController();
+				*/
+				
+				ReservaController controllerReservas = new ReservaController(new ReservaModel(), new ReservaView());
+				controllerReservas.initController();
 			}
 		});
 		frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
@@ -82,6 +89,20 @@ public class SwingMain {
 			}
 		});
 		frame.getContentPane().add(btnCargarDatosIniciales);
+		
+		// --- BLOQUE PARA VISUALIZAR LOS DATOS DE LAS TABLAS ---
+        
+        JButton btnDebugBD = new JButton("Consultar Tablas (Debug)");
+        btnDebugBD.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // Abre la ventana de visualización
+                DatabaseViewer viewer = new DatabaseViewer();
+                viewer.setVisible(true);
+            }
+        });
+        frame.getContentPane().add(btnDebugBD);
+        
+        // ----------------------------------
 	}
 
 	public JFrame getFrame() { return this.frame; }
