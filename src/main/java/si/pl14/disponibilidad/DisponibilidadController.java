@@ -70,6 +70,14 @@ public class DisponibilidadController {
     }
 
     private void accionSeleccionarDia(LocalDate fecha) {
+    	//Añadida la restriccion que se pedia en RedKanban de no poder ver dentro de más  de 30 días
+    	LocalDate limite = LocalDate.now().plusDays(30);
+    	/* Me he dado cuenta que es código inutil pero lo dejo por si acaso
+    	 * if (fecha.isAfter(limite)) {
+    	    throw new si.pl14.util.ApplicationException(
+    	        "No se puede consultar la disponibilidad de las instalaciones con más de 30 días de antelación.");
+    	}
+    	*/
         this.fechaSeleccionada = fecha;
         mostrarCalendario();
         cargarHorario(fecha);
