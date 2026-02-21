@@ -43,8 +43,8 @@ public class DisponibilidadView {
 
     public DisponibilidadView() {
         frame = new JDialog((Frame) null, "Disponibilidad de Instalación para los Socios", true);
-        frame.setSize(860, 760);
-        frame.setMinimumSize(new Dimension(720, 620));
+        frame.setSize(900, 920);
+        frame.setMinimumSize(new Dimension(760, 780));
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
@@ -307,7 +307,7 @@ public class DisponibilidadView {
         }
 
         JScrollPane scrollH = new JScrollPane(tabla);
-        scrollH.setPreferredSize(new Dimension(720, 300));
+        scrollH.setPreferredSize(new Dimension(720, 420));
         scrollH.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
         scrollH.getVerticalScrollBar().setUnitIncrement(16);
 
