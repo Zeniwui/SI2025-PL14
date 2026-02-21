@@ -7,7 +7,9 @@ import javax.swing.border.*;
 import java.awt.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Collections;
 
@@ -438,6 +440,186 @@ public class DisponibilidadView {
 
             tabMisReservas.add(lblCab,   BorderLayout.NORTH);
             tabMisReservas.add(scrollR,  BorderLayout.CENTER);
+        }
+
+        tabMisReservas.revalidate();
+        tabMisReservas.repaint();
+    }
+
+    /**
+     * Muestra TODAS las reservas del socio en la instalacion durante los próximos 30 días.
+     */
+    public void mostrarMisReservasPeriodo(String nombreInstalacion, LocalDate desde, LocalDate hasta,
+                                          List<Object[]> reservas) {
+        tabMisReservas.removeAll();
+
+        DateTimeFormatter fmtFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        // Cabecera
+        JPanel cab = new JPanel(new BorderLayout());
+        cab.setBackground(Color.WHITE);
+        cab.setBorder(new EmptyBorder(8, 8, 4, 8));
+
+        JLabel lblTit = new JLabel("Mis Reservas — " + nombreInstalacion);
+        lblTit.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        lblTit.setForeground(COLOR_PRIMARIO);
+
+        JLabel lblPeriodo = new JLabel("Período: " + desde.format(fmtFecha) + "  →  " + hasta.format(fmtFecha));
+        lblPeriodo.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+        lblPeriodo.setForeground(new Color(80, 80, 80));
+
+        cab.add(lblTit,     BorderLayout.NORTH);
+        cab.add(lblPeriodo, BorderLayout.SOUTH);
+
+        if (reservas.isEmpty()) {
+            // Panel vacío informativo
+            JPanel panelVacio = new JPanel(new GridBagLayout());
+            panelVacio.setBackground(new Color(235, 244, 255));
+
+            JPanel tarjeta = new JPanel();
+            tarjeta.setLayout(new BoxLayout(tarjeta, BoxLayout.Y_AXIS));
+            tarjeta.setBackground(Color.WHITE);
+            tarjeta.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(30, 100, 180), 2, true),
+                new EmptyBorder(24, 40, 24, 40)
+            ));
+
+            JLabel icono = new JLabel("📅", SwingConstants.CENTER);
+            icono.setFont(new Font("Segoe UI", Font.PLAIN, 36));
+            icono.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            JLabel msg = new JLabel("No tienes reservas en los próximos 30 días.", SwingConstants.CENTER);
+            msg.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+            msg.setForeground(new Color(80, 80, 80));
+            msg.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            tarjeta.add(icono);
+            tarjeta.add(Box.createVerticalStrut(10));
+            tarjeta.add(msg);
+            panelVacio.add(tarjeta);
+
+            tabMisReservas.add(cab,        BorderLayout.NORTH);
+            tabMisReservas.add(panelVacio, BorderLayout.CENTER);
+
+        } else {
+            // Tabla de reservas
+            JPanel tabla = new JPanel(new GridBagLayout());
+            tabla.setBackground(Color.WHITE);
+            tabla.setBorder(new EmptyBorder(4, 8, 8, 8));
+            GridBagConstraints gc = new GridBagConstraints();
+            gc.fill    = GridBagConstraints.HORIZONTAL;
+            gc.insets  = new Insets(2, 4, 2, 4);
+
+            // Cabeceras
+            String[] headers = {"Fecha", "Hora inicio", "Hora fin", "Duración", "Estado pago", "Método pago", "Coste"};
+            for (int col = 0; col < headers.length; col++) {
+                gc.gridx = col; gc.gridy = 0;
+                gc.weightx = (col == 0 || col == 4 || col == 5) ? 1.0 : 0;
+                JLabel h = new JLabel(headers[col]);
+                h.setFont(new Font("Segoe UI", Font.BOLD, 12));
+                h.setForeground(COLOR_PRIMARIO);
+                h.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, COLOR_PRIMARIO));
+                tabla.add(h, gc);
+            }
+
+            DateTimeFormatter fmtFechaTabla = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+            for (int fila = 0; fila < reservas.size(); fila++) {
+                Object[] r = reservas.get(fila);
+                String fecha    = r[0] != null ? r[0].toString() : "--";
+                String hIniStr  = r[1] != null ? r[1].toString() : "--";
+                String hFinStr  = r[2] != null ? r[2].toString() : "--";
+                String estado   = r[3] != null ? r[3].toString() : "-";
+                String metodo   = r[4] != null ? r[4].toString() : "-";
+                String coste    = r[5] != null ? String.format("%.2f €", ((Number)r[5]).doubleValue()) : "0.00 €";
+
+                // Calcular duración en horas
+                String duracion = "--";
+                try {
+                    int hIni = Integer.parseInt(hIniStr.substring(0, 2));
+                    int hFin = Integer.parseInt(hFinStr.substring(0, 2));
+                    duracion = (hFin - hIni) + "h";
+                } catch (Exception ignored) {}
+
+                // Formatear fecha a dd/MM/yyyy si viene como yyyy-MM-dd
+                String fechaFmt = fecha;
+                try {
+                    fechaFmt = LocalDate.parse(fecha).format(fmtFechaTabla);
+                } catch (Exception ignored) {}
+
+                // Nombre del día de la semana
+                String diaSemana = "";
+                try {
+                    diaSemana = LocalDate.parse(fecha)
+                        .getDayOfWeek().getDisplayName(TextStyle.FULL, new Locale("es", "ES"));
+                    diaSemana = Character.toUpperCase(diaSemana.charAt(0)) + diaSemana.substring(1);
+                } catch (Exception ignored) {}
+
+                String[] celdas = { fechaFmt + (diaSemana.isEmpty() ? "" : "\n(" + diaSemana + ")"),
+                                    hIniStr, hFinStr, duracion, estado, metodo, coste };
+
+                Color bgFila = fila % 2 == 0 ? new Color(235, 244, 255) : Color.WHITE;
+
+                for (int col = 0; col < celdas.length; col++) {
+                    gc.gridx = col; gc.gridy = fila + 1;
+                    gc.weightx = (col == 0 || col == 4 || col == 5) ? 1.0 : 0;
+
+                    JPanel celda = new JPanel(new BorderLayout(0, 0));
+                    celda.setBackground(bgFila);
+                    celda.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(210, 225, 245)));
+
+                    if (col == 0 && !diaSemana.isEmpty()) {
+                        // Fecha en dos líneas
+                        JPanel doble = new JPanel();
+                        doble.setLayout(new BoxLayout(doble, BoxLayout.Y_AXIS));
+                        doble.setBackground(bgFila);
+                        doble.setBorder(new EmptyBorder(3, 6, 3, 6));
+                        JLabel lFecha = new JLabel(fechaFmt);
+                        lFecha.setFont(new Font("Segoe UI", Font.BOLD, 12));
+                        lFecha.setForeground(new Color(0, 70, 160));
+                        JLabel lDia = new JLabel(diaSemana);
+                        lDia.setFont(new Font("Segoe UI", Font.ITALIC, 11));
+                        lDia.setForeground(new Color(100, 100, 100));
+                        doble.add(lFecha);
+                        doble.add(lDia);
+                        celda.add(doble, BorderLayout.CENTER);
+                    } else {
+                        JLabel lbl = new JLabel(celdas[col]);
+                        lbl.setFont(FONT_NORMAL);
+                        lbl.setForeground(new Color(0, 70, 160));
+                        lbl.setBorder(new EmptyBorder(3, 6, 3, 6));
+                        celda.add(lbl, BorderLayout.CENTER);
+                    }
+                    tabla.add(celda, gc);
+                }
+            }
+
+            // Fila de total
+            double totalCoste = reservas.stream()
+                .filter(r -> r[5] != null)
+                .mapToDouble(r -> ((Number) r[5]).doubleValue())
+                .sum();
+            gc.gridx = 0; gc.gridy = reservas.size() + 1;
+            gc.gridwidth = 6; gc.weightx = 1.0;
+            JLabel lblTotal = new JLabel("Total (" + reservas.size() + " reserva" + (reservas.size() != 1 ? "s" : "") + ")");
+            lblTotal.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            lblTotal.setForeground(COLOR_PRIMARIO);
+            lblTotal.setBorder(new EmptyBorder(4, 6, 4, 6));
+            tabla.add(lblTotal, gc);
+
+            gc.gridx = 6; gc.gridwidth = 1; gc.weightx = 0;
+            JLabel lblTotalCoste = new JLabel(String.format("%.2f €", totalCoste));
+            lblTotalCoste.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            lblTotalCoste.setForeground(new Color(0, 70, 160));
+            lblTotalCoste.setBorder(new EmptyBorder(4, 6, 4, 6));
+            tabla.add(lblTotalCoste, gc);
+
+            JScrollPane scrollR = new JScrollPane(tabla);
+            scrollR.setBorder(BorderFactory.createLineBorder(new Color(173, 216, 255)));
+            scrollR.getVerticalScrollBar().setUnitIncrement(16);
+
+            tabMisReservas.add(cab,     BorderLayout.NORTH);
+            tabMisReservas.add(scrollR, BorderLayout.CENTER);
         }
 
         tabMisReservas.revalidate();

@@ -48,6 +48,7 @@ public class DisponibilidadController {
         fechaSeleccionada = null;
         view.ocultarHorario();
         mostrarCalendario();
+        cargarReservasPeriodo(item);
     }
 
     private void mostrarCalendario() {
@@ -70,17 +71,22 @@ public class DisponibilidadController {
     }
 
     private void accionSeleccionarDia(LocalDate fecha) {
-    	//Añadida la restriccion que se pedia en RedKanban de no poder ver dentro de más  de 30 días
-    	LocalDate limite = LocalDate.now().plusDays(30);
-    	/* Me he dado cuenta que es código inutil pero lo dejo por si acaso
-    	 * if (fecha.isAfter(limite)) {
-    	    throw new si.pl14.util.ApplicationException(
-    	        "No se puede consultar la disponibilidad de las instalaciones con más de 30 días de antelación.");
-    	}
-    	*/
+        LocalDate limite = LocalDate.now().plusDays(30);
+        if (fecha.isAfter(limite)) {
+            throw new si.pl14.util.ApplicationException(
+                "No se puede consultar la disponibilidad de las instalaciones con más de 30 días de antelación.");
+        }
         this.fechaSeleccionada = fecha;
         mostrarCalendario();
         cargarHorario(fecha);
+    }
+
+    private void cargarReservasPeriodo(InstalacionItem item) {
+        LocalDate hoy    = LocalDate.now();
+        LocalDate limite = hoy.plusDays(30);
+        List<Object[]> reservas = model.getMisReservasPeriodo(
+            item.getId(), hoy.toString(), limite.toString());
+        view.mostrarMisReservasPeriodo(item.getNombre(), hoy, limite, reservas);
     }
 
     /**
@@ -94,14 +100,9 @@ public class DisponibilidadController {
 
         String fechaIso = fecha.toString();   // "yyyy-MM-dd"
 
-        // Pestana Disponibilidad
+        // Pestaña de la Disponibilidad
         Map<Integer, List<String>> ocupaciones =
             model.getOcupacionesPorHora(item.getId(), fechaIso);
         view.mostrarHorario(fecha, item.getNombre(), ocupaciones);
-
-        // Pestana Mis Reservas
-        List<Object[]> misReservas =
-            model.getMisReservasDelDia(item.getId(), fechaIso);
-        view.mostrarMisReservas(fecha, item.getNombre(), misReservas);
     }
 }

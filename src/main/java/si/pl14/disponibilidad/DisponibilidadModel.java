@@ -153,6 +153,23 @@ public class DisponibilidadModel {
         return db.executeQueryArray(sql, idInstalacion, fechaIso, ID_SOCIO_ACTUAL);
     }
 
+    /**
+     * Devuelve TODAS las reservas del socio actual en una instalacion
+     * dentro del rango [fechaDesde, fechaHasta] (formato "yyyy-MM-dd").
+     * Columnas: fecha(str), hora_inicio(str), hora_fin(str),
+     *           estado_pago, metodo_pago, coste_reserva
+     */
+    public List<Object[]> getMisReservasPeriodo(int idInstalacion, String fechaDesde, String fechaHasta) {
+        String sql =
+            "SELECT fecha, hora_inicio, hora_fin, " +
+            "       estado_pago, metodo_pago, coste_reserva " +
+            "FROM Reservas " +
+            "WHERE id_instalacion = ? AND id_socio = ? " +
+            "  AND fecha >= ? AND fecha <= ? " +
+            "ORDER BY fecha, hora_inicio";
+        return db.executeQueryArray(sql, idInstalacion, ID_SOCIO_ACTUAL, fechaDesde, fechaHasta);
+    }
+
     private int toInt(Object obj) {
         if (obj == null) return 0;
         if (obj instanceof Number) return ((Number) obj).intValue();
