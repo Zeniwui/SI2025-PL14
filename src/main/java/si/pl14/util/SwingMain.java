@@ -3,6 +3,7 @@ package si.pl14.util;
 import java.awt.EventQueue;
 import javax.swing.JFrame;
 
+import si.pl14.disponibilidad.DisponibilidadInstalacionFrame;
 import si.pl14.ejemplos.*;
 
 import javax.swing.BoxLayout;
@@ -50,7 +51,7 @@ public class SwingMain {
 	private void initialize() {
 		frame = new JFrame();
 		frame.setTitle("Main");
-		frame.setBounds(0, 0, 287, 185);
+		frame.setBounds(0, 0, 320, 230);
 		frame.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 		
 		JButton btnEjecutarTkrun = new JButton("Ejecutar giis.demo.tkrun");
@@ -63,6 +64,15 @@ public class SwingMain {
 		frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
 		frame.getContentPane().add(btnEjecutarTkrun);
 		
+		// ── NUEVA PANTALLA: Disponibilidad de Instalación ─────────────────
+		JButton btnDisponibilidad = new JButton("Disponibilidad de Instalación");
+		btnDisponibilidad.addActionListener(new ActionListener() { //NOSONAR codigo autogenerado
+			public void actionPerformed(ActionEvent e) {
+				DisponibilidadInstalacionFrame.launch();
+			}
+		});
+		frame.getContentPane().add(btnDisponibilidad);
+		// ──────────────────────────────────────────────────────────────────
 			
 		JButton btnInicializarBaseDeDatos = new JButton("Inicializar Base de Datos en Blanco");
 		btnInicializarBaseDeDatos.addActionListener(new ActionListener() { //NOSONAR codigo autogenerado
