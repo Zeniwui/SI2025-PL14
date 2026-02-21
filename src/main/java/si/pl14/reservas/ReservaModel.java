@@ -3,6 +3,7 @@ package si.pl14.reservas;
 import java.util.List;
 
 import si.pl14.model.InstalacionEntity;
+import si.pl14.model.ReservaDTO;
 import si.pl14.model.ReservaEntity;
 import si.pl14.model.SocioEntity;
 import si.pl14.util.ApplicationException;
@@ -22,6 +23,7 @@ public class ReservaModel {
                 "nombre, tipo, " +
                 "coste_hora AS costeHora " + 
                 "FROM Instalaciones";
+		
 		
 		return db.executeQueryPojo(InstalacionEntity.class, sql);
 	}
@@ -63,6 +65,28 @@ public class ReservaModel {
                 "WHERE fecha = ? AND id_instalacion = ?";
 		
 		return db.executeQueryPojo(ReservaEntity.class, sql, fecha, idInstalacion);
+	}
+	
+	/*
+	 * Obtiene las reservas que hay en un perido establecido
+	 */
+	public List<ReservaDTO> getReservasEnPeriodo(int idInstalacion, String fechaInicio, String fechaFin) {
+		String sql = "SELECT " +
+				"r.fecha AS fecha, " +
+				"CAST(strftime('%H', r.hora_inicio) AS INTEGER) AS horaInicio, " +
+				"CAST(strftime('%H', r.hora_fin) AS INTEGER) AS horaFin, " +
+				"i.nombre AS nombreInstalacion, " +
+				"(u.nombre || ' ' || u.apellidos) AS nombreSocio, " +
+				"a.nombre AS nombreActividad " +
+				"FROM Reservas r " +
+				"INNER JOIN Instalaciones i ON r.id_instalacion = i.id_instalacion " +
+				"LEFT JOIN Socios s ON r.id_socio = s.id_socio " +
+				"LEFT JOIN Usuarios u ON s.dni = u.dni " +
+				"LEFT JOIN Actividades a ON r.id_actividad = a.id_actividad " +
+				"WHERE r.id_instalacion = ? " +
+				"AND r.fecha >= ? AND r.fecha <= ?";
+		
+		return db.executeQueryPojo(ReservaDTO.class, sql, idInstalacion, fechaInicio, fechaFin);
 	}
 	
 	/*
