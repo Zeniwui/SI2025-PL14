@@ -1,3 +1,6 @@
+DROP TABLE IF EXISTS Instalaciones;
+DROP TABLE IF EXISTS PeriodosInscripcion;
+
 CREATE TABLE IF NOT EXISTS Usuarios (
     dni VARCHAR(20) PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,

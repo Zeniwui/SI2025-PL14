@@ -1,3 +1,10 @@
+DELETE FROM Horarios;
+DELETE FROM Reservas;
+DELETE FROM Actividades;
+DELETE FROM Instalaciones;
+DELETE FROM PeriodosInscripcion;
+DELETE FROM Socios;
+DELETE FROM Usuarios;
 -- Aquí añadiremos datos iniciales a la base de datos
 
 -- Datos iniciales para Instalaciones
