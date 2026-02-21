@@ -324,6 +324,108 @@ public class DisponibilidadView {
     public void ocultarHorario()    { panelHorario.setVisible(false); }
     public void ocultarCalendario() { panelCalendario.setVisible(false); }
 
+    /**
+     * Rellena la pestana "Mis Reservas" con el listado de reservas del socio actual
+     * para la fecha e instalacion seleccionadas.
+     * Cada fila del listado recibido contiene:
+     *   [0] horaInicioInt, [1] horaFinInt, [2] hora_inicio(str), [3] hora_fin(str),
+     *   [4] estado_pago,   [5] metodo_pago, [6] coste_reserva
+     */
+    public void mostrarMisReservas(java.time.LocalDate fecha, String nombreInstalacion,
+                                    java.util.List<Object[]> reservas) {
+        tabMisReservas.removeAll();
+
+        // Cabecera
+        JLabel lblCab = new JLabel(fecha.format(FMT) + "  —  " + nombreInstalacion);
+        lblCab.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        lblCab.setForeground(COLOR_PRIMARIO);
+        lblCab.setBorder(new EmptyBorder(8, 8, 6, 8));
+
+        if (reservas.isEmpty()) {
+            // Sin reservas: mostrar mensaje informativo
+            JPanel sinReservas = new JPanel(new GridBagLayout());
+            sinReservas.setBackground(new Color(235, 244, 255));
+
+            JPanel tarjeta = new JPanel();
+            tarjeta.setLayout(new BoxLayout(tarjeta, BoxLayout.Y_AXIS));
+            tarjeta.setBackground(Color.WHITE);
+            tarjeta.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(30, 100, 180), 2, true),
+                new EmptyBorder(20, 36, 20, 36)
+            ));
+            JLabel ico = new JLabel("📭", SwingConstants.CENTER);
+            ico.setFont(new Font("Segoe UI", Font.PLAIN, 36));
+            ico.setAlignmentX(Component.CENTER_ALIGNMENT);
+            JLabel msg = new JLabel("No tienes reservas en esta instalacion para este dia.", SwingConstants.CENTER);
+            msg.setFont(new Font("Segoe UI", Font.ITALIC, 13));
+            msg.setForeground(Color.GRAY);
+            msg.setAlignmentX(Component.CENTER_ALIGNMENT);
+            tarjeta.add(ico);
+            tarjeta.add(Box.createVerticalStrut(8));
+            tarjeta.add(msg);
+            sinReservas.add(tarjeta);
+
+            tabMisReservas.add(lblCab,       BorderLayout.NORTH);
+            tabMisReservas.add(sinReservas,  BorderLayout.CENTER);
+
+        } else {
+            // Tabla de reservas propias
+            JPanel tabla = new JPanel(new GridBagLayout());
+            tabla.setBackground(Color.WHITE);
+            tabla.setBorder(new EmptyBorder(4, 8, 8, 8));
+            GridBagConstraints gc = new GridBagConstraints();
+            gc.fill = GridBagConstraints.HORIZONTAL;
+            gc.insets = new Insets(3, 6, 3, 6);
+
+            // Cabeceras de columna
+            String[] headers = {"Hora", "Duración", "Estado pago", "Método pago", "Coste"};
+            for (int col = 0; col < headers.length; col++) {
+                gc.gridx = col; gc.gridy = 0; gc.weightx = col == 0 ? 0 : 1.0;
+                JLabel h = new JLabel(headers[col]);
+                h.setFont(new Font("Segoe UI", Font.BOLD, 12));
+                h.setForeground(COLOR_PRIMARIO);
+                h.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, COLOR_PRIMARIO));
+                tabla.add(h, gc);
+            }
+
+            // Filas de reservas
+            for (int fila = 0; fila < reservas.size(); fila++) {
+                Object[] r = reservas.get(fila);
+                String horaInicio = r[2] != null ? r[2].toString() : "--";
+                String horaFin    = r[3] != null ? r[3].toString() : "--";
+                int    hIni       = r[0] instanceof Number ? ((Number)r[0]).intValue() : 0;
+                int    hFin       = r[1] instanceof Number ? ((Number)r[1]).intValue() : 0;
+                String estado     = r[4] != null ? r[4].toString() : "-";
+                String metodo     = r[5] != null ? r[5].toString() : "-";
+                String coste      = r[6] != null ? String.format("%.2f €", ((Number)r[6]).doubleValue()) : "0.00 €";
+                String duracion   = (hFin - hIni) + "h";
+
+                String[] celdas = { horaInicio + " – " + horaFin, duracion, estado, metodo, coste };
+                for (int col = 0; col < celdas.length; col++) {
+                    gc.gridx = col; gc.gridy = fila + 1; gc.weightx = col == 0 ? 0 : 1.0;
+                    JPanel celda = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 3));
+                    celda.setBackground(fila % 2 == 0 ? new Color(235, 244, 255) : Color.WHITE);
+                    celda.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(210, 225, 245)));
+                    JLabel lbl = new JLabel(celdas[col]);
+                    lbl.setFont(FONT_NORMAL);
+                    lbl.setForeground(new Color(0, 70, 160));
+                    celda.add(lbl);
+                    tabla.add(celda, gc);
+                }
+            }
+
+            JScrollPane scrollR = new JScrollPane(tabla);
+            scrollR.setBorder(BorderFactory.createLineBorder(new Color(173, 216, 255)));
+            scrollR.getVerticalScrollBar().setUnitIncrement(16);
+
+            tabMisReservas.add(lblCab,   BorderLayout.NORTH);
+            tabMisReservas.add(scrollR,  BorderLayout.CENTER);
+        }
+
+        tabMisReservas.revalidate();
+        tabMisReservas.repaint();
+    }
+
     private JPanel crearPanelMisReservasVacio() {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(new Color(235, 244, 255));
@@ -390,13 +492,19 @@ public class DisponibilidadView {
             l.setForeground(new Color(0, 128, 0));
             p.add(l);
         } else {
-            boolean hayReserva = eventos.stream().anyMatch(e -> e.startsWith("[R]"));
-            p.setBackground(hayReserva ? COLOR_RESERVADA : COLOR_OCUPADO);
+            // Prioridad de color: mis reservas [M] > otros socios [R] > actividades [A]
+            boolean hayMia   = eventos.stream().anyMatch(e -> e.startsWith("[M]"));
+            boolean hayOtros = eventos.stream().anyMatch(e -> e.startsWith("[R]"));
+            if (hayMia)        p.setBackground(COLOR_MIS_RESERVAS);
+            else if (hayOtros) p.setBackground(COLOR_RESERVADA);
+            else               p.setBackground(COLOR_OCUPADO);
             for (int i = 0; i < eventos.size(); i++) {
                 String ev    = eventos.get(i);
+                boolean esMia = ev.startsWith("[M]");
                 String texto = ev.replaceFirst("^\\[.\\] ", "");
-                JLabel l = new JLabel(texto + "  ✗");
+                JLabel l = new JLabel(texto + (esMia ? "  ✓" : "  ✗"));
                 l.setFont(FONT_NORMAL);
+                l.setForeground(esMia ? new Color(0, 70, 160) : Color.BLACK);
                 p.add(l);
                 if (i < eventos.size() - 1) p.add(new JLabel(" | "));
             }
