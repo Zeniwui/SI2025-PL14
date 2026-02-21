@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.sql.DriverManager;
+import java.sql.Connection;
+import java.sql.Statement;
 
 /**
  * Modelo para la pantalla de disponibilidad de instalaciones.
@@ -28,14 +31,87 @@ public class DisponibilidadModel {
     public static final int ID_SOCIO_ACTUAL = 0;
 
     public DisponibilidadModel() {
-        // Migración automática: añadir columna es_evento_social si no existe
-        // (necesario cuando el .db fue creado con el schema antiguo)
+        ensureDatabase();
+    }
+
+    /**
+     * Garantiza que la base de datos tiene todos los datos necesarios.
+     * Reconstruye desde cero si el socio 0 no existe (indica carga incompleta).
+     */
+    private void ensureDatabase() {
+        // Comprobar si el socio 0 existe
+        try {
+            List<Object[]> rows = db.executeQueryArray(
+                "SELECT id_socio FROM Socios WHERE id_socio = 0");
+            if (!rows.isEmpty()) {
+                // BD ya correcta — solo migrar columna si falta
+                migrateEventoSocial();
+                return;
+            }
+        } catch (Exception ignored) {}
+
+        // Socio 0 no existe: reconstruir BD completa statement a statement
+        rebuildDatabase();
+    }
+
+    private void migrateEventoSocial() {
         try {
             db.executeUpdate(
                 "ALTER TABLE Actividades ADD COLUMN es_evento_social INTEGER NOT NULL DEFAULT 0");
-        } catch (Exception ignored) {
-            // La columna ya existe — ignorar el error es seguro
+        } catch (Exception ignored) {}
+    }
+
+    /**
+     * Reconstruye schema + datos ejecutando cada sentencia individualmente
+     * con foreign_keys desactivado para evitar que un fallo aborte todo el batch.
+     */
+    private void rebuildDatabase() {
+        java.io.File schemaFile = new java.io.File("src/main/resources/schema.sql");
+        java.io.File dataFile   = new java.io.File("src/main/resources/data.sql");
+        if (!schemaFile.exists() || !dataFile.exists()) return;
+
+        try (java.sql.Connection con = java.sql.DriverManager.getConnection(
+                new Database().getUrl());
+             java.sql.Statement stmt = con.createStatement()) {
+
+            con.setAutoCommit(false);
+            stmt.execute("PRAGMA foreign_keys = OFF");
+
+            // Schema
+            for (String sql : parseSql(schemaFile)) {
+                try { stmt.execute(sql); } catch (Exception ignored) {}
+            }
+
+            // Datos
+            for (String sql : parseSql(dataFile)) {
+                try { stmt.execute(sql); } catch (Exception ignored) {}
+            }
+
+            stmt.execute("PRAGMA foreign_keys = ON");
+            con.commit();
+
+        } catch (Exception e) {
+            throw new si.pl14.util.ApplicationException("Error reconstruyendo BD: " + e.getMessage());
         }
+    }
+
+    private java.util.List<String> parseSql(java.io.File file) throws Exception {
+        java.util.List<String> result = new java.util.ArrayList<>();
+        java.util.List<String> lines  = java.nio.file.Files.readAllLines(file.toPath());
+        StringBuilder current = new StringBuilder();
+        for (String line : lines) {
+            String trimmed = line.trim();
+            if (trimmed.isEmpty() || trimmed.startsWith("--")) continue;
+            // Strip inline comments
+            int commentIdx = trimmed.indexOf("--");
+            if (commentIdx > 0) trimmed = trimmed.substring(0, commentIdx).trim();
+            current.append(trimmed).append(" ");
+            if (trimmed.endsWith(";")) {
+                result.add(current.toString().trim());
+                current = new StringBuilder();
+            }
+        }
+        return result;
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -202,7 +278,6 @@ public class DisponibilidadModel {
      *   [4] duracion_horas (int), [5] estado_pago, [6] metodo_pago,
      *   [7] coste_reserva, [8] fecha_creacion
      */
-    
     public List<Object[]> getMisReservasPeriodo(int idInstalacion, String fechaDesde, String fechaHasta) {
         String sql =
             "SELECT id_reserva, " +

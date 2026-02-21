@@ -292,6 +292,8 @@ insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_socio, cos
 	(4, date('now','+14 day'), '20:00', '21:00', 0,  3.0, 'Pendiente', 'Tarjeta'),
 	(5, date('now','+14 day'), '19:00', '20:00', 0, 12.0, 'Pendiente', 'Efectivo'),
 	(6, date('now','+14 day'), '08:00', '09:00', 0,  8.0, 'Pagado',    'Tarjeta'),
+	(5, date('now','+9 day'), '19:00', '20:00', 0, 12.0, 'Pendiente', 'Efectivo'),
+	(4, date('now','+24 day'), '11:00', '13:00', 0,  9.0, 'Pagado',    'Tarjeta'),
 	-- Socio 1 — Carlos
 	(1, date('now','+14 day'), '10:00', '11:00', 1, 10.0, 'Pagado',    'Tarjeta'),
 	(4, date('now','+14 day'), '09:00', '10:00', 1,  3.0, 'Pagado',    'Tarjeta'),
