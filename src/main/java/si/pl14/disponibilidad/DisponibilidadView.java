@@ -20,6 +20,7 @@ public class DisponibilidadView {
     static final Color COLOR_OCUPADO      = new Color(255, 180, 180);
     static final Color COLOR_RESERVADA    = new Color(255, 220, 150);
     static final Color COLOR_MIS_RESERVAS = new Color(173, 216, 255);
+    static final Color COLOR_CERRADO      = new Color(220, 220, 220);
     static final Font  FONT_TITULO        = new Font("Segoe UI", Font.BOLD, 15);
     static final Font  FONT_NORMAL        = new Font("Segoe UI", Font.PLAIN, 13);
 
@@ -227,11 +228,34 @@ public class DisponibilidadView {
 
     public void mostrarHorario(LocalDate fecha, String nombreInstalacion,
                                 Map<Integer, List<String>> ocupaciones) {
+
+        // ── Calcular horario de apertura según día de la semana ───────────
+        // Lun-Vie (1-5): 08:00 - 21:00  |  Sáb-Dom (6-7): 09:00 - 15:00
+        boolean esFinDeSemana = fecha.getDayOfWeek().getValue() >= 6;
+        int horaApertura = esFinDeSemana ? 9  : 8;
+        int horaCierre   = esFinDeSemana ? 15 : 21;
+        String horarioTexto = esFinDeSemana
+            ? "Sábado/Domingo: 09:00 – 15:00"
+            : "Lunes–Viernes: 08:00 – 21:00";
+
+        // ── Cabecera de fecha + horario de apertura ───────────────────────
+        JPanel cabHorario = new JPanel(new BorderLayout());
+        cabHorario.setBackground(Color.WHITE);
+
         JLabel lblFecha = new JLabel(fecha.format(FMT) + "  —  " + nombreInstalacion);
         lblFecha.setFont(new Font("Segoe UI", Font.BOLD, 14));
         lblFecha.setForeground(COLOR_PRIMARIO);
-        lblFecha.setBorder(new EmptyBorder(8, 8, 6, 8));
+        lblFecha.setBorder(new EmptyBorder(8, 8, 2, 8));
 
+        JLabel lblHorario = new JLabel("🕐  Horario de apertura: " + horarioTexto);
+        lblHorario.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+        lblHorario.setForeground(new Color(80, 80, 80));
+        lblHorario.setBorder(new EmptyBorder(0, 8, 6, 8));
+
+        cabHorario.add(lblFecha,   BorderLayout.NORTH);
+        cabHorario.add(lblHorario, BorderLayout.SOUTH);
+
+        // ── Tabla de horas ────────────────────────────────────────────────
         JPanel tabla = new JPanel(new GridBagLayout());
         tabla.setBackground(Color.WHITE);
         tabla.setBorder(new EmptyBorder(0, 8, 8, 8));
@@ -239,16 +263,26 @@ public class DisponibilidadView {
         gc.fill = GridBagConstraints.HORIZONTAL;
         gc.insets = new Insets(2, 4, 2, 4);
 
+        int fila = 0;
         for (int hora = 0; hora <= 23; hora++) {
-            gc.gridx = 0; gc.gridy = hora; gc.weightx = 0;
+            boolean abierto = hora >= horaApertura && hora < horaCierre;
+
+            gc.gridx = 0; gc.gridy = fila; gc.weightx = 0;
             JLabel lblHora = new JLabel(String.format("%02d:00", hora));
             lblHora.setFont(new Font("Monospaced", Font.BOLD, 13));
             lblHora.setPreferredSize(new Dimension(65, 28));
+            // Hora en gris si el centro está cerrado
+            lblHora.setForeground(abierto ? Color.BLACK : new Color(180, 180, 180));
             tabla.add(lblHora, gc);
 
             gc.gridx = 1; gc.weightx = 1.0;
-            List<String> eventos = ocupaciones.getOrDefault(hora, Collections.emptyList());
-            tabla.add(crearCeldaHora(eventos), gc);
+            if (abierto) {
+                List<String> eventos = ocupaciones.getOrDefault(hora, Collections.emptyList());
+                tabla.add(crearCeldaHora(eventos), gc);
+            } else {
+                tabla.add(crearCeldaCerrada(), gc);
+            }
+            fila++;
         }
 
         JScrollPane scrollH = new JScrollPane(tabla);
@@ -256,17 +290,26 @@ public class DisponibilidadView {
         scrollH.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
         scrollH.getVerticalScrollBar().setUnitIncrement(16);
 
+        // Scroll automático a la hora de apertura
+        SwingUtilities.invokeLater(() -> {
+            int posY = horaApertura * 34; // aprox. altura de cada fila
+            scrollH.getVerticalScrollBar().setValue(posY);
+        });
+
+        // ── Leyenda ───────────────────────────────────────────────────────
         JPanel leyenda = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 2));
         leyenda.setBackground(Color.WHITE);
         leyenda.add(chip(COLOR_LIBRE,        "Libre ✓"));
         leyenda.add(chip(COLOR_OCUPADO,      "Actividad ✗"));
         leyenda.add(chip(COLOR_RESERVADA,    "Reserva de socio ✗"));
         leyenda.add(chip(COLOR_MIS_RESERVAS, "Mis reservas"));
+        leyenda.add(chip(COLOR_CERRADO,      "Centro cerrado"));
 
+        // ── Rellena la pestaña Disponibilidad ─────────────────────────────
         tabDisponibilidad.removeAll();
-        tabDisponibilidad.add(lblFecha, BorderLayout.NORTH);
-        tabDisponibilidad.add(scrollH,  BorderLayout.CENTER);
-        tabDisponibilidad.add(leyenda,  BorderLayout.SOUTH);
+        tabDisponibilidad.add(cabHorario, BorderLayout.NORTH);
+        tabDisponibilidad.add(scrollH,    BorderLayout.CENTER);
+        tabDisponibilidad.add(leyenda,    BorderLayout.SOUTH);
         tabDisponibilidad.revalidate();
         tabDisponibilidad.repaint();
 
@@ -324,6 +367,17 @@ public class DisponibilidadView {
 
         panel.add(tarjeta);
         return panel;
+    }
+
+    private JPanel crearCeldaCerrada() {
+        JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 2));
+        p.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
+        p.setBackground(COLOR_CERRADO);
+        JLabel l = new JLabel("Centro cerrado");
+        l.setFont(FONT_NORMAL);
+        l.setForeground(new Color(150, 150, 150));
+        p.add(l);
+        return p;
     }
 
     private JPanel crearCeldaHora(List<String> eventos) {
