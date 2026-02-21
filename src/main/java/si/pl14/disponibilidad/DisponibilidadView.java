@@ -218,9 +218,27 @@ public class DisponibilidadView {
         leyenda.add(chip(COLOR_SELECCIONADO,       "Seleccionado"));
         leyenda.add(chip(new Color(230, 230, 230), "Fuera de rango"));
 
+        JPanel aviso = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 2));
+        aviso.setBackground(new Color(255, 248, 220));
+        aviso.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(220, 180, 60), 1, true),
+            new EmptyBorder(3, 8, 3, 8)
+        ));
+        JLabel lblAviso = new JLabel("⚠  Solo se puede consultar la disponibilidad con un máximo de 30 días de antelación.");
+        lblAviso.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+        lblAviso.setForeground(new Color(140, 90, 0));
+        aviso.add(lblAviso);
+
+        JPanel sur = new JPanel();
+        sur.setLayout(new BoxLayout(sur, BoxLayout.Y_AXIS));
+        sur.setBackground(Color.WHITE);
+        sur.add(leyenda);
+        sur.add(Box.createVerticalStrut(4));
+        sur.add(aviso);
+
         panelCalendario.add(navMes,  BorderLayout.NORTH);
         panelCalendario.add(rejilla, BorderLayout.CENTER);
-        panelCalendario.add(leyenda, BorderLayout.SOUTH);
+        panelCalendario.add(sur,     BorderLayout.SOUTH);
         panelCalendario.setVisible(true);
         panelCalendario.revalidate();
         panelCalendario.repaint();
