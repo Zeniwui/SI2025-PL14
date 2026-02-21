@@ -3,160 +3,278 @@ package si.pl14.actividades;
 import java.awt.EventQueue;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-//import javax.swing.border.TitledBorder;
-import javax.swing.table.DefaultTableModel;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Font;
+import java.util.List;
 
-// View
 public class Planificar_Actividad_Admin_View extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-	private JPanel contentPane = new JPanel();
+	private JPanel contentPane;
 	private JTextField txtNombre = new JTextField();
-	private JTextField txtAforo = new JTextField();
-	private JTextField txtFechaInicio = new JTextField();
-	private JTextField txtFechaFin = new JTextField();
-	private JTextField txtCuotaSocio = new JTextField();
-	private JTextField txtCuotaNoSocio = new JTextField();
-	private JTable tableHorario = new JTable();
+	private JTextField txtAforo = new JTextField("20");
+	private JTextField txtFechaInicio = new JTextField("2026-03-01");
+	private JTextField txtFechaFin = new JTextField("2026-06-30");
+	private JTextField txtCuotaSocio = new JTextField("15.50");
+	private JTextField txtCuotaNoSocio = new JTextField("25.00");
+	private JTextField txtHoraInicio = new JTextField("10:00");
+	private JTextField txtHoraFin = new JTextField("11:30");
+	private JLabel lblInfoFechas = new JLabel("Fechas: Seleccione un periodo");
+	private JComboBox<String> cbDiaSemana = new JComboBox<>(
+			new String[] { "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo" });
+	private JButton btnCrearHorario = new JButton("AÑADIR HORARIO");
+	private DefaultListModel<String> listModelHorarios = new DefaultListModel<>();
+	private JList<String> listHorariosVista = new JList<>(listModelHorarios);
 	private JTextArea txtrDescripcion = new JTextArea();
-	private JButton btnCrear = new JButton("CREAR"); //fuera del main para ver si ahora funciona
+	private JButton btnCrear = new JButton("CREAR ACTIVIDAD");
+	private JLabel lblDescripcion = new JLabel("Descripción:");
+	private JScrollPane scrollDesc = new JScrollPane(txtrDescripcion);
+	private JLabel lblFechas = new JLabel("Periodo de tiempo:");
+	private JLabel lblPeriodo = new JLabel("Periodo Inscripción:");
+	private JComboBox<String> cbPeriodoInscripcion = new JComboBox<>(
+			new String[] { "Periodo de verano", "Periodo anual" });
+	private JLabel lblNombre = new JLabel("Nombre de la Actividad:");
+	private JPanel panelHorarios = new JPanel();
+	private JLabel lblHorario = new JLabel("Planificar Horarios");
+	private JLabel lblHIn = new JLabel("Desde:");
+	private JLabel lblHOut = new JLabel("Hasta:");
+	private JLabel lblInstalacion = new JLabel("Instalación:");
+	private JScrollPane scrollHorarios = new JScrollPane(listHorariosVista);
+	private JComboBox<String> cbInstalacion = new JComboBox<>(
+			new String[] { "Pista Interior 1", "Pista Exterior", "Piscina" });
+	private JLabel lblAforo = new JLabel("Aforo Máximo:");
+	private JLabel lblTipo = new JLabel("Categoría:");
+	private JComboBox<String> cbTipo = new JComboBox<>(new String[] { "Deporte", "Conferencia", "Competición" });
+	private JPanel panelPrecios = new JPanel();
+	private JLabel lblSocio = new JLabel("Socio:");
+	private JLabel lblNoSocio = new JLabel("No Socio:");
+	private JSeparator separator = new JSeparator();
 
 	public static void main(String[] args) {
-		/*
-		 * EventQueue.invokeLater(() -> { try { Planificar_Actividad_Admin_View frame =
-		 * new Planificar_Actividad_Admin_View(); frame.setVisible(true); } catch
-		 * (Exception e) { e.printStackTrace(); } });
-		 */
+		try {
+			for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+				if ("Nimbus".equals(info.getName())) {
+					UIManager.setLookAndFeel(info.getClassName());
+					break;
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-		// Cambio el main a ver si ahora funciona
-
-		// MVC
 		Planificar_Actividad_Admin_View vista = new Planificar_Actividad_Admin_View();
 		Planificar_Actividad_Model modelo = new Planificar_Actividad_Model();
 		Planificar_Actividad_Controller controlador = new Planificar_Actividad_Controller(modelo, vista);
 
-		// inicio controlador con el metofo
 		controlador.initController();
-
-		// hago visible aunque sea redundante
 		vista.setVisible(true);
 	}
 
 	public Planificar_Actividad_Admin_View() {
-		setTitle("Planificar Actividad - Admin");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 700, 600);
-		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		setContentPane(contentPane);
-		contentPane.setLayout(null); // Layout absoluto para replicar el dibujo
+		// Paleta de colores
+		Color azul = new Color(40, 60, 85);
+		Color fondo_gris = new Color(240, 242, 245);
+		Color verde_oscuro = new Color(46, 82, 58);
+		Color morado_seccion = new Color(242, 240, 250);
+		Color morado_texto = new Color(90, 70, 160);
+		Color morado_scroll = new Color(215, 210, 240);
 
-		// --- SECCIÓN IZQUIERDA: NOMBRE Y DESCRIPCIÓN ---
-		JLabel lblNombre = new JLabel("Nombre:");
-		lblNombre.setBounds(20, 20, 80, 14);
+		// Fuentes
+		Font mainFont = new Font("Segoe UI", Font.PLAIN, 13);
+		Font boldFont = new Font("Segoe UI", Font.BOLD, 13);
+		Font titleFont = new Font("Segoe UI", Font.BOLD, 15);
+
+		setTitle("Planificar Actividad - Administración");
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 780, 580);
+
+		contentPane = new JPanel();
+		contentPane.setBackground(fondo_gris);
+		contentPane.setBorder(new EmptyBorder(15, 15, 15, 15));
+		setContentPane(contentPane);
+		contentPane.setLayout(null);
+
+		// --- COLUMNA 1: DATOS BÁSICOS ---
+		lblNombre.setFont(boldFont);
+		lblNombre.setForeground(azul);
+		lblNombre.setBounds(30, 20, 200, 20);
 		contentPane.add(lblNombre);
 
-		txtNombre = new JTextField();
-		txtNombre.setBounds(20, 40, 250, 25);
+		txtNombre.setFont(mainFont);
+		txtNombre.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)),
+				BorderFactory.createEmptyBorder(2, 5, 2, 5)));
+		txtNombre.setBounds(30, 45, 240, 30);
 		contentPane.add(txtNombre);
 
-		JLabel lblDescripcion = new JLabel("Descripción:");
-		lblDescripcion.setBounds(20, 75, 100, 14);
+		lblDescripcion.setFont(boldFont);
+		lblDescripcion.setForeground(azul);
+		lblDescripcion.setBounds(30, 90, 100, 20);
 		contentPane.add(lblDescripcion);
 
-		JTextArea txtrDescripcion = new JTextArea();
-		txtrDescripcion.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-		txtrDescripcion.setBounds(20, 95, 250, 100);
-		contentPane.add(txtrDescripcion);
+		txtrDescripcion.setFont(mainFont);
+		txtrDescripcion.setLineWrap(true);
+		txtrDescripcion.setWrapStyleWord(true);
 
-		// --- SECCIÓN DERECHA: HORARIO (GRID) ---
-		JLabel lblHorario = new JLabel("Horario:");
-		lblHorario.setBounds(300, 20, 80, 14);
-		contentPane.add(lblHorario);
+		scrollDesc.setBounds(30, 115, 240, 80);
+		contentPane.add(scrollDesc);
 
-		String[] columnas = { "L", "M", "X", "J", "V", "S", "D" };
-		Object[][] datos = new Object[5][7]; // Filas de horas
-		tableHorario = new JTable(new DefaultTableModel(datos, columnas));
-		tableHorario.setRowHeight(25);
-		JScrollPane scrollPaneTable = new JScrollPane(tableHorario);
-		scrollPaneTable.setBounds(300, 40, 350, 155);
-		contentPane.add(scrollPaneTable);
+		lblFechas.setFont(boldFont);
+		lblFechas.setForeground(azul);
+		lblFechas.setBounds(30, 210, 200, 20);
+		contentPane.add(lblFechas);
 
-		// --- AFORO ---
-		JLabel lblAforo = new JLabel("Aforo:");
-		lblAforo.setBounds(300, 210, 60, 14);
-		contentPane.add(lblAforo);
-
-		txtAforo = new JTextField();
-		txtAforo.setText("15");
-		txtAforo.setBounds(350, 205, 50, 25);
-		contentPane.add(txtAforo);
-
-		// --- PERIODO DE TIEMPO ---
-		JLabel lblPeriodo = new JLabel("Periodo tiempo:");
-		lblPeriodo.setBounds(20, 250, 120, 14);
-		contentPane.add(lblPeriodo);
-
-		txtFechaInicio = new JTextField("AAAA-MM-DD");
-		txtFechaInicio.setBounds(20, 270, 120, 25);
+		txtFechaInicio.setBounds(30, 235, 110, 30);
+		txtFechaFin.setBounds(160, 235, 110, 30);
 		contentPane.add(txtFechaInicio);
-
-		txtFechaFin = new JTextField("AAAA-MM-DD");
-		txtFechaFin.setBounds(20, 300, 120, 25);
 		contentPane.add(txtFechaFin);
 
-		JComboBox<String> cbPeriodoInscripcion = new JComboBox<>(new String[] { "Periodo de verano", "Periodo anual" });
-		cbPeriodoInscripcion.setBounds(20, 330, 170, 25);
+		lblPeriodo.setFont(boldFont);
+		lblPeriodo.setForeground(azul);
+		lblPeriodo.setBounds(30, 280, 150, 20);
+		contentPane.add(lblPeriodo);
+
+		cbPeriodoInscripcion.setBounds(30, 305, 240, 30);
 		contentPane.add(cbPeriodoInscripcion);
 
-		// --- TIPO ACTIVIDAD E INSTALACIÓN ---
-		JLabel lblTipo = new JLabel("Tipo Actividad:");
-		lblTipo.setBounds(220, 250, 120, 14);
-		contentPane.add(lblTipo);
+		lblInfoFechas.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+		lblInfoFechas.setForeground(azul);
+		lblInfoFechas.setBounds(30, 340, 450, 20);
+		contentPane.add(lblInfoFechas);
 
-		JComboBox<String> cbTipo = new JComboBox<>(new String[] { "Deporte", "Conferencia", "Competición" });
-		cbTipo.setBounds(220, 270, 150, 25);
-		contentPane.add(cbTipo);
+		// --- COLUMNA 2: HORARIOS (BLOQUE DIFERENCIADO) ---
+		panelHorarios.setBackground(morado_seccion);
+		panelHorarios.setBorder(BorderFactory.createLineBorder(morado_texto, 1));
+		panelHorarios.setBounds(290, 15, 230, 255);
+		panelHorarios.setLayout(null);
+		contentPane.add(panelHorarios);
 
-		JLabel lblInstalacion = new JLabel("Instalación:");
-		lblInstalacion.setBounds(220, 310, 120, 14);
+		lblHorario.setFont(titleFont);
+		lblHorario.setForeground(morado_texto);
+		lblHorario.setBounds(15, 10, 180, 20);
+		panelHorarios.add(lblHorario);
+
+		cbDiaSemana.setBackground(Color.WHITE);
+		cbDiaSemana.setBounds(15, 35, 200, 30);
+		panelHorarios.add(cbDiaSemana);
+
+		lblHIn.setFont(boldFont);
+		lblHIn.setForeground(morado_texto);
+		lblHIn.setBounds(15, 75, 80, 20);
+		panelHorarios.add(lblHIn);
+
+		txtHoraInicio.setBounds(15, 95, 90, 30);
+		panelHorarios.add(txtHoraInicio);
+
+		lblHOut.setFont(boldFont);
+		lblHOut.setForeground(morado_texto);
+		lblHOut.setBounds(125, 75, 80, 20);
+		panelHorarios.add(lblHOut);
+
+		txtHoraFin.setBounds(125, 95, 90, 30);
+		panelHorarios.add(txtHoraFin);
+
+		btnCrearHorario.setBackground(morado_texto);
+		btnCrearHorario.setForeground(Color.WHITE);
+		btnCrearHorario.setFont(boldFont);
+		btnCrearHorario.setBounds(15, 135, 200, 35);
+		panelHorarios.add(btnCrearHorario);
+
+		listHorariosVista.setBackground(morado_scroll);
+		listHorariosVista.setForeground(morado_texto);
+		listHorariosVista.setSelectionBackground(morado_texto);
+		listHorariosVista.setSelectionForeground(Color.WHITE); // cuando pinchas se pone blanco
+
+		scrollHorarios.setBorder(BorderFactory.createLineBorder(morado_texto));
+		scrollHorarios.getViewport().setBackground(morado_scroll); 
+		scrollHorarios.setBounds(15, 180, 200, 65);
+		panelHorarios.add(scrollHorarios);
+
+		// fuera del cuadro morado
+		lblInstalacion.setFont(boldFont);
+		lblInstalacion.setForeground(azul);
+		lblInstalacion.setBounds(305, 280, 120, 20);
 		contentPane.add(lblInstalacion);
 
-		JComboBox<String> cbInstalacion = new JComboBox<>(
-				new String[] { "Pista Interior 1", "Pista Exterior", "Piscina" });
-		cbInstalacion.setBounds(220, 330, 150, 25);
+		cbInstalacion.setBackground(Color.WHITE);
+		cbInstalacion.setBounds(305, 305, 200, 30);
 		contentPane.add(cbInstalacion);
 
-		// --- CUOTAS MENSUALES ---
-		JLabel lblCuotaSocio = new JLabel("Cuota mensual SOCIO:");
-		lblCuotaSocio.setBounds(400, 250, 150, 14);
-		contentPane.add(lblCuotaSocio);
+		// --- COLUMNA 3: AFORO Y COSTES ---
+		lblAforo.setFont(boldFont);
+		lblAforo.setForeground(azul);
+		lblAforo.setBounds(550, 20, 120, 20);
+		contentPane.add(lblAforo);
 
-		txtCuotaSocio = new JTextField("10.00");
-		txtCuotaSocio.setBounds(400, 270, 60, 25);
-		contentPane.add(txtCuotaSocio);
-		contentPane.add(new JLabel("€/mes")).setBounds(470, 270, 50, 25);
+		txtAforo.setBounds(550, 45, 100, 30);
+		contentPane.add(txtAforo);
 
-		JLabel lblCuotaNoSocio = new JLabel("Cuota NO SOCIO:");
-		lblCuotaNoSocio.setBounds(400, 310, 150, 14);
-		contentPane.add(lblCuotaNoSocio);
+		lblTipo.setFont(boldFont);
+		lblTipo.setForeground(azul);
+		lblTipo.setBounds(550, 90, 100, 20);
+		contentPane.add(lblTipo);
 
-		txtCuotaNoSocio = new JTextField("10.00");
-		txtCuotaNoSocio.setBounds(400, 330, 60, 25);
-		contentPane.add(txtCuotaNoSocio);
-		contentPane.add(new JLabel("€/mes")).setBounds(470, 330, 50, 25);
+		cbTipo.setBounds(550, 115, 150, 30);
+		contentPane.add(cbTipo);
 
-		// --- BOTÓN CREAR ---
-		//JButton btnCrear = new JButton("CREAR");
-		btnCrear.setFont(new Font("Tahoma", Font.BOLD, 14));
-		btnCrear.setBackground(new Color(200, 200, 200));
-		btnCrear.setBounds(250, 450, 150, 40);
+		panelPrecios.setBackground(new Color(228, 243, 233));
+		panelPrecios.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(verde_oscuro),
+				"Tarifas (€)", 0, 0, boldFont, verde_oscuro));
+		panelPrecios.setBounds(540, 190, 180, 145);
+		panelPrecios.setLayout(null);
+		contentPane.add(panelPrecios);
+
+		lblSocio.setForeground(verde_oscuro);
+		lblSocio.setBounds(15, 25, 100, 20);
+		panelPrecios.add(lblSocio);
+
+		lblNoSocio.setForeground(verde_oscuro);
+		lblNoSocio.setBounds(15, 80, 100, 20);
+		panelPrecios.add(lblNoSocio);
+
+		txtCuotaSocio.setBounds(15, 45, 140, 25);
+		txtCuotaNoSocio.setBounds(15, 100, 140, 25);
+		panelPrecios.add(txtCuotaSocio);
+		panelPrecios.add(txtCuotaNoSocio);
+
+		separator.setBounds(30, 370, 700, 2);
+		contentPane.add(separator);
+
+		btnCrear.setBackground(morado_texto);
+		btnCrear.setForeground(Color.WHITE);
+		btnCrear.setBounds(280, 400, 220, 55);
 		contentPane.add(btnCrear);
 	}
 
-	// Métodos
+	// Métodos para rellenar los combos desde el controlador
+	public void cargarPeriodos(List<Object[]> periodos) {
+		cbPeriodoInscripcion.removeAllItems();
+		for (Object[] p : periodos) {
+			// Guardamos "ID - Nombre"
+			cbPeriodoInscripcion.addItem(p[0] + " - " + p[1]);
+		}
+	}
+
+	public void cargarInstalaciones(List<Object[]> instalaciones) {
+		cbInstalacion.removeAllItems();
+		for (Object[] i : instalaciones) {
+			cbInstalacion.addItem(i[0] + " - " + i[1]);
+		}
+	}
+
+	// Métodos para obtener el ID seleccionado (sacando el número del String "1 -
+	// Piscina")
+	public int getIdPeriodoSeleccionado() {
+		String item = (String) cbPeriodoInscripcion.getSelectedItem();
+		return (item == null) ? 0 : Integer.parseInt(item.split(" - ")[0]);
+	}
+
+	public int getIdInstalacionSeleccionada() {
+		String item = (String) cbInstalacion.getSelectedItem();
+		return (item == null) ? 0 : Integer.parseInt(item.split(" - ")[0]);
+	}
+
+	// --- GETTERS ---
 	public String getNombre() {
 		return txtNombre.getText();
 	}
@@ -185,7 +303,43 @@ public class Planificar_Actividad_Admin_View extends JFrame {
 		return txtCuotaNoSocio.getText();
 	}
 
+	public String getDiaSemana() {
+		return (String) cbDiaSemana.getSelectedItem();
+	}
+
+	public String getHoraInicio() {
+		return txtHoraInicio.getText();
+	}
+
+	public String getHoraFin() {
+		return txtHoraFin.getText();
+	}
+
 	public JButton getBtnCrear() {
 		return btnCrear;
+	}
+
+	public JButton getBtnCrearHorario() {
+		return btnCrearHorario;
+	}
+
+	public DefaultListModel<String> getListModelHorarios() {
+		return listModelHorarios;
+	}
+
+	public void setTextoFechas(String texto) {
+		lblInfoFechas.setText(texto);
+	}
+
+	public JComboBox<String> getCbPeriodoInscripcion() {
+		return cbPeriodoInscripcion;
+	}
+
+	public JTextField getTxtFechaInicio() {
+		return txtFechaInicio;
+	}
+
+	public JTextField getTxtFechaFin() {
+		return txtFechaFin;
 	}
 }
