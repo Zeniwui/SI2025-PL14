@@ -594,19 +594,30 @@ public class DisponibilidadView {
                 .filter(r -> r[5] != null)
                 .mapToDouble(r -> ((Number) r[5]).doubleValue())
                 .sum();
+
+            gc.gridwidth = 1; gc.weightx = 0; // reset
             gc.gridx = 0; gc.gridy = reservas.size() + 1;
             gc.gridwidth = 6; gc.weightx = 1.0;
-            JLabel lblTotal = new JLabel("Total (" + reservas.size() + " reserva" + (reservas.size() != 1 ? "s" : "") + ")");
+            gc.fill = GridBagConstraints.HORIZONTAL;
+            JLabel lblTotal = new JLabel("  Total (" + reservas.size() + " reserva" + (reservas.size() != 1 ? "s" : "") + ")");
             lblTotal.setFont(new Font("Segoe UI", Font.BOLD, 12));
             lblTotal.setForeground(COLOR_PRIMARIO);
-            lblTotal.setBorder(new EmptyBorder(4, 6, 4, 6));
+            lblTotal.setOpaque(true);
+            lblTotal.setBackground(new Color(220, 235, 255));
+            lblTotal.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(2, 0, 0, 0, COLOR_PRIMARIO),
+                new EmptyBorder(4, 6, 4, 6)));
             tabla.add(lblTotal, gc);
 
             gc.gridx = 6; gc.gridwidth = 1; gc.weightx = 0;
-            JLabel lblTotalCoste = new JLabel(String.format("%.2f €", totalCoste));
+            JLabel lblTotalCoste = new JLabel(String.format("  %.2f €", totalCoste));
             lblTotalCoste.setFont(new Font("Segoe UI", Font.BOLD, 12));
             lblTotalCoste.setForeground(new Color(0, 70, 160));
-            lblTotalCoste.setBorder(new EmptyBorder(4, 6, 4, 6));
+            lblTotalCoste.setOpaque(true);
+            lblTotalCoste.setBackground(new Color(220, 235, 255));
+            lblTotalCoste.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(2, 0, 0, 0, COLOR_PRIMARIO),
+                new EmptyBorder(4, 6, 4, 6)));
             tabla.add(lblTotalCoste, gc);
 
             JScrollPane scrollR = new JScrollPane(tabla);
