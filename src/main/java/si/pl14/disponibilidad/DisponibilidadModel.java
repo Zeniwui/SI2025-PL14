@@ -27,6 +27,17 @@ public class DisponibilidadModel {
      */
     public static final int ID_SOCIO_ACTUAL = 0;
 
+    public DisponibilidadModel() {
+        // Migración automática: añadir columna es_evento_social si no existe
+        // (necesario cuando el .db fue creado con el schema antiguo)
+        try {
+            db.executeUpdate(
+                "ALTER TABLE Actividades ADD COLUMN es_evento_social INTEGER NOT NULL DEFAULT 0");
+        } catch (Exception ignored) {
+            // La columna ya existe — ignorar el error es seguro
+        }
+    }
+
     // ─────────────────────────────────────────────────────────────────────────
     // Instalaciones
     // ─────────────────────────────────────────────────────────────────────────
