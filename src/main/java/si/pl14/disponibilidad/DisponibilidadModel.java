@@ -197,13 +197,23 @@ public class DisponibilidadModel {
     /**
      * Devuelve TODAS las reservas del socio actual en una instalacion
      * dentro del rango [fechaDesde, fechaHasta] (formato "yyyy-MM-dd").
-     * Columnas: fecha(str), hora_inicio(str), hora_fin(str),
-     *           estado_pago, metodo_pago, coste_reserva
+     * Columnas devueltas (en orden):
+     *   [0] id_reserva, [1] fecha, [2] hora_inicio, [3] hora_fin,
+     *   [4] duracion_horas (int), [5] estado_pago, [6] metodo_pago,
+     *   [7] coste_reserva, [8] fecha_creacion
      */
+    
     public List<Object[]> getMisReservasPeriodo(int idInstalacion, String fechaDesde, String fechaHasta) {
         String sql =
-            "SELECT fecha, hora_inicio, hora_fin, " +
-            "       estado_pago, metodo_pago, coste_reserva " +
+            "SELECT id_reserva, " +
+            "       fecha, " +
+            "       hora_inicio, " +
+            "       hora_fin, " +
+            "       (CAST(strftime('%H', hora_fin) AS INTEGER) - CAST(strftime('%H', hora_inicio) AS INTEGER)) AS duracion_horas, " +
+            "       estado_pago, " +
+            "       COALESCE(metodo_pago, '—') AS metodo_pago, " +
+            "       coste_reserva, " +
+            "       strftime('%d/%m/%Y %H:%M', fecha_creacion) AS fecha_creacion " +
             "FROM Reservas " +
             "WHERE id_instalacion = ? AND id_socio = ? " +
             "  AND fecha >= ? AND fecha <= ? " +
