@@ -1,6 +1,18 @@
--- Aquí irán las tablas para la base de datos
+-- Tablas del proyecto pl14
+-- IMPORTANTE: no usar comentarios inline (-- texto) al final de una linea dentro de un CREATE TABLE
+-- El parser de DbUtil.executeScript solo ignora lineas que EMPIEZAN por --
 
--- Tabla base para todos los usuarios
+drop table Horarios;
+drop table Reservas;
+drop table Actividades;
+drop table PeriodosInscripcion;
+drop table Instalaciones;
+drop table Socios;
+drop table Usuarios;
+drop table Carreras;
+
+create table Carreras (id int primary key not null, inicio date not null, fin date not null, fecha date not null, descr varchar(32), check(inicio<=fin), check(fin<fecha));
+
 CREATE TABLE IF NOT EXISTS Usuarios (
     dni VARCHAR(20) PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
@@ -9,7 +21,6 @@ CREATE TABLE IF NOT EXISTS Usuarios (
     email VARCHAR(100) NOT NULL
 );
 
--- Tabla para los socios
 CREATE TABLE IF NOT EXISTS Socios (
     id_socio INTEGER PRIMARY KEY,
     dni VARCHAR(20) NOT NULL,
@@ -20,13 +31,12 @@ CREATE TABLE IF NOT EXISTS Socios (
 
 CREATE TABLE IF NOT EXISTS PeriodosInscripcion (
     id_periodo INTEGER PRIMARY KEY AUTOINCREMENT,
-    nombre VARCHAR(50) NOT NULL,        
+    nombre VARCHAR(50) NOT NULL,
     inicio_socios DATE NOT NULL,
     fin_socios DATE NOT NULL,
     fin_no_socios DATE NOT NULL
 );
 
--- Tabla para las instalaciones del centro
 CREATE TABLE IF NOT EXISTS Instalaciones (
     id_instalacion INTEGER PRIMARY KEY AUTOINCREMENT,
     nombre VARCHAR(50) NOT NULL,
@@ -34,72 +44,48 @@ CREATE TABLE IF NOT EXISTS Instalaciones (
     coste_hora REAL NOT NULL
 );
 
--- Tabla para las actividades
 CREATE TABLE IF NOT EXISTS Actividades (
     id_actividad INTEGER PRIMARY KEY AUTOINCREMENT,
     nombre VARCHAR(100) NOT NULL,
     descripcion TEXT,
     id_instalacion INT NOT NULL,
-    aforo INT NOT NULL,                
+    aforo INT NOT NULL,
     fecha_inicio DATE,
     fecha_fin DATE,
     precio_socio DECIMAL(6,2),
     precio_no_socio DECIMAL(6,2),
-    
     id_periodo INT,
-    
     FOREIGN KEY (id_instalacion) REFERENCES Instalaciones(id_instalacion),
     FOREIGN KEY (id_periodo) REFERENCES PeriodosInscripcion(id_periodo)
 );
 
--- Tabla para reservas (tanto reservas de socios, como las reservas de instalaciones debidas a actividades)
 CREATE TABLE IF NOT EXISTS Reservas (
-
     id_reserva INTEGER PRIMARY KEY AUTOINCREMENT,
     id_instalacion INTEGER NOT NULL,
-    fecha DATE NOT NULL,				-- Formato (dd/mm/aaaa)
+    fecha DATE NOT NULL,
     hora_inicio TIME NOT NULL,
     hora_fin TIME NOT NULL,
-
-    -- Si la reserva es para un socio, se llena id_socio
-    -- Si es reserva es por una actividad, se llena id_actividad
     id_socio INTEGER NULL,
     id_actividad INTEGER NULL,
-
     coste_reserva DECIMAL(10, 2) DEFAULT 0,
-
-    -- Estado del pago: 'Pendiente', 'Pagado', 'Anulado', 'Cuota'
     estado_pago VARCHAR(20) DEFAULT 'Pendiente',
-    
-    -- Forma de pago: 'Tarjeta', 'Efectivo', 'Cuota_Mensual'
     metodo_pago VARCHAR(20),
-
-    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP, -- Para el resguardo
-
+    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_instalacion) REFERENCES Instalaciones(id_instalacion),
-    
-    -- Si eliminamos un socio, mantenemos el histórico poniendo NULL
     FOREIGN KEY (id_socio) REFERENCES Socios(id_socio) ON DELETE SET NULL,
-    
-    -- Si eliminamos una actividad, borramos sus reservas futuras automáticamente.
     FOREIGN KEY (id_actividad) REFERENCES Actividades(id_actividad) ON DELETE CASCADE,
-
-    -- No se puede terminar antes de empezar
     CONSTRAINT chk_horas_validas CHECK (hora_fin > hora_inicio),
-
-    -- Garantiza que una reserva no pueda pertenecer a un socio y a una actividad a la vez.
     CONSTRAINT chk_origen_unico CHECK (
-        (id_socio IS NOT NULL AND id_actividad IS NULL) OR  -- Caso: Reserva de Socio
-        (id_socio IS NULL AND id_actividad IS NOT NULL)	    -- Caso: Clase de Actividad
+        (id_socio IS NOT NULL AND id_actividad IS NULL) OR
+        (id_socio IS NULL AND id_actividad IS NOT NULL)
     )
 );
 
 CREATE TABLE IF NOT EXISTS Horarios (
     id_horario INTEGER PRIMARY KEY AUTOINCREMENT,
     id_actividad INTEGER NOT NULL,
-    dia_semana VARCHAR(15) NOT NULL, -- 'Lunes', 'Martes'...
+    dia_semana VARCHAR(15) NOT NULL,
     hora_inicio TIME NOT NULL,
     hora_fin TIME NOT NULL,
-    
     FOREIGN KEY (id_actividad) REFERENCES Actividades(id_actividad) ON DELETE CASCADE
 );
