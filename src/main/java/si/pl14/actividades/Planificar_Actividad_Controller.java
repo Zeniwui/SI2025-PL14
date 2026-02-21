@@ -62,7 +62,7 @@ public class Planificar_Actividad_Controller {
 					view.getTxtFechaFin().setText(fin);
 
 					// 2. Actualizamos el label de información inferior
-					view.setTextoFechas(" Periodo: desde " + inicio + " hasta " + fin);
+					view.setTextoFechas("<html>Periodo de validez:<br>Desde " + inicio + " hasta " + fin + "</html>");
 				}
 			}
 		});
@@ -70,6 +70,21 @@ public class Planificar_Actividad_Controller {
 		if (view.getCbPeriodoInscripcion().getItemCount() > 0) {
 			view.getCbPeriodoInscripcion().setSelectedIndex(0);
 		}
+
+		// boton eliminar horario seleccionado
+		view.getBtnEliminarHorario().addActionListener(e -> {
+			int index = view.getIndiceHorarioSeleccionado();
+
+			if (index != -1) { // -1 significa que no hay nada seleccionado
+				// 1. Lo eliminamos de la lista lógica (horariosTemporales)
+				horariosTemporales.remove(index);
+
+				// 2. Lo eliminamos del modelo de la lista visual
+				view.getListModelHorarios().remove(index);
+			} else {
+				JOptionPane.showMessageDialog(view, "Por favor, seleccione un horario de la lista para eliminarlo.");
+			}
+		});
 
 	}
 

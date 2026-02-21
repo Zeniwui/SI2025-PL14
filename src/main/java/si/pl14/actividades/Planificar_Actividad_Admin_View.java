@@ -50,6 +50,7 @@ public class Planificar_Actividad_Admin_View extends JFrame {
 	private JLabel lblSocio = new JLabel("Socio:");
 	private JLabel lblNoSocio = new JLabel("No Socio:");
 	private JSeparator separator = new JSeparator();
+	private JButton btnEliminarHorario = new JButton("ELIMINAR SELECCIONADO");
 
 	public static void main(String[] args) {
 		try {
@@ -139,13 +140,13 @@ public class Planificar_Actividad_Admin_View extends JFrame {
 
 		lblInfoFechas.setFont(new Font("Segoe UI", Font.ITALIC, 12));
 		lblInfoFechas.setForeground(azul);
-		lblInfoFechas.setBounds(30, 340, 450, 20);
+		lblInfoFechas.setBounds(30, 340, 450, 45);
 		contentPane.add(lblInfoFechas);
 
 		// --- COLUMNA 2: HORARIOS (BLOQUE DIFERENCIADO) ---
 		panelHorarios.setBackground(morado_seccion);
 		panelHorarios.setBorder(BorderFactory.createLineBorder(morado_texto, 1));
-		panelHorarios.setBounds(290, 15, 230, 255);
+		panelHorarios.setBounds(290, 15, 230, 305);
 		panelHorarios.setLayout(null);
 		contentPane.add(panelHorarios);
 
@@ -186,18 +187,24 @@ public class Planificar_Actividad_Admin_View extends JFrame {
 		listHorariosVista.setSelectionForeground(Color.WHITE); // cuando pinchas se pone blanco
 
 		scrollHorarios.setBorder(BorderFactory.createLineBorder(morado_texto));
-		scrollHorarios.getViewport().setBackground(morado_scroll); 
+		scrollHorarios.getViewport().setBackground(morado_scroll);
 		scrollHorarios.setBounds(15, 180, 200, 65);
 		panelHorarios.add(scrollHorarios);
+		
+		btnEliminarHorario.setFont(new Font("Segoe UI", Font.BOLD, 11));
+		btnEliminarHorario.setBackground(new Color(231, 76, 60));
+		btnEliminarHorario.setForeground(Color.WHITE);
+		btnEliminarHorario.setBounds(15, 255, 200, 30);
+		panelHorarios.add(btnEliminarHorario);
 
 		// fuera del cuadro morado
 		lblInstalacion.setFont(boldFont);
 		lblInstalacion.setForeground(azul);
-		lblInstalacion.setBounds(305, 280, 120, 20);
+		lblInstalacion.setBounds(290, 330, 120, 20);
 		contentPane.add(lblInstalacion);
 
 		cbInstalacion.setBackground(Color.WHITE);
-		cbInstalacion.setBounds(305, 305, 200, 30);
+		cbInstalacion.setBounds(290, 355, 230, 30);
 		contentPane.add(cbInstalacion);
 
 		// --- COLUMNA 3: AFORO Y COSTES ---
@@ -237,7 +244,7 @@ public class Planificar_Actividad_Admin_View extends JFrame {
 		panelPrecios.add(txtCuotaSocio);
 		panelPrecios.add(txtCuotaNoSocio);
 
-		separator.setBounds(30, 370, 700, 2);
+		separator.setBounds(30, 390, 700, 2);
 		contentPane.add(separator);
 
 		btnCrear.setBackground(morado_texto);
@@ -341,5 +348,15 @@ public class Planificar_Actividad_Admin_View extends JFrame {
 
 	public JTextField getTxtFechaFin() {
 		return txtFechaFin;
+	}
+
+	// Necesitamos un getter para el controlador
+	public JButton getBtnEliminarHorario() {
+		return btnEliminarHorario;
+	}
+
+	// Necesitamos saber qué índice hay seleccionado en la JList
+	public int getIndiceHorarioSeleccionado() {
+		return listHorariosVista.getSelectedIndex();
 	}
 }

@@ -16,10 +16,10 @@ INSERT INTO Instalaciones (nombre, tipo, coste_hora) VALUES ('Cancha de Balonces
 -- Datos iniciales para Periodos de Inscripción
 -- Formato de fecha estándar: YYYY-MM-DD
 INSERT INTO PeriodosInscripcion (nombre, inicio_socios, fin_socios, fin_no_socios) 
-VALUES ('Temporada Verano', '2024-06-01', '2024-06-15', '2024-08-30');
+VALUES ('Temporada Verano', '2026-06-01', '2026-06-15', '2026-08-30');
 
 INSERT INTO PeriodosInscripcion (nombre, inicio_socios, fin_socios, fin_no_socios) 
-VALUES ('Temporada Invierno', '2024-10-01', '2024-10-15', '2024-12-20');
+VALUES ('Temporada Invierno', '2026-10-01', '2026-10-15', '2026-12-20');
 
 -- Datos para Usuarios y Socios (opcional, para pruebas de reservas)
 INSERT INTO Usuarios (dni, nombre, apellidos, telefono, email) 
