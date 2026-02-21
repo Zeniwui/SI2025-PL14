@@ -11,51 +11,43 @@ import java.util.List;
 import java.util.Map;
 import java.util.Collections;
 
-/**
- * Vista de la pantalla "Disponibilidad de Instalación para los Socios".
- * Sigue el patrón MVC del proyecto: solo construye la UI y expone getters/setters.
- * No contiene ninguna lógica de negocio ni handlers de eventos.
- */
 public class DisponibilidadView {
 
-    // ─── Colores y fuentes ───────────────────────────────────────────────────
-    static final Color COLOR_PRIMARIO    = new Color(30, 100, 180);
-    static final Color COLOR_HOY         = new Color(173, 216, 230);
+    static final Color COLOR_PRIMARIO     = new Color(30, 100, 180);
+    static final Color COLOR_HOY          = new Color(173, 216, 230);
     static final Color COLOR_SELECCIONADO = new Color(30, 100, 180);
-    static final Color COLOR_LIBRE       = new Color(200, 240, 200);
-    static final Color COLOR_OCUPADO     = new Color(255, 180, 180);
-    static final Color COLOR_RESERVADA   = new Color(255, 220, 150);
-    static final Font  FONT_TITULO       = new Font("Segoe UI", Font.BOLD, 15);
-    static final Font  FONT_NORMAL       = new Font("Segoe UI", Font.PLAIN, 13);
+    static final Color COLOR_LIBRE        = new Color(200, 240, 200);
+    static final Color COLOR_OCUPADO      = new Color(255, 180, 180);
+    static final Color COLOR_RESERVADA    = new Color(255, 220, 150);
+    static final Color COLOR_MIS_RESERVAS = new Color(173, 216, 255);
+    static final Font  FONT_TITULO        = new Font("Segoe UI", Font.BOLD, 15);
+    static final Font  FONT_NORMAL        = new Font("Segoe UI", Font.PLAIN, 13);
 
     private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    // ─── Componentes principales ─────────────────────────────────────────────
-    private final JDialog      frame;
+    private final JDialog                    frame;
     private final JComboBox<InstalacionItem> cmbInstalacion;
-    private final JButton      btnComprobar;
-    private final JButton      btnCerrar;
-    private final JPanel       panelCalendario;
-    private final JPanel       panelHorario;
-
-    // Componentes del calendario (se reconstruyen en cada refresh)
+    private final JButton                    btnComprobar;
+    private final JButton                    btnCerrar;
+    private final JPanel                     panelCalendario;
+    private final JPanel                     panelHorario;
+    private final JTabbedPane                tabbedHorario;
+    private final JPanel                     tabDisponibilidad;
+    private final JPanel                     tabMisReservas;
     private JButton btnAnteriorMes;
     private JButton btnSiguienteMes;
 
-    // ─────────────────────────────────────────────────────────────────────────
     public DisponibilidadView() {
         frame = new JDialog((Frame) null, "Disponibilidad de Instalación para los Socios", true);
-        frame.setSize(860, 720);
-        frame.setMinimumSize(new Dimension(720, 600));
+        frame.setSize(860, 760);
+        frame.setMinimumSize(new Dimension(720, 620));
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
-        // ── Panel raíz ───────────────────────────────────────────────────────
         JPanel root = new JPanel(new BorderLayout(10, 10));
         root.setBorder(new EmptyBorder(14, 14, 14, 14));
         root.setBackground(Color.WHITE);
 
-        // ── Barra superior ───────────────────────────────────────────────────
         JPanel cabecera = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 4));
         cabecera.setBackground(Color.WHITE);
         cabecera.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, COLOR_PRIMARIO));
@@ -95,7 +87,6 @@ public class DisponibilidadView {
         topBar.add(cabecera, BorderLayout.CENTER);
         topBar.add(btnCerrar, BorderLayout.EAST);
 
-        // ── Área central (calendario + horario) ──────────────────────────────
         JPanel centro = new JPanel();
         centro.setLayout(new BoxLayout(centro, BoxLayout.Y_AXIS));
         centro.setBackground(Color.WHITE);
@@ -110,6 +101,22 @@ public class DisponibilidadView {
         panelHorario.setVisible(false);
         panelHorario.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+        tabbedHorario = new JTabbedPane();
+        tabbedHorario.setFont(new Font("Segoe UI", Font.BOLD, 13));
+
+        tabDisponibilidad = new JPanel(new BorderLayout());
+        tabDisponibilidad.setBackground(Color.WHITE);
+        tabbedHorario.addTab("Disponibilidad", tabDisponibilidad);
+
+        tabMisReservas = new JPanel(new BorderLayout());
+        tabMisReservas.setBackground(Color.WHITE);
+        tabMisReservas.add(crearPanelMisReservasVacio(), BorderLayout.CENTER);
+        tabbedHorario.addTab("Mis Reservas", tabMisReservas);
+        tabbedHorario.setBackgroundAt(1, new Color(30, 100, 180));
+        tabbedHorario.setForegroundAt(1, Color.WHITE);
+
+        panelHorario.add(tabbedHorario, BorderLayout.CENTER);
+
         centro.add(panelCalendario);
         centro.add(Box.createVerticalStrut(12));
         centro.add(panelHorario);
@@ -123,11 +130,6 @@ public class DisponibilidadView {
         frame.add(root);
     }
 
-    // ═════════════════════════════════════════════════════════════════════════
-    //  Métodos de población de la UI llamados desde el Controlador
-    // ═════════════════════════════════════════════════════════════════════════
-
-    /** Rellena el combo con la lista de instalaciones. */
     public void setInstalaciones(List<InstalacionEntity> lista) {
         cmbInstalacion.removeAllItems();
         cmbInstalacion.addItem(new InstalacionItem(0, "-- Seleccione instalación --"));
@@ -136,20 +138,11 @@ public class DisponibilidadView {
         }
     }
 
-    /**
-     * Reconstruye el panel del calendario para el mes indicado.
-     *
-     * @param fechaBase     primer día del mes a mostrar
-     * @param hoy           fecha actual (para colorear)
-     * @param limite        último día seleccionable (hoy + 30)
-     * @param fechaSelect   fecha actualmente seleccionada (puede ser null)
-     * @param onDiaClick    callback que recibe la fecha cuando el usuario pulsa un día
-     */
     public void mostrarCalendario(LocalDate fechaBase, LocalDate hoy, LocalDate limite,
-                                   LocalDate fechaSelect, java.util.function.Consumer<LocalDate> onDiaClick) {
+                                   LocalDate fechaSelect,
+                                   java.util.function.Consumer<LocalDate> onDiaClick) {
         panelCalendario.removeAll();
 
-        // ── Navegación mes ────────────────────────────────────────────────
         JPanel navMes = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 4));
         navMes.setBackground(new Color(240, 245, 255));
         navMes.setBorder(new EmptyBorder(4, 0, 4, 0));
@@ -170,7 +163,6 @@ public class DisponibilidadView {
         navMes.add(lblMes);
         navMes.add(btnSiguienteMes);
 
-        // ── Rejilla ───────────────────────────────────────────────────────
         JPanel rejilla = new JPanel(new GridLayout(0, 7, 4, 4));
         rejilla.setBackground(Color.WHITE);
         rejilla.setBorder(new EmptyBorder(8, 8, 8, 8));
@@ -182,8 +174,7 @@ public class DisponibilidadView {
             rejilla.add(lbl);
         }
 
-        // Celdas vacías hasta el primer día del mes
-        int primerDia = fechaBase.getDayOfWeek().getValue(); // 1=Lun, 7=Dom
+        int primerDia = fechaBase.getDayOfWeek().getValue();
         for (int i = 1; i < primerDia; i++) rejilla.add(new JLabel(""));
 
         LocalDate cursor = fechaBase;
@@ -220,32 +211,22 @@ public class DisponibilidadView {
             cursor = cursor.plusDays(1);
         }
 
-        // ── Leyenda ───────────────────────────────────────────────────────
         JPanel leyenda = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 2));
         leyenda.setBackground(Color.WHITE);
-        leyenda.add(chip(COLOR_HOY,              "Hoy"));
-        leyenda.add(chip(COLOR_SELECCIONADO,      "Seleccionado"));
-        leyenda.add(chip(new Color(230, 230, 230),"Fuera de rango"));
+        leyenda.add(chip(COLOR_HOY,               "Hoy"));
+        leyenda.add(chip(COLOR_SELECCIONADO,       "Seleccionado"));
+        leyenda.add(chip(new Color(230, 230, 230), "Fuera de rango"));
 
-        panelCalendario.add(navMes,   BorderLayout.NORTH);
-        panelCalendario.add(rejilla,  BorderLayout.CENTER);
-        panelCalendario.add(leyenda,  BorderLayout.SOUTH);
+        panelCalendario.add(navMes,  BorderLayout.NORTH);
+        panelCalendario.add(rejilla, BorderLayout.CENTER);
+        panelCalendario.add(leyenda, BorderLayout.SOUTH);
         panelCalendario.setVisible(true);
         panelCalendario.revalidate();
         panelCalendario.repaint();
     }
 
-    /**
-     * Construye y muestra el horario completo (00:00-23:00) de un día.
-     *
-     * @param fecha          día seleccionado
-     * @param nombreInstalacion nombre para mostrar en la cabecera
-     * @param ocupaciones    mapa hora → lista de etiquetas "[A]/[R] descripcion"
-     */
     public void mostrarHorario(LocalDate fecha, String nombreInstalacion,
                                 Map<Integer, List<String>> ocupaciones) {
-        panelHorario.removeAll();
-
         JLabel lblFecha = new JLabel(fecha.format(FMT) + "  —  " + nombreInstalacion);
         lblFecha.setFont(new Font("Segoe UI", Font.BOLD, 14));
         lblFecha.setForeground(COLOR_PRIMARIO);
@@ -275,35 +256,75 @@ public class DisponibilidadView {
         scrollH.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
         scrollH.getVerticalScrollBar().setUnitIncrement(16);
 
-        // Leyenda horario
         JPanel leyenda = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 2));
         leyenda.setBackground(Color.WHITE);
-        leyenda.add(chip(COLOR_LIBRE,    "Libre ✓"));
-        leyenda.add(chip(COLOR_OCUPADO,  "Actividad ✗"));
-        leyenda.add(chip(COLOR_RESERVADA,"Reserva de socio ✗"));
+        leyenda.add(chip(COLOR_LIBRE,        "Libre ✓"));
+        leyenda.add(chip(COLOR_OCUPADO,      "Actividad ✗"));
+        leyenda.add(chip(COLOR_RESERVADA,    "Reserva de socio ✗"));
+        leyenda.add(chip(COLOR_MIS_RESERVAS, "Mis reservas"));
 
-        panelHorario.add(lblFecha, BorderLayout.NORTH);
-        panelHorario.add(scrollH,  BorderLayout.CENTER);
-        panelHorario.add(leyenda,  BorderLayout.SOUTH);
+        tabDisponibilidad.removeAll();
+        tabDisponibilidad.add(lblFecha, BorderLayout.NORTH);
+        tabDisponibilidad.add(scrollH,  BorderLayout.CENTER);
+        tabDisponibilidad.add(leyenda,  BorderLayout.SOUTH);
+        tabDisponibilidad.revalidate();
+        tabDisponibilidad.repaint();
+
+        tabbedHorario.setSelectedIndex(0);
+
         panelHorario.setVisible(true);
         panelHorario.revalidate();
         panelHorario.repaint();
         frame.revalidate();
     }
 
-    /** Oculta el horario (al cambiar la instalación o recomprobar) */
-    public void ocultarHorario() {
-        panelHorario.setVisible(false);
-    }
+    public void ocultarHorario()    { panelHorario.setVisible(false); }
+    public void ocultarCalendario() { panelCalendario.setVisible(false); }
 
-    /** Oculta el calendario */
-    public void ocultarCalendario() {
-        panelCalendario.setVisible(false);
-    }
+    private JPanel crearPanelMisReservasVacio() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBackground(new Color(235, 244, 255));
 
-    // ═════════════════════════════════════════════════════════════════════════
-    //  Helpers de UI
-    // ═════════════════════════════════════════════════════════════════════════
+        JPanel tarjeta = new JPanel();
+        tarjeta.setLayout(new BoxLayout(tarjeta, BoxLayout.Y_AXIS));
+        tarjeta.setBackground(Color.WHITE);
+        tarjeta.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(30, 100, 180), 2, true),
+            new EmptyBorder(24, 40, 24, 40)
+        ));
+
+        JLabel icono = new JLabel("📅", SwingConstants.CENTER);
+        icono.setFont(new Font("Segoe UI", Font.PLAIN, 40));
+        icono.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel titulo = new JLabel("Mis Reservas", SwingConstants.CENTER);
+        titulo.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        titulo.setForeground(new Color(30, 100, 180));
+        titulo.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel subtitulo = new JLabel("Funcionalidad próximamente disponible", SwingConstants.CENTER);
+        subtitulo.setFont(new Font("Segoe UI", Font.ITALIC, 13));
+        subtitulo.setForeground(Color.GRAY);
+        subtitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel descripcion = new JLabel(
+            "<html><center>Aquí podrás consultar y gestionar<br>todas tus reservas en esta instalación.</center></html>",
+            SwingConstants.CENTER);
+        descripcion.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        descripcion.setForeground(new Color(80, 80, 80));
+        descripcion.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        tarjeta.add(icono);
+        tarjeta.add(Box.createVerticalStrut(10));
+        tarjeta.add(titulo);
+        tarjeta.add(Box.createVerticalStrut(6));
+        tarjeta.add(subtitulo);
+        tarjeta.add(Box.createVerticalStrut(12));
+        tarjeta.add(descripcion);
+
+        panel.add(tarjeta);
+        return panel;
+    }
 
     private JPanel crearCeldaHora(List<String> eventos) {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 2));
@@ -318,7 +339,7 @@ public class DisponibilidadView {
             boolean hayReserva = eventos.stream().anyMatch(e -> e.startsWith("[R]"));
             p.setBackground(hayReserva ? COLOR_RESERVADA : COLOR_OCUPADO);
             for (int i = 0; i < eventos.size(); i++) {
-                String ev = eventos.get(i);
+                String ev    = eventos.get(i);
                 String texto = ev.replaceFirst("^\\[.\\] ", "");
                 JLabel l = new JLabel(texto + "  ✗");
                 l.setFont(FONT_NORMAL);
@@ -343,26 +364,19 @@ public class DisponibilidadView {
         return p;
     }
 
-    // ═════════════════════════════════════════════════════════════════════════
-    //  Getters requeridos por el controlador
-    // ═════════════════════════════════════════════════════════════════════════
+    public JDialog                    getFrame()                  { return frame; }
+    public JButton                    getBtnComprobar()           { return btnComprobar; }
+    public JButton                    getBtnCerrar()              { return btnCerrar; }
+    public JButton                    getBtnAnteriorMes()         { return btnAnteriorMes; }
+    public JButton                    getBtnSiguienteMes()        { return btnSiguienteMes; }
+    public JComboBox<InstalacionItem> getCmbInstalacion()         { return cmbInstalacion; }
+    public JTabbedPane                getTabbedHorario()          { return tabbedHorario; }
+    public JPanel                     getTabMisReservas()         { return tabMisReservas; }
 
-    public JDialog getFrame()                               { return frame; }
-    public JButton getBtnComprobar()                        { return btnComprobar; }
-    public JButton getBtnCerrar()                           { return btnCerrar; }
-    public JButton getBtnAnteriorMes()                      { return btnAnteriorMes; }
-    public JButton getBtnSiguienteMes()                     { return btnSiguienteMes; }
-    public JComboBox<InstalacionItem> getCmbInstalacion()   { return cmbInstalacion; }
-
-    /** Devuelve la InstalacionItem seleccionada o null si no hay selección válida. */
     public InstalacionItem getInstalacionSeleccionada() {
         InstalacionItem item = (InstalacionItem) cmbInstalacion.getSelectedItem();
         return (item != null && item.getId() != 0) ? item : null;
     }
-
-    // ═════════════════════════════════════════════════════════════════════════
-    //  DTO interno para el combo
-    // ═════════════════════════════════════════════════════════════════════════
 
     public static class InstalacionItem {
         private final int    id;
