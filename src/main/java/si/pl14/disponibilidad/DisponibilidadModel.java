@@ -45,10 +45,12 @@ public class DisponibilidadModel {
         public int     horaInicio;
         public int     horaFin;
         public String  descripcion;
-        /** true = reserva de socio (propio o ajeno), false = actividad */
+        /** true = reserva de socio (propio o ajeno), false = actividad o evento */
         public boolean esReservaSocio;
         /** true = esta reserva pertenece al socio actual (ID_SOCIO_ACTUAL) */
         public boolean esMiaReserva;
+        /** true = evento social (actividad con es_evento_social=1) */
+        public boolean esEventoSocial;
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -78,6 +80,7 @@ public class DisponibilidadModel {
             dto.descripcion   = (String) f[2];
             dto.esReservaSocio = true;
             dto.esMiaReserva  = true;
+            dto.esEventoSocial = false;
             resultado.add(dto);
         }
 
@@ -95,24 +98,47 @@ public class DisponibilidadModel {
             dto.descripcion   = (String) f[2];
             dto.esReservaSocio = true;
             dto.esMiaReserva  = false;
+            dto.esEventoSocial = false;
             resultado.add(dto);
         }
 
-        // 3. Actividades
+        // 3. Actividades regulares (es_evento_social = 0)
         String sqlActividades =
             "SELECT CAST(strftime('%H', r.hora_inicio) AS INTEGER) AS horaInicio, " +
             "       CAST(strftime('%H', r.hora_fin)    AS INTEGER) AS horaFin, " +
             "       a.nombre AS descripcion " +
             "FROM Reservas r " +
             "JOIN Actividades a ON r.id_actividad = a.id_actividad " +
-            "WHERE r.id_instalacion = ? AND r.fecha = ? AND r.id_actividad IS NOT NULL";
+            "WHERE r.id_instalacion = ? AND r.fecha = ? AND r.id_actividad IS NOT NULL " +
+            "  AND a.es_evento_social = 0";
         for (Object[] f : db.executeQueryArray(sqlActividades, idInstalacion, fechaIso)) {
             OcupacionDTO dto = new OcupacionDTO();
-            dto.horaInicio    = toInt(f[0]);
-            dto.horaFin       = toInt(f[1]);
-            dto.descripcion   = (String) f[2];
+            dto.horaInicio     = toInt(f[0]);
+            dto.horaFin        = toInt(f[1]);
+            dto.descripcion    = (String) f[2];
             dto.esReservaSocio = false;
-            dto.esMiaReserva  = false;
+            dto.esMiaReserva   = false;
+            dto.esEventoSocial = false;
+            resultado.add(dto);
+        }
+
+        // 4. Eventos sociales (es_evento_social = 1)
+        String sqlEventos =
+            "SELECT CAST(strftime('%H', r.hora_inicio) AS INTEGER) AS horaInicio, " +
+            "       CAST(strftime('%H', r.hora_fin)    AS INTEGER) AS horaFin, " +
+            "       a.nombre AS descripcion " +
+            "FROM Reservas r " +
+            "JOIN Actividades a ON r.id_actividad = a.id_actividad " +
+            "WHERE r.id_instalacion = ? AND r.fecha = ? AND r.id_actividad IS NOT NULL " +
+            "  AND a.es_evento_social = 1";
+        for (Object[] f : db.executeQueryArray(sqlEventos, idInstalacion, fechaIso)) {
+            OcupacionDTO dto = new OcupacionDTO();
+            dto.horaInicio     = toInt(f[0]);
+            dto.horaFin        = toInt(f[1]);
+            dto.descripcion    = (String) f[2];
+            dto.esReservaSocio = false;
+            dto.esMiaReserva   = false;
+            dto.esEventoSocial = true;
             resultado.add(dto);
         }
 
@@ -126,7 +152,11 @@ public class DisponibilidadModel {
     public Map<Integer, List<String>> getOcupacionesPorHora(int idInstalacion, String fechaIso) {
         Map<Integer, List<String>> mapa = new HashMap<>();
         for (OcupacionDTO o : getOcupaciones(idInstalacion, fechaIso)) {
-            String prefijo = o.esMiaReserva ? "[M] " : (o.esReservaSocio ? "[R] " : "[A] ");
+            String prefijo;
+            if      (o.esMiaReserva)   prefijo = "[M] ";
+            else if (o.esReservaSocio) prefijo = "[R] ";
+            else if (o.esEventoSocial) prefijo = "[E] ";
+            else                       prefijo = "[A] ";
             int fin = (o.horaFin > o.horaInicio) ? o.horaFin : o.horaInicio + 1;
             for (int h = o.horaInicio; h < fin && h <= 23; h++) {
                 mapa.computeIfAbsent(h, k -> new ArrayList<>()).add(prefijo + o.descripcion);

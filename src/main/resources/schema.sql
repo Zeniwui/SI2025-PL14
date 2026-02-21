@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS Actividades (
     precio_socio DECIMAL(6,2),
     precio_no_socio DECIMAL(6,2),
     id_periodo INT,
+    es_evento_social INTEGER NOT NULL DEFAULT 0,
     FOREIGN KEY (id_instalacion) REFERENCES Instalaciones(id_instalacion),
     FOREIGN KEY (id_periodo) REFERENCES PeriodosInscripcion(id_periodo)
 );

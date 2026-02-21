@@ -23,6 +23,7 @@ public class DisponibilidadView {
     static final Color COLOR_RESERVADA    = new Color(255, 220, 150);
     static final Color COLOR_MIS_RESERVAS = new Color(173, 216, 255);
     static final Color COLOR_CERRADO      = new Color(220, 220, 220);
+    static final Color COLOR_EVENTO_SOCIAL = new Color(255, 200, 100);
     static final Font  FONT_TITULO        = new Font("Segoe UI", Font.BOLD, 15);
     static final Font  FONT_NORMAL        = new Font("Segoe UI", Font.PLAIN, 13);
 
@@ -319,11 +320,12 @@ public class DisponibilidadView {
         // ── Leyenda ───────────────────────────────────────────────────────
         JPanel leyenda = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 2));
         leyenda.setBackground(Color.WHITE);
-        leyenda.add(chip(COLOR_LIBRE,        "Libre ✓"));
-        leyenda.add(chip(COLOR_OCUPADO,      "Actividad ✗"));
-        leyenda.add(chip(COLOR_RESERVADA,    "Reserva de socio ✗"));
-        leyenda.add(chip(COLOR_MIS_RESERVAS, "Mis reservas"));
-        leyenda.add(chip(COLOR_CERRADO,      "Centro cerrado"));
+        leyenda.add(chip(COLOR_LIBRE,          "Libre ✓"));
+        leyenda.add(chip(COLOR_OCUPADO,        "Actividad ✗"));
+        leyenda.add(chip(COLOR_EVENTO_SOCIAL,  "Evento Social ★"));
+        leyenda.add(chip(COLOR_RESERVADA,      "Reserva de socio ✗"));
+        leyenda.add(chip(COLOR_MIS_RESERVAS,   "Mis reservas"));
+        leyenda.add(chip(COLOR_CERRADO,        "Centro cerrado"));
 
         // ── Rellena la pestaña Disponibilidad ─────────────────────────────
         tabDisponibilidad.removeAll();
@@ -692,19 +694,27 @@ public class DisponibilidadView {
             l.setForeground(new Color(0, 128, 0));
             p.add(l);
         } else {
-            // Prioridad de color: mis reservas [M] > otros socios [R] > actividades [A]
-            boolean hayMia   = eventos.stream().anyMatch(e -> e.startsWith("[M]"));
-            boolean hayOtros = eventos.stream().anyMatch(e -> e.startsWith("[R]"));
-            if (hayMia)        p.setBackground(COLOR_MIS_RESERVAS);
-            else if (hayOtros) p.setBackground(COLOR_RESERVADA);
-            else               p.setBackground(COLOR_OCUPADO);
+            // Prioridad de color: mis reservas [M] > evento social [E] > otros socios [R] > actividades [A]
+            boolean hayMia    = eventos.stream().anyMatch(e -> e.startsWith("[M]"));
+            boolean hayEvento = eventos.stream().anyMatch(e -> e.startsWith("[E]"));
+            boolean hayOtros  = eventos.stream().anyMatch(e -> e.startsWith("[R]"));
+            if      (hayMia)    p.setBackground(COLOR_MIS_RESERVAS);
+            else if (hayEvento) p.setBackground(COLOR_EVENTO_SOCIAL);
+            else if (hayOtros)  p.setBackground(COLOR_RESERVADA);
+            else                p.setBackground(COLOR_OCUPADO);
             for (int i = 0; i < eventos.size(); i++) {
-                String ev    = eventos.get(i);
-                boolean esMia = ev.startsWith("[M]");
-                String texto = ev.replaceFirst("^\\[.\\] ", "");
-                JLabel l = new JLabel(texto + (esMia ? "  ✓" : "  ✗"));
-                l.setFont(FONT_NORMAL);
-                l.setForeground(esMia ? new Color(0, 70, 160) : Color.BLACK);
+                String ev      = eventos.get(i);
+                boolean esMia  = ev.startsWith("[M]");
+                boolean esEvento = ev.startsWith("[E]");
+                String texto   = ev.replaceFirst("^\\[.\\] ", "");
+                String icono   = esMia ? "  ✓" : (esEvento ? "  ★" : "  ✗");
+                JLabel l = new JLabel(texto + icono);
+                l.setFont(esEvento
+                    ? new Font("Segoe UI", Font.BOLD, 13)
+                    : FONT_NORMAL);
+                l.setForeground(esMia    ? new Color(0, 70, 160)
+                              : esEvento ? new Color(160, 80, 0)
+                              : Color.BLACK);
                 p.add(l);
                 if (i < eventos.size() - 1) p.add(new JLabel(" | "));
             }

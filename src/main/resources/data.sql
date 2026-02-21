@@ -55,20 +55,25 @@ insert into PeriodosInscripcion(nombre, inicio_socios, fin_socios, fin_no_socios
 	('Temporada 2026', '2026-01-01', '2026-06-30', '2026-07-31');
 
 -- ─── Actividades ──────────────────────────────────────────────────────────────
--- Tipo A: 2 horas seguidas          (ids 1-4)
--- Tipo B: turno manana + turno tarde (ids 5-8, dos reservas separadas por actividad)
--- Tipo C: evento social +2 horas    (ids 9-10)
-insert into Actividades(nombre, descripcion, id_instalacion, aforo, fecha_inicio, fecha_fin, precio_socio, precio_no_socio, id_periodo) values
-	('Torneo de Badminton',        'Torneo junior de badminton (2h)',           6, 20, '2026-02-01', '2026-06-13', 15.0, 25.0, 1),
-	('Natacion Intensiva',         'Entrenamiento intensivo de natacion (2h)',  3, 12, '2026-02-01', '2026-06-30',  9.0, 16.0, 1),
-	('Spinning Avanzado',          'Clase de spinning alto rendimiento (2h)',   4, 15, '2026-02-01', '2026-06-30',  8.0, 14.0, 1),
-	('Padel Dobles',               'Partido oficial de padel por parejas (2h)', 5,  4, '2026-02-01', '2026-06-30', 12.0, 20.0, 1),
-	('Yoga Matinal',               'Sesion de yoga por la manana (1h)',         4, 10, '2026-02-01', '2026-06-13',  5.0, 10.0, 1),
-	('Yoga Vespertino',            'Sesion de yoga vespertina (1h)',             4, 10, '2026-02-01', '2026-06-13',  5.0, 10.0, 1),
-	('Aquagym Manana',             'Aquagym turno de manana (1h)',              3, 20, '2026-02-01', '2026-06-30',  6.0, 11.0, 1),
-	('Aquagym Tarde',              'Aquagym turno de tarde (1h)',               3, 20, '2026-02-01', '2026-06-30',  6.0, 11.0, 1),
-	('Torneo de Voley Playa',      'Torneo social de voley (4h)',               6, 40, '2026-02-01', '2026-03-29', 10.0, 20.0, 1),
-	('Gala de Natacion',           'Exhibicion y competicion natacion (3h)',    3, 60, '2026-02-01', '2026-06-30', 18.0, 30.0, 1);
+-- Tipo A: actividades regulares (es_evento_social=0)
+-- Tipo B: turno manana + turno tarde (es_evento_social=0)
+-- Tipo C: eventos sociales +2 horas (es_evento_social=1)
+insert into Actividades(nombre, descripcion, id_instalacion, aforo, fecha_inicio, fecha_fin, precio_socio, precio_no_socio, id_periodo, es_evento_social) values
+	('Torneo de Badminton',        'Torneo junior de badminton (2h)',           6, 20, '2026-02-01', '2026-06-13', 15.0, 25.0, 1, 0),
+	('Natacion Intensiva',         'Entrenamiento intensivo de natacion (2h)',  3, 12, '2026-02-01', '2026-06-30',  9.0, 16.0, 1, 0),
+	('Spinning Avanzado',          'Clase de spinning alto rendimiento (2h)',   4, 15, '2026-02-01', '2026-06-30',  8.0, 14.0, 1, 0),
+	('Padel Dobles',               'Partido oficial de padel por parejas (2h)', 5,  4, '2026-02-01', '2026-06-30', 12.0, 20.0, 1, 0),
+	('Yoga Matinal',               'Sesion de yoga por la manana (1h)',         4, 10, '2026-02-01', '2026-06-13',  5.0, 10.0, 1, 0),
+	('Yoga Vespertino',            'Sesion de yoga vespertina (1h)',             4, 10, '2026-02-01', '2026-06-13',  5.0, 10.0, 1, 0),
+	('Aquagym Manana',             'Aquagym turno de manana (1h)',              3, 20, '2026-02-01', '2026-06-30',  6.0, 11.0, 1, 0),
+	('Aquagym Tarde',              'Aquagym turno de tarde (1h)',               3, 20, '2026-02-01', '2026-06-30',  6.0, 11.0, 1, 0),
+	-- Eventos sociales (es_evento_social=1, todos duran mas de 2h)
+	('Torneo de Voley Playa',      'Torneo social de voley (4h)',               6, 40, '2026-02-01', '2026-03-29', 10.0, 20.0, 1, 1),
+	('Gala de Natacion',           'Exhibicion y competicion natacion (3h)',    3, 60, '2026-02-01', '2026-06-30', 18.0, 30.0, 1, 1),
+	('Fiesta de Fin de Temporada', 'Celebracion anual del club (4h)',           6, 80, '2026-02-01', '2026-06-30',  5.0, 15.0, 1, 1),
+	('Gran Prix de Natacion',      'Competicion anual por equipos (3h)',        3, 50, '2026-02-01', '2026-06-30', 12.0, 25.0, 1, 1),
+	('Torneo Mixto de Padel',      'Torneo social mixto de padel (3h)',         5, 16, '2026-02-01', '2026-06-30', 14.0, 28.0, 1, 1),
+	('Olimpiada del Club',         'Competicion multideporte entre socios (5h)',6, 100,'2026-02-01', '2026-06-30',  8.0, 20.0, 1, 1);
 
 -- ─── RESERVAS DE SOCIOS ───────────────────────────────────────────────────────
 
@@ -121,9 +126,7 @@ insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_socio, cos
 	(4, date('now','+5 day'), '11:00', '12:00', 1,  3.0, 'Pendiente', 'Tarjeta'),
 	(4, date('now','+5 day'), '10:00', '11:00', 0,  3.0, 'Pendiente', 'Tarjeta');
 
--- ─── RESERVAS DE ACTIVIDADES ──────────────────────────────────────────────────
-
--- [A] Actividades 2 horas seguidas ────────────────────────────────────────────
+-- ─── RESERVAS DE ACTIVIDADES REGULARES ───────────────────────────────────────
 
 -- Torneo de Badminton (id=1) en Polideportivo (id=6): 10:00-12:00
 insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_actividad, coste_reserva, estado_pago) values
@@ -145,38 +148,58 @@ insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_actividad,
 	(5, date('now'),         '08:00', '10:00', 4, 0.0, 'Cuota'),
 	(5, date('now','+1 day'),'08:00', '10:00', 4, 0.0, 'Cuota');
 
--- [B] Actividades con turno manana Y tarde ─────────────────────────────────────
-
--- Yoga Matinal (id=5) en Gimnasio (id=4): manana 09:00-10:00
+-- Yoga Matinal (id=5) en Gimnasio (id=4): 09:00-10:00
 insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_actividad, coste_reserva, estado_pago) values
 	(4, date('now'),         '09:00', '10:00', 5, 0.0, 'Cuota'),
 	(4, date('now','+1 day'),'09:00', '10:00', 5, 0.0, 'Cuota'),
 	(4, date('now','+2 day'),'09:00', '10:00', 5, 0.0, 'Cuota');
 
--- Yoga Vespertino (id=6) en Gimnasio (id=4): tarde 19:00-20:00
+-- Yoga Vespertino (id=6) en Gimnasio (id=4): 19:00-20:00
 insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_actividad, coste_reserva, estado_pago) values
 	(4, date('now'),         '19:00', '20:00', 6, 0.0, 'Cuota'),
 	(4, date('now','+1 day'),'19:00', '20:00', 6, 0.0, 'Cuota'),
 	(4, date('now','+2 day'),'19:00', '20:00', 6, 0.0, 'Cuota');
 
--- Aquagym Manana (id=7) en Piscina (id=3): manana 08:00-09:00
+-- Aquagym Manana (id=7) en Piscina (id=3): 08:00-09:00
 insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_actividad, coste_reserva, estado_pago) values
 	(3, date('now'),         '08:00', '09:00', 7, 0.0, 'Cuota'),
 	(3, date('now','+1 day'),'08:00', '09:00', 7, 0.0, 'Cuota');
 
--- Aquagym Tarde (id=8) en Piscina (id=3): tarde 18:00-19:00
+-- Aquagym Tarde (id=8) en Piscina (id=3): 18:00-19:00
 insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_actividad, coste_reserva, estado_pago) values
 	(3, date('now'),         '18:00', '19:00', 8, 0.0, 'Cuota'),
 	(3, date('now','+1 day'),'18:00', '19:00', 8, 0.0, 'Cuota');
 
--- [C] Eventos sociales de mas de 2 horas ──────────────────────────────────────
+-- ─── RESERVAS DE EVENTOS SOCIALES ────────────────────────────────────────────
 
--- Torneo de Voley Playa (id=9) en Polideportivo (id=6): 4 horas 09:00-13:00
+-- Torneo de Voley Playa (id=9) en Polideportivo (id=6): 4h 09:00-13:00
 insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_actividad, coste_reserva, estado_pago) values
-	(6, date('now'),         '09:00', '13:00', 9, 0.0, 'Cuota'),
-	(6, date('now','+2 day'),'09:00', '13:00', 9, 0.0, 'Cuota');
+	(6, date('now'),          '09:00', '13:00', 9, 0.0, 'Cuota'),
+	(6, date('now','+2 day'), '09:00', '13:00', 9, 0.0, 'Cuota'),
+	(6, date('now','+7 day'), '09:00', '13:00', 9, 0.0, 'Cuota');
 
--- Gala de Natacion (id=10) en Piscina (id=3): 3 horas 16:00-19:00
+-- Gala de Natacion (id=10) en Piscina (id=3): 3h 16:00-19:00
 insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_actividad, coste_reserva, estado_pago) values
-	(3, date('now','+1 day'),'16:00', '19:00', 10, 0.0, 'Cuota'),
-	(3, date('now','+3 day'),'16:00', '19:00', 10, 0.0, 'Cuota');
+	(3, date('now','+1 day'), '16:00', '19:00', 10, 0.0, 'Cuota'),
+	(3, date('now','+3 day'), '16:00', '19:00', 10, 0.0, 'Cuota'),
+	(3, date('now','+10 day'),'16:00', '19:00', 10, 0.0, 'Cuota');
+
+-- Fiesta de Fin de Temporada (id=11) en Polideportivo (id=6): 4h 17:00-21:00
+insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_actividad, coste_reserva, estado_pago) values
+	(6, date('now','+4 day'), '17:00', '21:00', 11, 0.0, 'Cuota'),
+	(6, date('now','+14 day'),'17:00', '21:00', 11, 0.0, 'Cuota');
+
+-- Gran Prix de Natacion (id=12) en Piscina (id=3): 3h 10:00-13:00
+insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_actividad, coste_reserva, estado_pago) values
+	(3, date('now','+5 day'), '10:00', '13:00', 12, 0.0, 'Cuota'),
+	(3, date('now','+20 day'),'10:00', '13:00', 12, 0.0, 'Cuota');
+
+-- Torneo Mixto de Padel (id=13) en Pista de Padel (id=5): 3h 10:00-13:00
+insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_actividad, coste_reserva, estado_pago) values
+	(5, date('now','+3 day'), '10:00', '13:00', 13, 0.0, 'Cuota'),
+	(5, date('now','+15 day'),'10:00', '13:00', 13, 0.0, 'Cuota');
+
+-- Olimpiada del Club (id=14) en Polideportivo (id=6): 5h 09:00-14:00
+insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_actividad, coste_reserva, estado_pago) values
+	(6, date('now','+6 day'), '09:00', '14:00', 14, 0.0, 'Cuota'),
+	(6, date('now','+25 day'),'09:00', '14:00', 14, 0.0, 'Cuota');
