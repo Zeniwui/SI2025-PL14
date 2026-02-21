@@ -91,19 +91,13 @@ public class DisponibilidadView {
         topBar.add(cabecera, BorderLayout.CENTER);
         topBar.add(btnCerrar, BorderLayout.EAST);
 
-        JPanel centro = new JPanel();
-        centro.setLayout(new BoxLayout(centro, BoxLayout.Y_AXIS));
-        centro.setBackground(Color.WHITE);
-
         panelCalendario = new JPanel(new BorderLayout());
         panelCalendario.setBackground(Color.WHITE);
         panelCalendario.setVisible(false);
-        panelCalendario.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         panelHorario = new JPanel(new BorderLayout());
         panelHorario.setBackground(Color.WHITE);
         panelHorario.setVisible(false);
-        panelHorario.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         tabbedHorario = new JTabbedPane();
         tabbedHorario.setFont(new Font("Segoe UI", Font.BOLD, 13));
@@ -121,16 +115,16 @@ public class DisponibilidadView {
 
         panelHorario.add(tabbedHorario, BorderLayout.CENTER);
 
-        centro.add(panelCalendario);
-        centro.add(Box.createVerticalStrut(12));
-        centro.add(panelHorario);
-
-        JScrollPane scroll = new JScrollPane(centro);
-        scroll.setBorder(null);
-        scroll.getVerticalScrollBar().setUnitIncrement(16);
+        // Layout principal: calendario fijo arriba, horario ocupa el resto
+        // Sin scroll externo: solo la tabla de horas tendra scroll propio
+        JPanel centro = new JPanel(new BorderLayout(0, 12));
+        centro.setBackground(Color.WHITE);
+        centro.setBorder(new EmptyBorder(0, 0, 0, 0));
+        centro.add(panelCalendario, BorderLayout.NORTH);
+        centro.add(panelHorario,   BorderLayout.CENTER);
 
         root.add(topBar, BorderLayout.NORTH);
-        root.add(scroll, BorderLayout.CENTER);
+        root.add(centro, BorderLayout.CENTER);
         frame.add(root);
     }
 
@@ -307,7 +301,6 @@ public class DisponibilidadView {
         }
 
         JScrollPane scrollH = new JScrollPane(tabla);
-        scrollH.setPreferredSize(new Dimension(720, 420));
         scrollH.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
         scrollH.getVerticalScrollBar().setUnitIncrement(16);
 
