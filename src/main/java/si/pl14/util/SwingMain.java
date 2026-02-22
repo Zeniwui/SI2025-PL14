@@ -8,10 +8,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
-import si.pl14.reservas.ReservaController;
-import si.pl14.reservas.ReservaModel;
-import si.pl14.reservas.ReservaView;
-
 /**
  * Punto de entrada principal que incluye botones para la ejecucion de las pantallas 
  * de las aplicaciones de ejemplo
@@ -55,20 +51,34 @@ public class SwingMain {
 		frame.setBounds(0, 0, 287, 185);
 		frame.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 		
+		/* esto pasaría al socio view
 		JButton btnEjecutarTkrun = new JButton("Ejecutar giis.demo.tkrun");
-		btnEjecutarTkrun.addActionListener(new ActionListener() { //NOSONAR codigo autogenerado
+		btnEjecutarTkrun.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
-				/*CarrerasController controller=new CarrerasController(new CarrerasModel(), new CarrerasView());
-				controller.initController();
-				*/
 				
 				ReservaController controllerReservas = new ReservaController(new ReservaModel(), new ReservaView());
 				controllerReservas.initController();
 			}
 		});
+		*/
+		
+		JButton btnAdmin = new JButton("Entrar al panel de administrador");
+		btnAdmin.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new AdminView();
+			}
+		});
 		frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
-		frame.getContentPane().add(btnEjecutarTkrun);
+		frame.getContentPane().add(btnAdmin);
+		
+		JButton btnSocio = new JButton("Entrar al panel de socio");
+		btnSocio.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new SociosView();
+			}
+		});
+		frame.getContentPane().add(btnSocio);
 		
 			
 		JButton btnInicializarBaseDeDatos = new JButton("Inicializar Base de Datos en Blanco");
