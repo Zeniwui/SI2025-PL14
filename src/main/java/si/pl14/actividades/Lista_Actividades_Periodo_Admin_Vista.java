@@ -102,11 +102,11 @@ public class Lista_Actividades_Periodo_Admin_Vista extends JFrame {
 		};
 
 		tableResultados = new JTable(modelTabla);
-		tableResultados.setRowHeight(45); // Filas altas para legibilidad
+		tableResultados.setRowHeight(45);
 		tableResultados.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		tableResultados.setSelectionBackground(new Color(238, 242, 255));
 		tableResultados.setSelectionForeground(texto_principal);
-		tableResultados.setShowVerticalLines(false); // Estilo moderno sin líneas verticales
+		tableResultados.setShowVerticalLines(false);
 		tableResultados.setGridColor(new Color(230, 230, 230));
 
 		// Header
