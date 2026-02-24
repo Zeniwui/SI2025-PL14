@@ -122,8 +122,7 @@ public class PeriodosInscripciónView {
         
         g.gridx = 0; g.gridy = 2; g.gridwidth = 2; g.weightx = 1.0;
         g.insets = new Insets(10, 4, 4, 4);
-        form.add(separador("A su vez se tiene que tener en cuenta cualquier incongruencia posible " 
-        	    + PeriodosInscripciónModel.MAX_DIAS_PERIODO + " días)"), g);
+        form.add(separador("A su vez se tiene que tener en cuenta cualquier incongruencia posible " ), g);
         g.gridwidth = 1;
         g.insets = new Insets(6, 4, 6, 4);
 
