@@ -10,13 +10,14 @@ import java.util.List;
 
 /**
  * Modelo para "Crear Periodo de Inscripcion".
- *
+ *~~Por Martín~~
  * Reglas de negocio:
  *   1. Todos los campos son obligatorios.
  *   2. Formato de fecha: dd/MM/yyyy.
  *   3. inicio_socios < fin_socios  (diferencia estricta > 3 dias)
  *   4. fin_socios    < fin_no_socios (diferencia estricta > 3 dias)
  *   5. No puede existir otro periodo con el mismo nombre.
+ *   6. Socios y no socios deben de tener un periodo de inscripción menor de 30 dias.
  */
 public class PeriodosInscripciónModel {
 
@@ -25,6 +26,7 @@ public class PeriodosInscripciónModel {
 
     /** Duracion minima en dias que debe tener cada sub-periodo. */
     private static final int MIN_DIAS_PERIODO = 3;
+    private static final int MAX_DIAS_PERIODO = 30;
 
     private final Database db = new Database();
 
@@ -75,8 +77,13 @@ public class PeriodosInscripciónModel {
             throw new ApplicationException(
                 "La Fecha Inicio Socios debe ser anterior a la Fecha Fin Socios.");
 
-        // Regla: periodo socios > 3 dias
+        // Regla: periodo socios > 3 dias y tmb < 30 días
         long diasSocios = java.time.temporal.ChronoUnit.DAYS.between(inicioSocios, finSocios);
+        if (diasSocios >= MAX_DIAS_PERIODO)
+            throw new ApplicationException(
+                "El periodo de socios debe durar menos de " + MAX_DIAS_PERIODO +
+                " dias (actualmente: " + diasSocios + " dia(s)).");
+        
         if (diasSocios <= MIN_DIAS_PERIODO)
             throw new ApplicationException(
                 "El periodo de socios debe durar más de " + MIN_DIAS_PERIODO +
@@ -87,13 +94,17 @@ public class PeriodosInscripciónModel {
             throw new ApplicationException(
                 "La Fecha Fin No Socios debe ser posterior a la Fecha Fin Socios.");
 
-        // Regla: periodo no socios (desde fin_socios hasta fin_no_socios) > 3 dias
+        // Regla: misma que para los socios
         long diasNoSocios = java.time.temporal.ChronoUnit.DAYS.between(finSocios, finNoSocios);
         if (diasNoSocios <= MIN_DIAS_PERIODO)
             throw new ApplicationException(
                 "El periodo de no socios debe durar más de " + MIN_DIAS_PERIODO +
                 " dias (actualmente: " + diasNoSocios + " dia(s)).");
-
+        
+        if (diasNoSocios >= MAX_DIAS_PERIODO)
+            throw new ApplicationException(
+                "El periodo de no socios debe durar menos de " + MAX_DIAS_PERIODO +
+                " dias (actualmente: " + diasNoSocios + " dia(s)).");
         // Unicidad de nombre
         List<Object[]> existe = db.executeQueryArray(
             "SELECT id_periodo FROM PeriodosInscripcion WHERE LOWER(nombre) = LOWER(?)", nombre);
