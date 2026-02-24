@@ -1,10 +1,29 @@
 -- Aquí añadiremos datos iniciales a la base de datos
 
--- Este es el ejemplo inicial de la plantilla (ver como referencia)
-delete from carreras;
-insert into carreras(id,inicio,fin,fecha,descr) values 
-	(100,'2016-10-05','2016-10-25','2016-11-09','finalizada'),
-	(101,'2016-10-05','2016-10-25','2016-11-10','en fase 3'),
-	(102,'2016-11-05','2016-11-09','2016-11-20','en fase 2'),
-	(103,'2016-11-10','2016-11-15','2016-11-21','en fase 1'),
-	(104,'2016-11-11','2016-11-15','2016-11-22','antes inscripcion');
+-- ─────────────────────────────────────────────────────────────────
+-- Datos iniciales PL-14
+-- ─────────────────────────────────────────────────────────────────
+
+-- Socio 0 = usuario actual de prueba
+INSERT OR IGNORE INTO Usuarios(dni, nombre, apellidos, telefono, email)
+    VALUES('00000000A','Usuario','Actual',600000000,'miusuariogrupo4@test.com');
+
+INSERT OR IGNORE INTO Socios(id_socio, dni, contrasena, estado_pagos)
+    VALUES(0,'00000000A','1234xd','Al Corriente');
+
+-- Instalaciones de ejemplo
+INSERT OR IGNORE INTO Instalaciones(nombre, tipo, coste_hora)
+    VALUES('Pista Tenis 1','Tenis',8.00);
+INSERT OR IGNORE INTO Instalaciones(nombre, tipo, coste_hora)
+    VALUES('Piscina Cubierta','Natacion',5.50);
+INSERT OR IGNORE INTO Instalaciones(nombre, tipo, coste_hora)
+    VALUES('Sala Padel A','Padel',10.00);
+
+-- Periodos de inscripcion de ejemplo
+INSERT OR IGNORE INTO PeriodosInscripcion
+    (nombre, inicio_socios, fin_socios, fin_no_socios)
+    VALUES('Torneo Golf Primavera','2026-03-25','2026-04-01','2026-04-08');
+
+INSERT OR IGNORE INTO PeriodosInscripcion
+    (nombre, inicio_socios, fin_socios, fin_no_socios)
+    VALUES('Clases Natacion Verano','2026-05-01','2026-05-15','2026-05-31');
