@@ -25,8 +25,8 @@ public class PeriodosInscripciónModel {
     private static final DateTimeFormatter FMT_DISP = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     /** Duracion minima en dias que debe tener cada sub-periodo. */
-    private static final int MIN_DIAS_PERIODO = 3;
-    private static final int MAX_DIAS_PERIODO = 30;
+    public static final int MIN_DIAS_PERIODO = 3;
+    public static final int MAX_DIAS_PERIODO = 30;
 
     private final Database db = new Database();
 

@@ -108,7 +108,10 @@ public class PeriodosInscripciónView {
         // Separador
         g.gridx = 0; g.gridy = 1; g.gridwidth = 2; g.weightx = 1.0;
         g.insets = new Insets(10, 4, 4, 4);
-        form.add(separador("Fechas del periodo  (cada sub-periodo debe durar más de 3 días)"), g);
+        form.add(separador("Fechas del periodo  (cada sub-periodo debe durar más de " 
+        	    + PeriodosInscripciónModel.MIN_DIAS_PERIODO + " días)"), g);
+        form.add(separador("A su vez se tiene que tener en cuenta cualquier incongruencia y sub-periodos menores de " 
+        	    + PeriodosInscripciónModel.MAX_DIAS_PERIODO + " días)"), g);
         g.gridwidth = 1;
         g.insets = new Insets(6, 4, 6, 4);
 
