@@ -1,10 +1,14 @@
 package si.pl14.periodosinscripcion;
 
+import si.pl14.model.PeriodoInscripcionEntity;
+
 import javax.swing.*;
 import javax.swing.border.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.util.List;
 
 /**
  * Vista de "Crear Periodo de Inscripcion".
@@ -15,19 +19,7 @@ import java.awt.event.FocusEvent;
  *   - Fecha Fin Socios
  *   - Fecha Fin No Socios
  *
- * Layout:
- *   ┌─ Crear periodo de inscripcion ──────────── [X] ┐
- *   │  Nombre: [_________________________________]    │
- *   │                                                 │
- *   │  Fecha Inicio Socios →  [__________]            │
- *   │  Fecha Fin Socios    →  [__________]            │
- *   │  Fecha Fin No Socios →  [__________]            │
- *   │                                                 │
- *   │  ┌─ Periodo de inscripcion para: "..."  ─┐      │
- *   │  │  Socios:    dd/MM - dd/MM             │  [Confirmar
- *   │  │  No Socios: hasta dd/MM               │   periodo]
- *   │  └───────────────────────────────────────┘      │
- *   └─────────────────────────────────────────────────┘
+ * Adicionalmente (ya se que no se pedía en RedKanban pero me parecía necesario para comprobar el funcionamiento) muestra una tabla con todos los periodos ya guardados en BD.
  */
 public class PeriodosInscripciónView {
 
@@ -42,6 +34,7 @@ public class PeriodosInscripciónView {
     private static final Font  F_CAMPO   = new Font("Segoe UI", Font.PLAIN, 13);
     private static final Font  F_RES     = new Font("Segoe UI", Font.PLAIN, 13);
     private static final Font  F_RES_NEG = new Font("Segoe UI", Font.BOLD,  13);
+    private static final Font  F_TABLA   = new Font("Segoe UI", Font.PLAIN, 12);
 
     // ── Componentes ───────────────────────────────────────────────────────────
     private final JDialog    frame;
@@ -58,11 +51,15 @@ public class PeriodosInscripciónView {
     private final JLabel lblResSocios;
     private final JLabel lblResNoSocios;
 
+    // Tabla de periodos guardados
+    private final DefaultTableModel tableModel;
+    private final JTable            tablaPeriodos;
+
     // ── Constructor ───────────────────────────────────────────────────────────
     public PeriodosInscripciónView() {
         frame = new JDialog((Frame) null, "Crear periodo de inscripcion", true);
-        frame.setSize(500, 440);
-        frame.setMinimumSize(new Dimension(460, 400));
+        frame.setSize(600, 660);
+        frame.setMinimumSize(new Dimension(560, 600));
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         frame.setResizable(false);
@@ -95,7 +92,7 @@ public class PeriodosInscripciónView {
         // ── Formulario ────────────────────────────────────────────────────────
         JPanel form = new JPanel(new GridBagLayout());
         form.setBackground(FONDO);
-        form.setBorder(new EmptyBorder(22, 28, 16, 28));
+        form.setBorder(new EmptyBorder(20, 28, 10, 28));
 
         GridBagConstraints g = new GridBagConstraints();
         g.fill   = GridBagConstraints.HORIZONTAL;
@@ -111,7 +108,7 @@ public class PeriodosInscripciónView {
         // Separador
         g.gridx = 0; g.gridy = 1; g.gridwidth = 2; g.weightx = 1.0;
         g.insets = new Insets(10, 4, 4, 4);
-        form.add(separador(), g);
+        form.add(separador("Fechas del periodo  (cada sub-periodo debe durar más de 3 días)"), g);
         g.gridwidth = 1;
         g.insets = new Insets(6, 4, 6, 4);
 
@@ -139,7 +136,7 @@ public class PeriodosInscripciónView {
         g.gridx = 1; g.gridy = 4; g.weightx = 1.0;
         form.add(txtFinNoSocios, g);
 
-        // ── Panel resumen + botón Confirmar (misma fila) ──────────────────────
+        // ── Resumen + botón Confirmar ─────────────────────────────────────────
         panelResumen = new JPanel();
         panelResumen.setLayout(new BoxLayout(panelResumen, BoxLayout.Y_AXIS));
         panelResumen.setBackground(FONDO_RES);
@@ -158,7 +155,7 @@ public class PeriodosInscripciónView {
         panelResumen.add(lblResNoSocios);
 
         g.gridx = 0; g.gridy = 5; g.gridwidth = 1; g.weightx = 1.0;
-        g.insets = new Insets(18, 4, 4, 8);
+        g.insets = new Insets(16, 4, 4, 8);
         g.fill = GridBagConstraints.BOTH;
         form.add(panelResumen, g);
 
@@ -174,13 +171,56 @@ public class PeriodosInscripciónView {
         btnConfirmar.setName("btnConfirmar");
 
         g.gridx = 1; g.gridy = 5; g.gridwidth = 1; g.weightx = 0;
-        g.insets = new Insets(18, 0, 4, 4);
+        g.insets = new Insets(16, 0, 4, 4);
         g.fill = GridBagConstraints.BOTH;
         form.add(btnConfirmar, g);
 
-        // ── Montaje ───────────────────────────────────────────────────────────
+        // ── Tabla de periodos guardados ───────────────────────────────────────
+        String[] columnas = {"#", "Nombre", "Inicio Socios", "Fin Socios", "Fin No Socios"};
+        tableModel = new DefaultTableModel(columnas, 0) {
+            @Override public boolean isCellEditable(int r, int c) { return false; }
+        };
+        tablaPeriodos = new JTable(tableModel);
+        tablaPeriodos.setFont(F_TABLA);
+        tablaPeriodos.setRowHeight(24);
+        tablaPeriodos.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
+        tablaPeriodos.getTableHeader().setBackground(AZUL);
+        tablaPeriodos.getTableHeader().setForeground(Color.WHITE);
+        tablaPeriodos.setSelectionBackground(new Color(210, 228, 255));
+        tablaPeriodos.setGridColor(new Color(210, 220, 240));
+        tablaPeriodos.setShowGrid(true);
+
+        // Ancho columna id
+        tablaPeriodos.getColumnModel().getColumn(0).setMaxWidth(40);
+
+        JScrollPane scrollTabla = new JScrollPane(tablaPeriodos);
+        scrollTabla.setBorder(BorderFactory.createCompoundBorder(
+            new EmptyBorder(0, 28, 14, 28),
+            BorderFactory.createLineBorder(BORDE, 1, true)));
+        scrollTabla.setPreferredSize(new Dimension(0, 160));
+
+        JPanel panelTabla = new JPanel(new BorderLayout());
+        panelTabla.setBackground(FONDO);
+
+        JPanel cabeceraTabla = new JPanel(new BorderLayout());
+        cabeceraTabla.setBackground(FONDO);
+        cabeceraTabla.setBorder(new EmptyBorder(4, 28, 4, 28));
+        JLabel lblTabla = new JLabel("📋  Periodos de inscripcion guardados:");
+        lblTabla.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        lblTabla.setForeground(new Color(50, 60, 90));
+        cabeceraTabla.add(lblTabla, BorderLayout.CENTER);
+
+        panelTabla.add(cabeceraTabla, BorderLayout.NORTH);
+        panelTabla.add(scrollTabla,   BorderLayout.CENTER);
+
+        // ── Montaje final ─────────────────────────────────────────────────────
+        JPanel centro = new JPanel(new BorderLayout());
+        centro.setBackground(FONDO);
+        centro.add(form,        BorderLayout.NORTH);
+        centro.add(panelTabla,  BorderLayout.CENTER);
+
         root.add(barTitulo, BorderLayout.NORTH);
-        root.add(form,      BorderLayout.CENTER);
+        root.add(centro,    BorderLayout.CENTER);
         frame.add(root);
     }
 
@@ -226,13 +266,13 @@ public class PeriodosInscripciónView {
         return tf;
     }
 
-    private JPanel separador() {
+    private JPanel separador(String titulo) {
         JPanel p = new JPanel(new BorderLayout());
         p.setBackground(new Color(225, 235, 252));
         p.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createMatteBorder(0, 3, 0, 0, AZUL),
             new EmptyBorder(4, 10, 4, 10)));
-        JLabel l = new JLabel("Fechas del periodo");
+        JLabel l = new JLabel(titulo);
         l.setFont(new Font("Segoe UI", Font.BOLD, 11));
         l.setForeground(AZUL);
         p.add(l, BorderLayout.CENTER);
@@ -249,13 +289,6 @@ public class PeriodosInscripciónView {
 
     // ── Actualizacion del resumen ─────────────────────────────────────────────
 
-    /**
-     * Refresca el cuadro de resumen en tiempo real.
-     * Muestra texto exacto del wireframe:
-     *   Periodo de inscripcion para: "nombre"
-     *   Socios:    dd/MM/yyyy - dd/MM/yyyy
-     *   No Socios: hasta dd/MM/yyyy
-     */
     public void actualizarResumen(String nombre, String iniS, String finS, String finN) {
         boolean ok = !nombre.isEmpty() && !iniS.isEmpty()
                   && !finS.isEmpty()   && !finN.isEmpty();
@@ -272,6 +305,23 @@ public class PeriodosInscripciónView {
         }
         panelResumen.revalidate();
         panelResumen.repaint();
+    }
+
+    /**
+     * Recarga la tabla inferior con la lista de periodos guardados en BD.
+     * Convierte fechas ISO a formato dd/MM/yyyy para mostrar.
+     */
+    public void cargarTablaPeriodos(List<PeriodoInscripcionEntity> periodos) {
+        tableModel.setRowCount(0);
+        for (PeriodoInscripcionEntity p : periodos) {
+            tableModel.addRow(new Object[]{
+                p.getIdPeriodo(),
+                p.getNombre(),
+                PeriodosInscripciónModel.isoADisplay(p.getInicioSocios()),
+                PeriodosInscripciónModel.isoADisplay(p.getFinSocios()),
+                PeriodosInscripciónModel.isoADisplay(p.getFinNoSocios())
+            });
+        }
     }
 
     public void mostrarExito(String nombre) {
