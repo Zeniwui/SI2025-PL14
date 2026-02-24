@@ -27,6 +27,7 @@ public class PeriodosInscripciónModel {
     /** Duracion minima en dias que debe tener cada sub-periodo. */
     public static final int MIN_DIAS_PERIODO = 3;
     public static final int MAX_DIAS_PERIODO = 30;
+    public static final int MAX_PERIODOS     = 15;
 
     private final Database db = new Database();
 
@@ -48,7 +49,7 @@ public class PeriodosInscripciónModel {
             "       fin_socios      AS finSocios, " +
             "       fin_no_socios   AS finNoSocios " +
             "FROM PeriodosInscripcion " +
-            "ORDER BY inicio_socios DESC";
+            "ORDER BY inicio_socios ASC";
         return db.executeQueryPojo(PeriodoInscripcionEntity.class, sql);
     }
 
@@ -71,7 +72,16 @@ public class PeriodosInscripciónModel {
         LocalDate inicioSocios = parseFecha(inicioSociosStr, "Fecha Inicio Socios");
         LocalDate finSocios    = parseFecha(finSociosStr,    "Fecha Fin Socios");
         LocalDate finNoSocios  = parseFecha(finNoSociosStr,  "Fecha Fin No Socios");
-
+        
+        // Regla: limite de periodos
+        List<Object[]> conteo = db.executeQueryArray(
+        	    "SELECT COUNT(*) FROM PeriodosInscripcion");
+        	int total = conteo.isEmpty() ? 0 : ((Number) conteo.get(0)[0]).intValue();
+        	if (total >= MAX_PERIODOS)
+        	    throw new ApplicationException(
+        	        "No se pueden crear más de " + MAX_PERIODOS +
+        	        " periodos de inscripcion. Elimine alguno antes de continuar.");
+        
         // Regla: inicio_socios < fin_socios
         if (!inicioSocios.isBefore(finSocios))
             throw new ApplicationException(
