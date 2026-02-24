@@ -73,7 +73,13 @@ public class PeriodosInscripciónView {
         barTitulo.setBorder(new EmptyBorder(10, 16, 10, 10));
 
         JLabel lblTitulo = new JLabel("🕐  Crear periodo de inscripcion  📋");
-        lblTitulo.setFont(F_TITULO);
+        String[] fuentes = {"Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", "Segoe UI"};
+        Font fuenteEmoji = null;
+        for (String f : fuentes) {
+            fuenteEmoji = new Font(f, Font.BOLD, 15);
+            if (!fuenteEmoji.getFamily().equals("Dialog")) break;
+        }
+        lblTitulo.setFont(fuenteEmoji);
         lblTitulo.setForeground(Color.WHITE);
 
         btnCerrar = new JButton("✕");
