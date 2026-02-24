@@ -109,34 +109,40 @@ public class PeriodosInscripciónView {
         g.gridx = 0; g.gridy = 1; g.gridwidth = 2; g.weightx = 1.0;
         g.insets = new Insets(10, 4, 4, 4);
         form.add(separador("Fechas del periodo  (cada sub-periodo debe durar más de " 
-        	    + PeriodosInscripciónModel.MIN_DIAS_PERIODO + " días)"), g);
-        form.add(separador("A su vez se tiene que tener en cuenta cualquier incongruencia y sub-periodos menores de " 
+        	    + PeriodosInscripciónModel.MIN_DIAS_PERIODO + " días y menos de"
+        	    + PeriodosInscripciónModel.MAX_DIAS_PERIODO + " días)"), g);
+        g.gridwidth = 1;
+        g.insets = new Insets(6, 4, 6, 4);
+        
+        g.gridx = 0; g.gridy = 2; g.gridwidth = 2; g.weightx = 1.0;
+        g.insets = new Insets(10, 4, 4, 4);
+        form.add(separador("A su vez se tiene que tener en cuenta cualquier incongruencia posible " 
         	    + PeriodosInscripciónModel.MAX_DIAS_PERIODO + " días)"), g);
         g.gridwidth = 1;
         g.insets = new Insets(6, 4, 6, 4);
 
         // Fila 2 – Fecha Inicio Socios
-        g.gridx = 0; g.gridy = 2; g.weightx = 0;
+        g.gridx = 0; g.gridy = 3; g.weightx = 0;
         form.add(label("Fecha Inicio Socios →"), g);
         txtInicioSocios = campoFecha();
         txtInicioSocios.setName("txtInicioSocios");
-        g.gridx = 1; g.gridy = 2; g.weightx = 1.0;
+        g.gridx = 1; g.gridy = 3; g.weightx = 1.0;
         form.add(txtInicioSocios, g);
 
         // Fila 3 – Fecha Fin Socios
-        g.gridx = 0; g.gridy = 3; g.weightx = 0;
+        g.gridx = 0; g.gridy = 4; g.weightx = 0;
         form.add(label("Fecha Fin Socios →"), g);
         txtFinSocios = campoFecha();
         txtFinSocios.setName("txtFinSocios");
-        g.gridx = 1; g.gridy = 3; g.weightx = 1.0;
+        g.gridx = 1; g.gridy = 4; g.weightx = 1.0;
         form.add(txtFinSocios, g);
 
         // Fila 4 – Fecha Fin No Socios
-        g.gridx = 0; g.gridy = 4; g.weightx = 0;
+        g.gridx = 0; g.gridy = 5; g.weightx = 0;
         form.add(label("Fecha Fin No Socios →"), g);
         txtFinNoSocios = campoFecha();
         txtFinNoSocios.setName("txtFinNoSocios");
-        g.gridx = 1; g.gridy = 4; g.weightx = 1.0;
+        g.gridx = 1; g.gridy = 5; g.weightx = 1.0;
         form.add(txtFinNoSocios, g);
 
         // ── Resumen + botón Confirmar ─────────────────────────────────────────
@@ -157,7 +163,7 @@ public class PeriodosInscripciónView {
         panelResumen.add(Box.createVerticalStrut(2));
         panelResumen.add(lblResNoSocios);
 
-        g.gridx = 0; g.gridy = 5; g.gridwidth = 1; g.weightx = 1.0;
+        g.gridx = 0; g.gridy = 6; g.gridwidth = 1; g.weightx = 1.0;
         g.insets = new Insets(16, 4, 4, 8);
         g.fill = GridBagConstraints.BOTH;
         form.add(panelResumen, g);
@@ -173,7 +179,7 @@ public class PeriodosInscripciónView {
         btnConfirmar.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnConfirmar.setName("btnConfirmar");
 
-        g.gridx = 1; g.gridy = 5; g.gridwidth = 1; g.weightx = 0;
+        g.gridx = 1; g.gridy = 6; g.gridwidth = 1; g.weightx = 0;
         g.insets = new Insets(16, 0, 4, 4);
         g.fill = GridBagConstraints.BOTH;
         form.add(btnConfirmar, g);
