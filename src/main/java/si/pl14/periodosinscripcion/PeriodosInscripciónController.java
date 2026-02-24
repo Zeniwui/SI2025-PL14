@@ -10,10 +10,10 @@ import javax.swing.event.DocumentListener;
  * Controlador de "Crear Periodo de Inscripcion". Patron MVC.
  *
  * Flujo:
- *  1. Usuario rellena nombre, fecha inicio socios, fecha fin socios,
- *     fecha fin no socios.
+ *  1. Al abrir la pantalla carga en la tabla los periodos ya guardados en BD.
  *  2. El resumen se actualiza en tiempo real conforme se escribe.
- *  3. "Confirmar periodo" valida (en el modelo), guarda y resetea.
+ *  3. "Confirmar periodo" valida (en el modelo), guarda en BD,
+ *     refresca la tabla y resetea el formulario.
  */
 public class PeriodosInscripciónController {
 
@@ -28,10 +28,13 @@ public class PeriodosInscripciónController {
 
     public void initController() {
 
+        // Cargar periodos existentes en la tabla al abrir la pantalla
+        cargarPeriodos();
+
         // Cerrar ventana
         view.getBtnCerrar().addActionListener(e -> view.getFrame().dispose());
 
-        // Resumen en tiempo real: escuchar cambios en todos los campos
+        // Resumen en tiempo real
         DocumentListener dl = new DocumentListener() {
             @Override public void insertUpdate(DocumentEvent e)  { refrescarResumen(); }
             @Override public void removeUpdate(DocumentEvent e)  { refrescarResumen(); }
@@ -42,7 +45,7 @@ public class PeriodosInscripciónController {
         view.getTxtFinSocios()    .getDocument().addDocumentListener(dl);
         view.getTxtFinNoSocios()  .getDocument().addDocumentListener(dl);
 
-        // Confirmar
+        // Confirmar: guardar y refrescar tabla
         view.getBtnConfirmar().addActionListener(
             e -> SwingUtil.exceptionWrapper(this::confirmar));
 
@@ -58,7 +61,14 @@ public class PeriodosInscripciónController {
         String finN   = PeriodosInscripciónView.fechaValor(view.getTxtFinNoSocios());
 
         PeriodoInscripcionEntity creado = model.crearPeriodo(nombre, iniS, finS, finN);
+
+        // Mostrar confirmacion, resetear formulario y refrescar tabla con el nuevo periodo
         view.mostrarExito(creado.getNombre());
+        cargarPeriodos();
+    }
+
+    private void cargarPeriodos() {
+        view.cargarTablaPeriodos(model.getPeriodos());
     }
 
     private void refrescarResumen() {
