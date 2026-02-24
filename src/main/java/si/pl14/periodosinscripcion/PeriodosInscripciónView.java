@@ -72,7 +72,7 @@ public class PeriodosInscripciónView {
         barTitulo.setBackground(AZUL);
         barTitulo.setBorder(new EmptyBorder(10, 16, 10, 10));
 
-        JLabel lblTitulo = new JLabel("Crear periodo de inscripcion");
+        JLabel lblTitulo = new JLabel("🕐  Crear periodo de inscripcion  📋");
         lblTitulo.setFont(F_TITULO);
         lblTitulo.setForeground(Color.WHITE);
 
@@ -109,7 +109,7 @@ public class PeriodosInscripciónView {
         g.gridx = 0; g.gridy = 1; g.gridwidth = 2; g.weightx = 1.0;
         g.insets = new Insets(10, 4, 4, 4);
         form.add(separador("Fechas del periodo  (cada sub-periodo debe durar más de " 
-        	    + PeriodosInscripciónModel.MIN_DIAS_PERIODO + " días y menos de"
+        	    + PeriodosInscripciónModel.MIN_DIAS_PERIODO + " días y menos de "
         	    + PeriodosInscripciónModel.MAX_DIAS_PERIODO + " días)"), g);
         g.gridwidth = 1;
         g.insets = new Insets(6, 4, 6, 4);
