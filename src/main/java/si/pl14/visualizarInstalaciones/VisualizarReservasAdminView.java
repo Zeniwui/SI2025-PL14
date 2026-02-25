@@ -1,4 +1,4 @@
-package si.pl14.reservas;
+package si.pl14.visualizarInstalaciones;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -154,11 +154,12 @@ public class VisualizarReservasAdminView {
                     if (esDiaValido) {
                         c.setBackground(COLOR_LIBRE_BG);
                         c.setForeground(COLOR_LIBRE_FG);
+                        ((JLabel) c).setText("Libre");
                     } else {
                         c.setBackground(COLOR_GRIS_LIBRE_BG);
                         c.setForeground(COLOR_GRIS_LIBRE_FG);
+                        ((JLabel) c).setText("");
                     }
-                    ((JLabel) c).setText("Libre");
                 } else {
                     if (esDiaValido) {
                         c.setBackground(COLOR_OCUPADO_BG);

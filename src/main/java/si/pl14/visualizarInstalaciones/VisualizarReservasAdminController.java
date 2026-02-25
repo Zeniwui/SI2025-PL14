@@ -1,4 +1,4 @@
-package si.pl14.reservas;
+package si.pl14.visualizarInstalaciones;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -18,7 +18,7 @@ import si.pl14.util.SwingUtil;
 
 public class VisualizarReservasAdminController {
 	
-	private ReservaModel model;
+	private VisualizarReservasAdminModel model;
 	private VisualizarReservasAdminView view;
 	
 	private LocalDate fechaLunesActual;
@@ -30,7 +30,7 @@ public class VisualizarReservasAdminController {
     private final int HORA_APERTURA = 9;
     private final int DIAS_MAXIMOS_VISUALIZACION = 30;
 	
-	public VisualizarReservasAdminController(ReservaModel m, VisualizarReservasAdminView v) {
+	public VisualizarReservasAdminController(VisualizarReservasAdminModel m, VisualizarReservasAdminView v) {
 		model = m;
 		view = v;
 		
