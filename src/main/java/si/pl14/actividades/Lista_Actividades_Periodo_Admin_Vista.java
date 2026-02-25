@@ -2,6 +2,7 @@ package si.pl14.actividades;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
@@ -35,112 +36,104 @@ public class Lista_Actividades_Periodo_Admin_Vista extends JFrame {
 	
 	
 	public Lista_Actividades_Periodo_Admin_Vista() {
-		// Colores
-		Color azul_soft = new Color(132, 156, 189);     
-		Color indigo_medio = new Color(139, 141, 214);   
-		Color fondo_app = new Color(248, 250, 252);     
-		Color gris_borde = new Color(226, 232, 240);    
-		Color blanco_puro = Color.WHITE;
-		Color texto_principal = new Color(30, 41, 59);  
+	    Color pastel_blue = new Color(214, 230, 242);
+	    Color pastel_purple = new Color(230, 230, 250);
+	    Color soft_gray = new Color(245, 247, 250);
+	    Color border_color = new Color(210, 215, 223);
+	    Color dark_text = new Color(70, 80, 95);
+	    Color white = Color.WHITE;
 
-		setTitle("Panel de Administración - Gestión de Actividades");
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setSize(1300, 750);
-		setLocationRelativeTo(null); // Centrar en pantalla
+	    setTitle("Gestión de Actividades - Panel Administrativo");
+	    setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+	    setSize(1300, 750);
+	    setLocationRelativeTo(null);
 
-		contentPane = new JPanel();
-		contentPane.setBackground(fondo_app);
-		contentPane.setBorder(new EmptyBorder(30, 30, 30, 30));
-		setContentPane(contentPane);
-		contentPane.setLayout(new BorderLayout(0, 20));
+	    contentPane = new JPanel();
+	    contentPane.setBackground(soft_gray);
+	    contentPane.setBorder(new EmptyBorder(25, 25, 25, 25));
+	    setContentPane(contentPane);
+	    contentPane.setLayout(new BorderLayout(0, 20));
 
-		// --- PANEL SUPERIOR ---
-		JPanel northPanel = new JPanel();
-		northPanel.setOpaque(false);
-		northPanel.setLayout(new BorderLayout());
+	    JPanel northPanel = new JPanel(new BorderLayout());
+	    northPanel.setOpaque(false);
 
-		JLabel lblTitulo = new JLabel("Actividades Ofertadas");
-		lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 28));
-		lblTitulo.setForeground(indigo_medio);
-		northPanel.add(lblTitulo, BorderLayout.NORTH);
+	    JLabel lblTitulo = new JLabel("Actividades Ofertadas");
+	    lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 26));
+	    lblTitulo.setForeground(dark_text);
+	    northPanel.add(lblTitulo, BorderLayout.NORTH);
 
-		JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 20));
-		filterPanel.setOpaque(false);
+	    JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 15));
+	    filterPanel.setOpaque(false);
 
-		JLabel lblSeleccionarPeriodo = new JLabel("Periodo lectivo:");
-		lblSeleccionarPeriodo.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 15));
-		lblSeleccionarPeriodo.setForeground(new Color(100, 100, 100));
-		filterPanel.add(lblSeleccionarPeriodo);
+	    JLabel lblSeleccionarPeriodo = new JLabel("Periodo lectivo:");
+	    lblSeleccionarPeriodo.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 14));
+	    lblSeleccionarPeriodo.setForeground(dark_text);
+	    filterPanel.add(lblSeleccionarPeriodo);
 
-		cbPeriodo.setPreferredSize(new Dimension(300, 35));
-		cbPeriodo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-		cbPeriodo.setBackground(blanco_puro);
-		filterPanel.add(cbPeriodo);
+	    cbPeriodo.setPreferredSize(new Dimension(280, 35));
+	    cbPeriodo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+	    cbPeriodo.setBackground(white);
+	    filterPanel.add(cbPeriodo);
 
-		// Botón Consultar
-		btnConsultar.setPreferredSize(new Dimension(150, 40));
-		btnConsultar.setFont(new Font("Segoe UI", Font.BOLD, 14));
-		btnConsultar.setBackground(indigo_medio);
-		btnConsultar.setForeground(blanco_puro);
-		btnConsultar.setBorder(BorderFactory.createLineBorder(new Color(79, 70, 229), 1));
-		btnConsultar.setOpaque(true);
-		btnConsultar.setCursor(new Cursor(Cursor.HAND_CURSOR));
-		btnConsultar.setFocusPainted(false);
-		filterPanel.add(btnConsultar);
+	    btnConsultar.setPreferredSize(new Dimension(140, 38));
+	    btnConsultar.setFont(new Font("Segoe UI Bold", Font.BOLD, 13));
+	    btnConsultar.setBackground(pastel_purple);
+	    btnConsultar.setForeground(dark_text);
+	    btnConsultar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+	    btnConsultar.setFocusPainted(false);
+	    btnConsultar.setBorder(new LineBorder(border_color, 1));
+	    filterPanel.add(btnConsultar);
 
-		northPanel.add(filterPanel, BorderLayout.CENTER);
-		contentPane.add(northPanel, BorderLayout.NORTH);
+	    northPanel.add(filterPanel, BorderLayout.CENTER);
+	    contentPane.add(northPanel, BorderLayout.NORTH);
 
-		// --- PANEL CENTRAL ---
-		String[] columnas = { "Nombre", "Tipo", "Duración", "Horarios", "F. Inicio", "F. Fin", "Plazas", "Precio Socio",
-				"Precio No Socio" };
-		modelTabla = new DefaultTableModel(null, columnas) {
-			@Override
-			public boolean isCellEditable(int r, int c) {
-				return false;
-			}
-		};
+	    String[] columnas = { "Nombre", "Tipo", "Instalación", "Duración", "Horarios", "F. Inicio", "F. Fin", "Plazas", "Socio", "No socio" };
+	    modelTabla = new DefaultTableModel(null, columnas) {
+	        @Override
+	        public boolean isCellEditable(int r, int c) {
+	            return false;
+	        }
+	    };
 
-		tableResultados = new JTable(modelTabla);
-		tableResultados.setRowHeight(45);
-		tableResultados.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-		tableResultados.setSelectionBackground(new Color(238, 242, 255));
-		tableResultados.setSelectionForeground(texto_principal);
-		tableResultados.setShowVerticalLines(false);
-		tableResultados.setGridColor(new Color(230, 230, 230));
+	    tableResultados = new JTable(modelTabla);
+	    tableResultados.setRowHeight(40);
+	    tableResultados.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+	    tableResultados.setSelectionBackground(pastel_blue);
+	    tableResultados.setSelectionForeground(dark_text);
+	    tableResultados.setGridColor(soft_gray);
+	    tableResultados.setShowVerticalLines(true);
 
-		// Header
-		tableResultados.getTableHeader().setPreferredSize(new Dimension(0, 45));
-		tableResultados.getTableHeader().setBackground(azul_soft);
-		tableResultados.getTableHeader().setForeground(blanco_puro);
-		tableResultados.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
-		tableResultados.getTableHeader().setReorderingAllowed(false);
+	    tableResultados.getTableHeader().setPreferredSize(new Dimension(0, 40));
+	    tableResultados.getTableHeader().setBackground(pastel_blue);
+	    tableResultados.getTableHeader().setForeground(dark_text);
+	    tableResultados.getTableHeader().setFont(new Font("Segoe UI Bold", Font.BOLD, 13));
+	    tableResultados.getTableHeader().setReorderingAllowed(false);
 
-		tableResultados.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-		int[] anchos = { 220, 100, 90, 250, 100, 100, 70, 90, 90 };
-		for (int i = 0; i < anchos.length; i++) {
-			tableResultados.getColumnModel().getColumn(i).setPreferredWidth(anchos[i]);
-		}
+	    tableResultados.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+	    int[] anchos = { 200, 100, 180, 90, 220, 100, 100, 70, 85, 85 };
+	    for (int i = 0; i < columnas.length; i++) {
+	        tableResultados.getColumnModel().getColumn(i).setPreferredWidth(anchos[i]);
+	    }
 
-		JScrollPane scrollPane = new JScrollPane(tableResultados);
-		scrollPane.getViewport().setBackground(blanco_puro);
-		scrollPane.setBorder(BorderFactory.createEmptyBorder());
-		contentPane.add(scrollPane, BorderLayout.CENTER);
+	    JScrollPane scrollPane = new JScrollPane(tableResultados);
+	    scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	    scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+	    scrollPane.getViewport().setBackground(white);
+	    scrollPane.setBorder(new LineBorder(border_color, 1));
+	    contentPane.add(scrollPane, BorderLayout.CENTER);
 
-		// --- PANEL INFERIOR ---
-		JPanel southPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		southPanel.setOpaque(false);
+	    JPanel southPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+	    southPanel.setOpaque(false);
 
-		btnVolver.setPreferredSize(new Dimension(120, 40));
-		btnVolver.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 14));
-		btnVolver.setBackground(blanco_puro);
-		btnVolver.setForeground(azul_soft);
-		btnVolver.setBorder(BorderFactory.createLineBorder(gris_borde, 2));
-		btnVolver.setFocusPainted(false);
-		btnVolver.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200), 1));
-		southPanel.add(btnVolver);
+	    btnVolver.setPreferredSize(new Dimension(110, 35));
+	    btnVolver.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 13));
+	    btnVolver.setBackground(white);
+	    btnVolver.setForeground(dark_text);
+	    btnVolver.setFocusPainted(false);
+	    btnVolver.setBorder(new LineBorder(border_color, 1));
+	    southPanel.add(btnVolver);
 
-		contentPane.add(southPanel, BorderLayout.SOUTH);
+	    contentPane.add(southPanel, BorderLayout.SOUTH);
 	}
 
 	// Métodos para el Controlador

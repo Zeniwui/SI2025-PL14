@@ -1,23 +1,13 @@
 package si.pl14.actividades;
 
-import java.time.LocalTime;
-import java.time.Duration;
-
 public class ActividadDTO {
-    private String nombre;
-    private String tipo; // "Deporte", "Conferencia", etc.
-    private String horarios;
-    private String fechaInicio;
-    private String fechaFin;
+    private String nombre, tipo, horarios, fechaInicio, fechaFin, hIni, hFin, instalacion;
     private int plazas;
-    private double precioSocio;
-    private double precioNoSocio;
-    private String hIni; 
-    private String hFin;
+    private double precioSocio, precioNoSocio;
 
     public ActividadDTO(String nombre, String tipo, String horarios, String fechaInicio, 
                         String fechaFin, int plazas, double precioSocio, 
-                        double precioNoSocio, String hIni, String hFin) {
+                        double precioNoSocio, String instalacion, String hIni, String hFin) {
         this.nombre = nombre;
         this.tipo = tipo;
         this.horarios = horarios;
@@ -26,24 +16,25 @@ public class ActividadDTO {
         this.plazas = plazas;
         this.precioSocio = precioSocio;
         this.precioNoSocio = precioNoSocio;
+        this.instalacion = (instalacion != null) ? instalacion : "No asignada";
         this.hIni = hIni;
         this.hFin = hFin;
     }
 
     public String getDuracion() {
         try {
-            if (hIni == null || hFin == null) return "N/A";
-            long minutos = Duration.between(LocalTime.parse(hIni), LocalTime.parse(hFin)).toMinutes();
-            long horas = minutos / 60;
-            long resto = minutos % 60;
-            return (horas > 0 ? horas + "h " : "") + (resto > 0 ? resto + "min" : "");
-        } catch (Exception e) { return "Error"; }
+            // El error solía dar aquí si hIni o hFin llegaban vacíos o en índices incorrectos
+            if (hIni == null || hFin == null || hIni.isEmpty()) return "N/A";
+            long minutos = java.time.Duration.between(java.time.LocalTime.parse(hIni), java.time.LocalTime.parse(hFin)).toMinutes();
+            return (minutos / 60) + "h " + (minutos % 60) + "min";
+        } catch (Exception e) { return "N/A"; }
     }
 
     public Object[] toArray() {
         return new Object[]{
             nombre,
             tipo,
+            instalacion,      // <--- Añadido a la tabla
             getDuracion(),
             horarios != null ? horarios : "Sin horario",
             fechaInicio,
@@ -53,4 +44,11 @@ public class ActividadDTO {
             String.format("%.2f€", precioNoSocio)
         };
     }
+    
+    // Getters necesarios para el controller...
+    public String getNombre() { return nombre; }
+    public String getFechaInicio() { return fechaInicio; }
+    public String getFechaFin() { return fechaFin; }
+    public String gethIni() { return hIni; }
+    public String gethFin() { return hFin; }
 }
