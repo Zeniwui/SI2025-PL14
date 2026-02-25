@@ -10,8 +10,19 @@ import si.pl14.util.Database;
 
 public class ReservaModel {
 	
+	private final int HORA_APERTURA = 9;
+	private final int HORA_CIERRE = 21;
+	
 	private Database db = new Database();
 	
+	public int getHoraApertura() {
+		return HORA_APERTURA;
+	}
+
+	public int getHoraCierre() {
+		return HORA_CIERRE;
+	}
+
 	/*
 	 * Obtiene la lista de instalaciones
 	 */

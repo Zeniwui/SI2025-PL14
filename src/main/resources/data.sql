@@ -41,3 +41,16 @@ INSERT INTO Reservas (id_instalacion, fecha, hora_inicio, hora_fin, id_socio, id
 -- Reserva automática por la clase de Yoga el Lunes 23/02/2026 de 09:00 a 10:00
 INSERT INTO Reservas (id_instalacion, fecha, hora_inicio, hora_fin, id_socio, id_actividad, estado_pago, metodo_pago) VALUES 
 (4, '2026-02-23', '09:00', '10:00', NULL, 1, NULL, NULL);
+
+-- Mas reservas
+INSERT INTO Reservas (id_instalacion, fecha, hora_inicio, hora_fin, id_socio, id_actividad, coste_reserva, estado_pago, metodo_pago) VALUES 
+(1, '2026-02-26', '10:00', '12:00', 1, NULL, 20.00, 'Pagado', 'Tarjeta'),
+(2, '2026-02-27', '17:00', '18:00', 1, NULL, 12.00, 'Pendiente', 'Cuota_Mensual'),
+(3, '2026-02-28', '11:00', '13:00', 2, NULL, 20.00, 'Pagado', 'Efectivo'),
+(4, '2026-03-02', '09:00', '10:00', NULL, 1, NULL, NULL, NULL),
+(1, '2026-03-05', '18:00', '19:00', 1, NULL, 10.00, 'Pagado', 'Tarjeta'),
+(2, '2026-03-08', '19:00', '21:00', 2, NULL, 24.00, 'Pendiente', 'Cuota_Mensual'),
+(4, '2026-03-09', '09:00', '10:00', NULL, 1, NULL, NULL, NULL),
+(3, '2026-03-15', '10:00', '11:00', 1, NULL, 10.00, 'Pagado', 'Tarjeta'),
+(1, '2026-03-18', '16:00', '18:00', 1, NULL, 20.00, 'Pagado', 'Tarjeta'),
+(2, '2026-03-22', '12:00', '13:00', 2, NULL, 12.00, 'Pendiente', 'Cuota_Mensual');

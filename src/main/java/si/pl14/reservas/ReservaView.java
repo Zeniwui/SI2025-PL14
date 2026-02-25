@@ -21,6 +21,7 @@ public class ReservaView {
     private JSpinner spinHoraFin;
     private JButton btnComprobar;
     private JLabel lblInformacion;
+    private JLabel lblPrecioTotal;
     private JRadioButton rdbtnPagoInmediato;
     private JRadioButton rdbtnCuotaMensual;
     private ButtonGroup grupoPago;
@@ -66,7 +67,6 @@ public class ReservaView {
         JPanel cardPanel = new JPanel();
         cardPanel.setBackground(COLOR_PANEL);
         cardPanel.setBorder(new LineBorder(new Color(220, 220, 220), 1, true)); 
-        // Layout interno: 2 Columnas
         cardPanel.setLayout(new MigLayout("fill, insets 30", "[grow][grow]", "[][grow][][]"));
         
         frame.getContentPane().add(cardPanel, "cell 0 1, grow");
@@ -129,10 +129,9 @@ public class ReservaView {
         lblFechaSeleccionada.setForeground(COLOR_PRIMARIO);
         lblFechaSeleccionada.setHorizontalAlignment(SwingConstants.LEFT);
         
-        // Inicializamos con la fecha actual
+        // Inicializamos el calendario con la fecha actual
         actualizarLabelFecha(calendarFecha.getDate());
 
-        // Listener para que cambie al pulsar en el calendario
         calendarFecha.addPropertyChangeListener("calendar", new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
@@ -141,6 +140,7 @@ public class ReservaView {
         });
 
         cardPanel.add(lblFechaSeleccionada, "cell 1 1, flowy, aligny top, gapbottom 20");       
+        
         // -- Horarios --
         JLabel lblHorario = createLabel("Horario Disponible");
         cardPanel.add(lblHorario, "cell 1 1, flowy, aligny top, gapbottom 10");
@@ -149,28 +149,28 @@ public class ReservaView {
         panelHoras.setOpaque(false);
         
         panelHoras.add(new JLabel("De:"));
-        spinHoraInicio = new JSpinner(new SpinnerNumberModel(9, 0, 23, 1));
+        spinHoraInicio = new JSpinner(); 
         styleSpinner(spinHoraInicio);
         panelHoras.add(spinHoraInicio, "w 60!");
 
         panelHoras.add(new JLabel("A:"));
-        spinHoraFin = new JSpinner(new SpinnerNumberModel(10, 0, 23, 1));
+        spinHoraFin = new JSpinner();
         styleSpinner(spinHoraFin);
         panelHoras.add(spinHoraFin, "w 60!");
         
         cardPanel.add(panelHoras, "cell 1 1, aligny top, wrap");
         
+        // Etiqueta de Precio Total
+        lblPrecioTotal = new JLabel("Precio Total: -- €");
+        lblPrecioTotal.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        lblPrecioTotal.setForeground(COLOR_PRIMARIO);
+        cardPanel.add(lblPrecioTotal, "cell 1 1, flowy, gapy 10, wrap");
+        
+        // Mensajes de información para las comprobaciones
         lblInformacion = new JLabel();
-        lblInformacion.setForeground(Color.red);
-        cardPanel.add(lblInformacion, "cell 1 1, flowy, wrap");
-
-        /*
-        // Botón Comprobar
-        btnComprobar = new JButton("Comprobar Disponibilidad");
-        btnComprobar.setName("btnComprobar");
-        styleButton(btnComprobar, COLOR_PRIMARIO, Color.WHITE);
-        cardPanel.add(btnComprobar, "cell 1 1, aligny top, gapy 10, growx");
-        */
+        lblInformacion.setForeground(new Color(231, 76, 60));
+        lblInformacion.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        cardPanel.add(lblInformacion, "cell 1 1, flowy, wrap, w 300!, h 40!");
 
         // -- Pago --
         JLabel lblPago = createLabel("Método de Pago");
@@ -246,15 +246,29 @@ public class ReservaView {
             ((JSpinner.DefaultEditor)editor).getTextField().setHorizontalAlignment(JTextField.CENTER);
         }
     }
+    
+    public void setHorariosDisponibles(int horaApertura, int horaCierre) {
+        int totalHoras = horaCierre - horaApertura + 1;
+        Object[] horas = new Object[totalHoras + 1];
+        
+        horas[0] = "";
+        
+        for (int i = 0; i < totalHoras; i++) {
+            horas[i + 1] = horaApertura + i;
+        }
+        
+        spinHoraInicio.setModel(new SpinnerListModel(horas));
+        spinHoraFin.setModel(new SpinnerListModel(horas));
+    }
 
     public JFrame getFrame() { return this.frame; }
     public JComboBox<Object> getCbInstalaciones() { return this.cbInstalaciones; }
     public JCalendar getCalendarFecha() { return this.calendarFecha; }
-    public int getHoraInicio() { return (int) this.spinHoraInicio.getValue(); }
-    public int getHoraFin() { return (int) this.spinHoraFin.getValue(); }
     public JButton getBtnComprobar() { return this.btnComprobar; }
+    public JSpinner getSpinHoraInicio() { return this.spinHoraInicio; }
+    public JSpinner getSpinHoraFin() { return this.spinHoraFin; }
+    public JLabel getLblPrecioTotal() { return this.lblPrecioTotal; }
     public JLabel getLblInformacion() { return this.lblInformacion; }
-    public void setTextoInformacion(String mensaje) { this.lblInformacion.setText(mensaje); }
     public JButton getBtnCancelar() { return this.btnCancelar; }
     public JButton getBtnReservar() { return this.btnReservar; }
     public boolean esPagoInmediato() { return this.rdbtnPagoInmediato.isSelected(); }
@@ -262,4 +276,21 @@ public class ReservaView {
     public JTextArea getTextoResumen() { return this.txtResumen; }
     public void setTextoResumen(String mensaje) { this.txtResumen.setText(mensaje); }
     public JLabel getLblFechaSeleccionada() { return lblFechaSeleccionada; }
+
+    public int getHoraInicio() { 
+        Object val = this.spinHoraInicio.getValue();
+        return (val instanceof Integer) ? (int) val : -1; 
+    }
+    public int getHoraFin() { 
+        Object val = this.spinHoraFin.getValue();
+        return (val instanceof Integer) ? (int) val : -1; 
+    }
+    
+    public void setTextoInformacion(String mensaje) { 
+        if (mensaje == null || mensaje.isEmpty()) {
+            this.lblInformacion.setText("");
+        } else {
+            this.lblInformacion.setText("<html>" + mensaje + "</html>"); 
+        }
+    }
 }

@@ -43,6 +43,10 @@ public class ReservaController {
 	    
 	    view.getCalendarFecha().setMinSelectableDate(hoy);
 	    view.getCalendarFecha().setMaxSelectableDate(fechaMaxima);
+	    
+	    int horaApertura = model.getHoraApertura();
+	    int horaCierre = model.getHoraCierre();
+	    view.setHorariosDisponibles(horaApertura, horaCierre);
 		
 		view.getFrame().setVisible(true);
 	}
@@ -50,7 +54,9 @@ public class ReservaController {
 	public void initController() {
 		view.getBtnReservar().addActionListener(e -> SwingUtil.exceptionWrapper(() -> realizarReserva()));
 		
-		
+		view.getCbInstalaciones().addActionListener(e -> SwingUtil.exceptionWrapper(() -> calcularYMostrarPrecio()));
+		view.getSpinHoraInicio().addChangeListener(e -> SwingUtil.exceptionWrapper(() -> calcularYMostrarPrecio()));
+		view.getSpinHoraFin().addChangeListener(e -> SwingUtil.exceptionWrapper(() -> calcularYMostrarPrecio()));
 	}
 	
 	private void getInstalaciones() {
@@ -58,13 +64,12 @@ public class ReservaController {
 		
 		DefaultComboBoxModel<Object> lmodel = new DefaultComboBoxModel<>();
 		
-		/* Por si queremos que la primera selección del comboBox sea "seleccionar instalacion"
+		// Por si queremos que la primera selección del comboBox sea "seleccionar instalacion"
 		InstalacionEntity opcionDefecto = new InstalacionEntity();
 	    opcionDefecto.setNombre("Seleccionar instalación...");
 	    opcionDefecto.setIdInstalacion(-1);
 	    
 	    lmodel.addElement(opcionDefecto);
-		*/
 		
 		for (InstalacionEntity i : instalaciones) {
 	        lmodel.addElement(i);
@@ -81,13 +86,32 @@ public class ReservaController {
 	            
 	            if (value instanceof InstalacionEntity) {
 	                InstalacionEntity instalacion = (InstalacionEntity) value;
-	                setText(instalacion.getNombre());
+	                if (instalacion.getIdInstalacion() == -1) {
+	                    setText(instalacion.getNombre());
+	                } else {
+	                    setText(instalacion.getNombre() + " (" + instalacion.getCosteHora() + " €/h)");
+	                }
 	            }
 	            return this;
 	        }
 	    });
 		
-		// view.getCbInstalaciones().setSelectedIndex(0);		
+		view.getCbInstalaciones().setSelectedIndex(0);		
+	}
+	
+	private void calcularYMostrarPrecio() {
+	    InstalacionEntity instalacion = (InstalacionEntity) view.getCbInstalaciones().getSelectedItem();
+	    int horaInicio = view.getHoraInicio();
+	    int horaFin = view.getHoraFin();
+
+	    if (instalacion != null && instalacion.getIdInstalacion() > 0 
+	            && horaInicio != -1 && horaFin != -1 && horaFin > horaInicio) {
+	        
+	        float precio = model.getPrecioReserva(instalacion.getIdInstalacion(), horaInicio, horaFin);
+	        view.getLblPrecioTotal().setText(String.format("Precio Total: %.2f €", precio));
+	    } else {
+	        view.getLblPrecioTotal().setText("Precio Total: -- €");
+	    }
 	}
 	
 	private void realizarReserva() {
@@ -119,7 +143,11 @@ public class ReservaController {
 			metodoPago = "Cuota mensual";
 		}
 		
-		if (!model.estaAlCorriente(ID_SOCIO_ACTUAL)) {
+		if (idInstalacionSeleccionada <= 0) {
+			view.setTextoInformacion("SELECCIONA UNA INSTALACIÓN");
+		} else if (horaInicioSeleccionada == -1 || horaFinSeleccionada == -1) {
+		    view.setTextoInformacion("Por favor, selecciona una hora de inicio y de fin.");
+		} else if(!model.estaAlCorriente(ID_SOCIO_ACTUAL)) {
 			view.setTextoInformacion("SOCIO CON PAGOS PENDIENTES. NO PUEDE RESERVAR");
 		} else if (diasAntelacion < 0) {
 			view.setTextoInformacion("NO SE PUEDE RESERVAR EN FECHAS PASADAS");

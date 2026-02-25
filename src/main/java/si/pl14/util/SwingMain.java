@@ -55,7 +55,7 @@ public class SwingMain {
 		frame.setBounds(0, 0, 287, 185);
 		frame.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 		
-		JButton btnEjecutarTkrun = new JButton("Ejecutar giis.demo.tkrun");
+		JButton btnEjecutarTkrun = new JButton("SOCIO: Reservar instalacion");
 		btnEjecutarTkrun.addActionListener(new ActionListener() { //NOSONAR codigo autogenerado
 			public void actionPerformed(ActionEvent e) {
 				
