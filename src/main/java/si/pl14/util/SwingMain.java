@@ -65,24 +65,6 @@ public class SwingMain {
 		frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
 		frame.getContentPane().add(btnEjecutarTkrun);
 		
-		
-		
-//		JButton btnAdmin = new JButton("Entrar al panel de administrador");
-//		btnAdmin.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent e) {
-//				new AdminView();
-//			}
-//		});
-//		frame.getContentPane().add(btnAdmin);
-//		
-//		JButton btnSocio = new JButton("Entrar al panel de socio");
-//		btnSocio.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent e) {
-//				new SociosView();
-//			}
-//		});
-//		frame.getContentPane().add(btnSocio);
-		
 			
 		JButton btnInicializarBaseDeDatos = new JButton("Inicializar Base de Datos en Blanco");
 		btnInicializarBaseDeDatos.addActionListener(new ActionListener() { //NOSONAR codigo autogenerado

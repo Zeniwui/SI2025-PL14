@@ -27,7 +27,8 @@ public class VisualizarReservasAdminController {
     private final DateTimeFormatter formatterCabecera = DateTimeFormatter.ofPattern("EEEE dd", new Locale("es", "ES"));
     private final DateTimeFormatter formatterIsoDb = DateTimeFormatter.ISO_LOCAL_DATE;
     
-    private final int HORA_APERTURA = 9;
+    private int horaApertura;
+    private int horaCierre;
     private final int DIAS_MAXIMOS_VISUALIZACION = 30;
 	
 	public VisualizarReservasAdminController(VisualizarReservasAdminModel m, VisualizarReservasAdminView v) {
@@ -38,6 +39,11 @@ public class VisualizarReservasAdminController {
 	}
 	
 	public void initView() {
+		
+		this.horaApertura = model.getHoraApertura();
+		this.horaCierre = model.getHoraCierre();
+		
+		view.inicializarFilasHorario(this.horaApertura, this.horaCierre);
 		
 		this.getInstalaciones();
 		
@@ -155,8 +161,8 @@ public class VisualizarReservasAdminController {
             
             int columna = fechaReserva.getDayOfWeek().getValue();
             
-            int filaInicio = reserva.getHoraInicio() - HORA_APERTURA;
-            int filaFin = reserva.getHoraFin() - HORA_APERTURA;
+            int filaInicio = reserva.getHoraInicio() - horaApertura;
+            int filaFin = reserva.getHoraFin() - horaApertura;
             
             String textoOcupado = "Ocupado";
             if (reserva.getNombreActividad() != null && !reserva.getNombreActividad().isEmpty()) {

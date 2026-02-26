@@ -120,10 +120,6 @@ public class VisualizarReservasAdminView {
         tablaHorario.getColumnModel().getColumn(0).setPreferredWidth(60);
         tablaHorario.getColumnModel().getColumn(0).setMaxWidth(60);
 
-        for (int i = 9; i <= 21; i++) {
-            tableModel.addRow(new Object[]{i + ":00", "Libre", "Libre", "Libre", "Libre", "Libre", "Libre", "Libre"});
-        }
-
         JScrollPane scrollPane = new JScrollPane(tablaHorario);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         panelTabla.add(scrollPane, BorderLayout.CENTER);
@@ -192,6 +188,14 @@ public class VisualizarReservasAdminView {
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btn.setBorder(new LineBorder(new Color(200, 200, 200), 1));
         btn.setPreferredSize(new Dimension(140, 30));
+    }
+    
+    public void inicializarFilasHorario(int horaApertura, int horaCierre) {
+        tableModel.setRowCount(0); 
+        
+        for (int i = horaApertura; i <= horaCierre; i++) {
+            tableModel.addRow(new Object[]{i + ":00", "Libre", "Libre", "Libre", "Libre", "Libre", "Libre", "Libre"});
+        }
     }
 
     public JFrame getFrame() { return frame; }

@@ -7,7 +7,25 @@ import si.pl14.model.ReservaDTO;
 import si.pl14.util.Database;
 
 public class VisualizarReservasAdminModel {
-private Database db = new Database();
+	
+	private final int HORA_APERTURA = 9;
+	private final int HORA_CIERRE = 21;
+	
+	private Database db = new Database();
+	
+	/*
+	 * Obtiene la hora de apertura del centro deportivo
+	 */
+	public int getHoraApertura() {
+		return HORA_APERTURA; 
+	}
+	
+	/*
+	 * Obtiene la hora de cierre del centro deportivo
+	 */
+	public int getHoraCierre() {
+		return HORA_CIERRE; 
+	}
 	
 	/*
 	 * Obtiene la lista de instalaciones
