@@ -50,25 +50,29 @@ public class Planificar_Actividad_Controller {
 		});
 
 		view.getCbPeriodoInscripcion().addActionListener(e -> {
-			int id = view.getIdPeriodoSeleccionado();
-			if (id > 0) {
-				Object[] datos = model.obtenerDetallesPeriodo(id);
-				if (datos != null) {
-					String inicio = datos[0].toString();
-					String fin = datos[1].toString();
+		    int id = view.getIdPeriodoSeleccionado();
+		    if (id > 0) {
+		        Object[] datos = model.obtenerDetallesPeriodo(id);
+		        if (datos != null && datos.length >= 3) {
+		            String inicioSocios = datos[0].toString();
+		            String finSocios_iniNS = datos[1].toString();
+		            String finNoSocios = datos[2].toString();
 
-					// 1. Actualizamos los campos de texto de la fecha
-					view.getTxtFechaInicio().setText(inicio);
-					view.getTxtFechaFin().setText(fin);
+		            
+		            view.getTxtFechaInicio().setText(inicioSocios);
+		            view.getTxtFechaFin().setText(finSocios_iniNS);
+		            view.getTxtFechaFinNS().setText(finNoSocios);
 
-					// 2. Actualizamos el label de información inferior
-					view.setTextoFechas("<html>Periodo de validez:<br>Desde " + inicio + " hasta " + fin + "</html>");
-				}
-			}
+		            // 2. Actualizamos el label de información inferior con el desglose completo
+		            view.setTextoFechas("<html><b>Periodo Socios:</b> " + inicioSocios + " al " + finSocios_iniNS + 
+		                                "<br><b>Periodo No Socios:</b> " + finSocios_iniNS + " al " + finNoSocios + "</html>");
+		        }
+		    }
 		});
 
+		// Forzar la carga inicial si hay elementos
 		if (view.getCbPeriodoInscripcion().getItemCount() > 0) {
-			view.getCbPeriodoInscripcion().setSelectedIndex(0);
+		    view.getCbPeriodoInscripcion().setSelectedIndex(0);
 		}
 
 		// boton eliminar horario seleccionado

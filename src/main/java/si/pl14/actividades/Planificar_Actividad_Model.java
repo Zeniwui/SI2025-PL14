@@ -27,21 +27,22 @@ public class Planificar_Actividad_Model {
 			try {
 				// insertar Actividad
 				String sqlAct = "INSERT INTO Actividades (nombre, descripcion, id_instalacion, aforo, "
-						+ "fecha_inicio, fecha_fin, precio_socio, precio_no_socio, id_periodo) "
-						+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+				        + "fecha_inicio, fecha_fin, fecha_fin_no_socios, precio_socio, precio_no_socio, id_periodo) "
+				        + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 				int idActividadGenerated;
 				try (PreparedStatement pst = conn.prepareStatement(sqlAct, Statement.RETURN_GENERATED_KEYS)) {
 					pst.setString(1, actividad.getNombre());
-					pst.setString(2, actividad.getDescripcion());
-					pst.setInt(3, actividad.getIdInstalacion());
-					pst.setInt(4, actividad.getAforo());
-					pst.setDate(5, java.sql.Date.valueOf(actividad.getFechaInicio()));
-					pst.setDate(6, java.sql.Date.valueOf(actividad.getFechaFin()));
-					pst.setFloat(7, (float) actividad.getPrecioSocio());
-					pst.setFloat(8, (float) actividad.getPrecioNoSocio());
-					pst.setInt(9, actividad.getIdPeriodo());
-					pst.executeUpdate();
+				    pst.setString(2, actividad.getDescripcion());
+				    pst.setInt(3, actividad.getIdInstalacion());
+				    pst.setInt(4, actividad.getAforo());
+				    pst.setDate(5, java.sql.Date.valueOf(actividad.getFechaInicio())); // Inicio Socios
+				    pst.setDate(6, java.sql.Date.valueOf(actividad.getFechaFin()));    // Fin Socios
+				    pst.setDate(7, java.sql.Date.valueOf(actividad.getFechaFinNS())); // Fin No Socios (NUEVO)
+				    pst.setFloat(8, (float) actividad.getPrecioSocio());
+				    pst.setFloat(9, (float) actividad.getPrecioNoSocio());
+				    pst.setInt(10, actividad.getIdPeriodo());
+				    pst.executeUpdate();
 
 					ResultSet rs = pst.getGeneratedKeys();
 					if (rs.next())
@@ -129,6 +130,7 @@ public class Planificar_Actividad_Model {
 		// Fechas
 		LocalDate inicio = null;
 		LocalDate fin = null;
+		LocalDate finNS = null;
 
 		if (a.getFechaInicio() == null || a.getFechaInicio().isEmpty()) {
 			errores.add("- La fecha de inicio es obligatoria.");
@@ -156,6 +158,20 @@ public class Planificar_Actividad_Model {
 		if (inicio != null && fin != null && !fin.isAfter(inicio)) {
 			errores.add("- La fecha de fin debe ser posterior a la de inicio.");
 		}
+		
+		if (a.getFechaFinNS() == null || a.getFechaFinNS().isEmpty()) {
+		    errores.add("- La fecha de fin para no socios es obligatoria.");
+		} else {
+		    try {
+		        finNS = LocalDate.parse(a.getFechaFinNS());
+		    } catch (DateTimeParseException e) {
+		        errores.add("- Formato de fecha de fin no socios inválido.");
+		    }
+		}
+		
+		if (fin != null && finNS != null && !finNS.isAfter(fin)) {
+		    errores.add("- La fecha de fin para no socios debe ser posterior al fin de periodo de socios.");
+		}
 
 		// Si hay errores, lanzamos la excepción con la lista unida por saltos de línea
 		if (!errores.isEmpty()) {
@@ -178,14 +194,14 @@ public class Planificar_Actividad_Model {
 		System.out.println("DEBUG: Instalaciones encontradas en la BD: " + res.size());
 		return res;
 	}
-	
+
 	// conexion con la clase periodos inscripcion
 	public Object[] obtenerDetallesPeriodo(int idPeriodo) {
-	    String sql = "SELECT inicio_socios, fin_no_socios FROM PeriodosInscripcion WHERE id_periodo = ?";
-	    List<Object[]> lista = db.executeQueryArray(sql, idPeriodo);
-	    if (lista != null && !lista.isEmpty()) {
-	        return lista.get(0); // devuelve la fila con las fechas
-	    }
-	    return null;
+		String sql = "SELECT inicio_socios, fin_socios, fin_no_socios FROM PeriodosInscripcion WHERE id_periodo = ?";
+		List<Object[]> lista = db.executeQueryArray(sql, idPeriodo);
+		if (lista != null && !lista.isEmpty()) {
+			return lista.get(0);
+		}
+		return null;
 	}
 }

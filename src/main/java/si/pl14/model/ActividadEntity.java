@@ -8,6 +8,7 @@ public class ActividadEntity {
     private int aforo;
     private String fechaInicio;
     private String fechaFin;    
+    private String fechaFinNS; 
     private double precioSocio;
     private double precioNoSocio;
     private int idPeriodo;
@@ -52,6 +53,11 @@ public class ActividadEntity {
 	public String getFechaFin() {
 		return fechaFin;
 	}
+	
+	public String getFechaFinNS() {
+		return fechaFinNS;
+	}
+	
 	public void setFechaFin(String fechaFin) {
 		this.fechaFin = fechaFin;
 	}
