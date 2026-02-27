@@ -3,11 +3,14 @@ package si.pl14.util;
 import java.awt.EventQueue;
 import javax.swing.JFrame;
 import si.pl14.ejemplos.*;
-import si.pl14.periodosinscripcion.PeriodosInscripciónFrame;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import si.pl14.periodosinscripcion.PeriodosInscripciónController;
+import si.pl14.periodosinscripcion.PeriodosInscripciónModel;
+import si.pl14.periodosinscripcion.PeriodosInscripciónView;
+
 
 public class SwingMain {
 
@@ -65,11 +68,15 @@ public class SwingMain {
         });
         frame.getContentPane().add(btnCargarDatosIniciales);
 
-        // ── Nueva historia de usuario: Crear Periodo de Inscripcion ──────────
         JButton btnCrearPeriodo = new JButton("Crear Periodo de Inscripcion");
         btnCrearPeriodo.addActionListener(new ActionListener() { //NOSONAR codigo autogenerado
             public void actionPerformed(ActionEvent e) {
-                PeriodosInscripciónFrame.launch();
+                PeriodosInscripciónController ctrl =
+                    new PeriodosInscripciónController(
+                        new PeriodosInscripciónModel(),
+                        new PeriodosInscripciónView()
+                    );
+                ctrl.initController();
             }
         });
         frame.getContentPane().add(btnCrearPeriodo);
