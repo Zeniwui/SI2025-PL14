@@ -42,10 +42,16 @@ public class DisponibilidadView {
 
     public DisponibilidadView() {
         frame = new JDialog((Frame) null, "Disponibilidad de Instalación para los Socios", true);
-        frame.setSize(900, 920);
-        frame.setMinimumSize(new Dimension(760, 780));
-        frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        frame.setMinimumSize(new Dimension(760, 600));
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        Insets screenInsets = Toolkit.getDefaultToolkit().getScreenInsets(
+            java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment()
+                .getDefaultScreenDevice().getDefaultConfiguration());
+        int winWidth  = Math.min(950, screenSize.width  - screenInsets.left - screenInsets.right);
+        int winHeight = Math.min(1000, screenSize.height - screenInsets.top  - screenInsets.bottom);
+        frame.setSize(winWidth, winHeight);
+        frame.setLocationRelativeTo(null);
 
         JPanel root = new JPanel(new BorderLayout(10, 10));
         root.setBorder(new EmptyBorder(14, 14, 14, 14));

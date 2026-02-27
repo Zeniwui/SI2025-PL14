@@ -134,7 +134,7 @@ public abstract class DbUtil {
 			line = line.trim();
 			if (line.length() == 0 || line.startsWith("--")) // ignora lineas vacias comentarios de linea
 				continue;
-			// Elimina comentarios de linea al final (p.ej. "...); -- comentario")
+			// elimina comentarios de linea al final de la sentencia
 			int commentIdx = line.indexOf("--");
 			if (commentIdx >= 0)
 				line = line.substring(0, commentIdx).trim();
