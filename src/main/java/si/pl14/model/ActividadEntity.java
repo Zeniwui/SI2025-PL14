@@ -1,5 +1,9 @@
 package si.pl14.model;
 
+//es_evento_social existe en BD pero no se mapea en la Entity
+//(no se diferencia entre tipos de actividad en la presentacion).
+//Mantener la columna en schema.sql por retrocompatibilidad con otras ramas.
+
 public class ActividadEntity {
 	private int idActividad;
     private String nombre;

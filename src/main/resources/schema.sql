@@ -2,14 +2,14 @@
 -- IMPORTANTE: no usar comentarios inline (-- texto) al final de una linea dentro de un CREATE TABLE
 -- El parser de DbUtil.executeScript solo ignora lineas que EMPIEZAN por --
 
-drop table Horarios;
-drop table Reservas;
-drop table Actividades;
-drop table PeriodosInscripcion;
-drop table Instalaciones;
-drop table Socios;
-drop table Usuarios;
-drop table Carreras;
+drop table if exists Horarios;
+drop table if exists Reservas;
+drop table if exists Actividades;
+drop table if exists PeriodosInscripcion;
+drop table if exists Instalaciones;
+drop table if exists Socios;
+drop table if exists Usuarios;
+drop table if exists Carreras;
 
 create table Carreras (id int primary key not null, inicio date not null, fin date not null, fecha date not null, descr varchar(32), check(inicio<=fin), check(fin<fecha));
 
@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS Socios (
 CREATE TABLE IF NOT EXISTS PeriodosInscripcion (
     id_periodo INTEGER PRIMARY KEY AUTOINCREMENT,
     nombre VARCHAR(50) NOT NULL,
+    descripcion   TEXT,   
     inicio_socios DATE NOT NULL,
     fin_socios DATE NOT NULL,
     fin_no_socios DATE NOT NULL

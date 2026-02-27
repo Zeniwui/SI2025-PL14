@@ -54,10 +54,9 @@ insert into Instalaciones(nombre, tipo, coste_hora) values
 insert into PeriodosInscripcion(nombre, inicio_socios, fin_socios, fin_no_socios) values
 	('Temporada 2026', '2026-01-01', '2026-06-30', '2026-07-31');
 
--- ─── Actividades ──────────────────────────────────────────────────────────────
--- Tipo A: actividades regulares (es_evento_social=0)
--- Tipo B: turno manana + turno tarde (es_evento_social=0)
--- Tipo C: eventos sociales +2 horas (es_evento_social=1)
+-- ─── Actividades ─────────────────────────────────────────────────────────────
+-- Nota: es_evento_social se mantiene en BD por retrocompatibilidad pero
+-- la aplicacion no diferencia entre tipos de actividad en la presentacion.
 insert into Actividades(nombre, descripcion, id_instalacion, aforo, fecha_inicio, fecha_fin, precio_socio, precio_no_socio, id_periodo, es_evento_social) values
 	('Torneo de Badminton',        'Torneo junior de badminton (2h)',           6, 20, '2026-02-01', '2026-06-13', 15.0, 25.0, 1, 0),
 	('Natacion Intensiva',         'Entrenamiento intensivo de natacion (2h)',  3, 12, '2026-02-01', '2026-06-30',  9.0, 16.0, 1, 0),
@@ -219,7 +218,7 @@ insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_actividad,
 	(3, date('now'),         '18:00', '19:00', 8, 0.0, 'Cuota'),
 	(3, date('now','+1 day'),'18:00', '19:00', 8, 0.0, 'Cuota');
 
--- ─── RESERVAS DE EVENTOS SOCIALES ────────────────────────────────────────────
+-- ─── RESERVAS DE EVENTOS SOCIALES(Actividades tmb) ────────────────────────────────────────────
 
 -- Torneo de Voley Playa (id=9) en Polideportivo (id=6): 4h 09:00-13:00
 insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_actividad, coste_reserva, estado_pago) values
