@@ -21,11 +21,12 @@ CREATE TABLE IF NOT EXISTS Socios (
 );
 
 CREATE TABLE IF NOT EXISTS PeriodosInscripcion (
-    id_periodo    INTEGER     PRIMARY KEY AUTOINCREMENT,
-    nombre        VARCHAR(50) NOT NULL,
-    inicio_socios DATE        NOT NULL,
-    fin_socios    DATE        NOT NULL,
-    fin_no_socios DATE        NOT NULL,
+    id_periodo    INTEGER      PRIMARY KEY AUTOINCREMENT,
+    nombre        VARCHAR(50)  NOT NULL,
+    descripcion   TEXT,
+    inicio_socios DATE         NOT NULL,
+    fin_socios    DATE         NOT NULL,
+    fin_no_socios DATE         NOT NULL,
     CONSTRAINT chk_socios    CHECK (inicio_socios <= fin_socios),
     CONSTRAINT chk_no_socios CHECK (fin_socios    <= fin_no_socios)
 );

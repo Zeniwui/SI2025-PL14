@@ -10,21 +10,20 @@ import java.util.List;
 
 /**
  * Modelo para "Crear Periodo de Inscripcion".
- *~~Por Martín~~
+ * ~~Por Martín~~
  * Reglas de negocio:
- *   1. Todos los campos son obligatorios.
+ *   1. Nombre obligatorio. Descripcion opcional.
  *   2. Formato de fecha: dd/MM/yyyy.
- *   3. inicio_socios < fin_socios  (diferencia estricta > 3 dias)
- *   4. fin_socios    < fin_no_socios (diferencia estricta > 3 dias)
+ *   3. inicio_socios < fin_socios  (diferencia estricta > MIN y < MAX dias)
+ *   4. fin_socios    < fin_no_socios (diferencia estricta > MIN y < MAX dias)
  *   5. No puede existir otro periodo con el mismo nombre.
- *   6. Socios y no socios deben de tener un periodo de inscripción menor de 30 dias.
+ *   6. No se pueden superar MAX_PERIODOS periodos en total.
  */
 public class PeriodosInscripciónModel {
 
     private static final DateTimeFormatter FMT_ISO  = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DateTimeFormatter FMT_DISP = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    /** Duracion minima en dias que debe tener cada sub-periodo. */
     public static final int MIN_DIAS_PERIODO = 3;
     public static final int MAX_DIAS_PERIODO = 30;
     public static final int MAX_PERIODOS     = 15;
@@ -33,33 +32,39 @@ public class PeriodosInscripciónModel {
 
     public PeriodosInscripciónModel() {
         db.createDatabase(true);
+        migrarColumnaDescripcion();
     }
 
+    /**
+     * Migración: añade la columna descripcion si la BD ya existia sin ella.
+     * SQLite no soporta IF NOT EXISTS en ALTER TABLE, por eso se captura la excepcion.
+     */
+    private void migrarColumnaDescripcion() {
+        try {
+            db.executeUpdate("ALTER TABLE PeriodosInscripcion ADD COLUMN descripcion TEXT");
+        } catch (Exception ignored) {
+            // La columna ya existe, no hay nada que hacer
+        }
+    }
     // ── Consulta ──────────────────────────────────────────────────────────────
 
-    /**
-     * Devuelve todos los periodos almacenados, del mas reciente al mas antiguo.
-     * Usado por el controlador para refrescar la tabla de periodos guardados.
-     */
     public List<PeriodoInscripcionEntity> getPeriodos() {
         String sql =
-            "SELECT id_periodo   AS idPeriodo, " +
+            "SELECT id_periodo      AS idPeriodo, " +
             "       nombre, " +
+            "       descripcion, " +
             "       inicio_socios   AS inicioSocios, " +
             "       fin_socios      AS finSocios, " +
             "       fin_no_socios   AS finNoSocios " +
             "FROM PeriodosInscripcion " +
-            "ORDER BY inicio_socios ASC";
+            "ORDER BY id_periodo ASC";
         return db.executeQueryPojo(PeriodoInscripcionEntity.class, sql);
     }
 
     // ── Creacion ──────────────────────────────────────────────────────────────
 
-    /**
-     * Valida y persiste un nuevo periodo de inscripcion.
-     * Devuelve la entidad creada con el id asignado por la BD.
-     */
     public PeriodoInscripcionEntity crearPeriodo(String nombre,
+                                                  String descripcion,
                                                   String inicioSociosStr,
                                                   String finSociosStr,
                                                   String finNoSociosStr) {
@@ -68,35 +73,37 @@ public class PeriodosInscripciónModel {
             throw new ApplicationException("El nombre del periodo no puede estar vacio.");
         nombre = nombre.trim();
 
+        // Descripcion opcional — limpiar si viene nula
+        if (descripcion == null) descripcion = "";
+        descripcion = descripcion.trim();
+
         // Parsear fechas
         LocalDate inicioSocios = parseFecha(inicioSociosStr, "Fecha Inicio Socios");
         LocalDate finSocios    = parseFecha(finSociosStr,    "Fecha Fin Socios");
         LocalDate finNoSocios  = parseFecha(finNoSociosStr,  "Fecha Fin No Socios");
-        
-        // Regla: limite de periodos
+
+        // Limite maximo de periodos
         List<Object[]> conteo = db.executeQueryArray(
-        	    "SELECT COUNT(*) FROM PeriodosInscripcion");
-        	int total = conteo.isEmpty() ? 0 : ((Number) conteo.get(0)[0]).intValue();
-        	if (total >= MAX_PERIODOS)
-        	    throw new ApplicationException(
-        	        "No se pueden crear más de " + MAX_PERIODOS +
-        	        " periodos de inscripcion. Elimine alguno antes de continuar.");
-        
+            "SELECT COUNT(*) FROM PeriodosInscripcion");
+        int total = conteo.isEmpty() ? 0 : ((Number) conteo.get(0)[0]).intValue();
+        if (total >= MAX_PERIODOS)
+            throw new ApplicationException(
+                "No se pueden crear más de " + MAX_PERIODOS +
+                " periodos de inscripcion. Elimine alguno antes de continuar.");
+
         // Regla: inicio_socios < fin_socios
         if (!inicioSocios.isBefore(finSocios))
             throw new ApplicationException(
                 "La Fecha Inicio Socios debe ser anterior a la Fecha Fin Socios.");
 
-        // Regla: periodo socios > 3 dias y tmb < 30 días
         long diasSocios = java.time.temporal.ChronoUnit.DAYS.between(inicioSocios, finSocios);
-        if (diasSocios >= MAX_DIAS_PERIODO)
-            throw new ApplicationException(
-                "El periodo de socios debe durar menos de " + MAX_DIAS_PERIODO +
-                " dias (actualmente: " + diasSocios + " dia(s)).");
-        
         if (diasSocios <= MIN_DIAS_PERIODO)
             throw new ApplicationException(
                 "El periodo de socios debe durar más de " + MIN_DIAS_PERIODO +
+                " dias (actualmente: " + diasSocios + " dia(s)).");
+        if (diasSocios >= MAX_DIAS_PERIODO)
+            throw new ApplicationException(
+                "El periodo de socios debe durar menos de " + MAX_DIAS_PERIODO +
                 " dias (actualmente: " + diasSocios + " dia(s)).");
 
         // Regla: fin_socios < fin_no_socios
@@ -104,17 +111,16 @@ public class PeriodosInscripciónModel {
             throw new ApplicationException(
                 "La Fecha Fin No Socios debe ser posterior a la Fecha Fin Socios.");
 
-        // Regla: misma que para los socios
         long diasNoSocios = java.time.temporal.ChronoUnit.DAYS.between(finSocios, finNoSocios);
         if (diasNoSocios <= MIN_DIAS_PERIODO)
             throw new ApplicationException(
                 "El periodo de no socios debe durar más de " + MIN_DIAS_PERIODO +
                 " dias (actualmente: " + diasNoSocios + " dia(s)).");
-        
         if (diasNoSocios >= MAX_DIAS_PERIODO)
             throw new ApplicationException(
                 "El periodo de no socios debe durar menos de " + MAX_DIAS_PERIODO +
                 " dias (actualmente: " + diasNoSocios + " dia(s)).");
+
         // Unicidad de nombre
         List<Object[]> existe = db.executeQueryArray(
             "SELECT id_periodo FROM PeriodosInscripcion WHERE LOWER(nombre) = LOWER(?)", nombre);
@@ -124,9 +130,10 @@ public class PeriodosInscripciónModel {
 
         // Insertar en BD
         db.executeUpdate(
-            "INSERT INTO PeriodosInscripcion (nombre, inicio_socios, fin_socios, fin_no_socios) " +
-            "VALUES (?, ?, ?, ?)",
+            "INSERT INTO PeriodosInscripcion (nombre, descripcion, inicio_socios, fin_socios, fin_no_socios) " +
+            "VALUES (?, ?, ?, ?, ?)",
             nombre,
+            descripcion,
             inicioSocios.format(FMT_ISO),
             finSocios.format(FMT_ISO),
             finNoSocios.format(FMT_ISO));
@@ -139,6 +146,7 @@ public class PeriodosInscripciónModel {
         PeriodoInscripcionEntity creado = new PeriodoInscripcionEntity();
         creado.setIdPeriodo(nuevoId);
         creado.setNombre(nombre);
+        creado.setDescripcion(descripcion);
         creado.setInicioSocios(inicioSocios.format(FMT_ISO));
         creado.setFinSocios(finSocios.format(FMT_ISO));
         creado.setFinNoSocios(finNoSocios.format(FMT_ISO));
@@ -158,7 +166,6 @@ public class PeriodosInscripciónModel {
         }
     }
 
-    /** Convierte fecha ISO yyyy-MM-dd a dd/MM/yyyy para mostrar en pantalla. */
     public static String isoADisplay(String iso) {
         try { return LocalDate.parse(iso, FMT_ISO).format(FMT_DISP); }
         catch (Exception e) { return iso; }
