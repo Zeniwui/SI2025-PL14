@@ -4,6 +4,9 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
+
+import si.pl14.util.DatabaseViewer;
+
 import java.awt.*;
 import java.util.List;
 
@@ -35,6 +38,8 @@ public class Lista_Actividades_Periodo_Admin_Vista extends JFrame {
 				Lista_Actividades_Periodo_Model modelo = new Lista_Actividades_Periodo_Model();
 				Lista_Actividades_Periodo_Controller controlador = new Lista_Actividades_Periodo_Controller(modelo,
 						vista);
+				DatabaseViewer frame = new DatabaseViewer();
+				frame.setVisible(true);
 
 				// iniciar controlador
 				controlador.initController();
