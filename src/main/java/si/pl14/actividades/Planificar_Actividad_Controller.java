@@ -98,26 +98,26 @@ public class Planificar_Actividad_Controller {
 	}
 
 	private ActividadEntity mappearActividadDesdeVista() {
-		ActividadEntity actividad = new ActividadEntity();
+	    ActividadEntity actividad = new ActividadEntity();
 
-		actividad.setNombre(view.getNombre());
-		actividad.setDescripcion(view.getDescripcion());
-		try {
-			actividad.setAforo(Integer.parseInt(view.getAforo()));
-			actividad.setPrecioSocio(Double.parseDouble(view.getPrecioSocio()));
-			actividad.setPrecioNoSocio(Double.parseDouble(view.getPrecioNoSocio()));
-		} catch (NumberFormatException e) {
-			throw new ApplicationException("El aforo y los precios deben ser valores numéricos válidos.");
-		}
+	    actividad.setNombre(view.getNombre());
+	    actividad.setDescripcion(view.getDescripcion());
+	    
+	    try {
+	        actividad.setAforo(Integer.parseInt(view.getAforo()));
+	        actividad.setPrecioSocio(Double.parseDouble(view.getPrecioSocio()));
+	        actividad.setPrecioNoSocio(Double.parseDouble(view.getPrecioNoSocio()));
+	    } catch (NumberFormatException e) {
+	        throw new ApplicationException("El aforo y los precios deben ser valores numéricos válidos.");
+	    }
 
-		// Mapeo de fechas (formato AAAA-MM-DD)
-		actividad.setFechaInicio(view.getFechaInicio());
-		actividad.setFechaFin(view.getFechaFin());
+	    actividad.setFechaInicio(view.getFechaInicio());
+	    actividad.setFechaFin(view.getFechaFin());
+	    actividad.setFechaFinNS(view.getTxtFechaFinNS().getText()); 
 
-		// seleccionar id
-		actividad.setIdInstalacion(view.getIdInstalacionSeleccionada());
-		actividad.setIdPeriodo(view.getIdPeriodoSeleccionado());
+	    actividad.setIdInstalacion(view.getIdInstalacionSeleccionada());
+	    actividad.setIdPeriodo(view.getIdPeriodoSeleccionado());
 
-		return actividad;
+	    return actividad;
 	}
 }

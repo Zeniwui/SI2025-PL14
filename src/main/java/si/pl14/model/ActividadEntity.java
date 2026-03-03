@@ -79,4 +79,7 @@ public class ActividadEntity {
 	public void setIdPeriodo(int idPeriodo) {
 		this.idPeriodo = idPeriodo;
 	}
+	public void setFechaFinNS(String fechaFinNS) {
+        this.fechaFinNS = fechaFinNS;
+    }
 }

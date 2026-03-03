@@ -2,7 +2,11 @@ package si.pl14.actividades;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+
+import si.pl14.util.DatabaseViewer;
+
 import java.awt.Color;
+import java.awt.EventQueue;
 import java.awt.Font;
 import java.util.List;
 
@@ -72,6 +76,16 @@ public class Planificar_Actividad_Admin_View extends JFrame {
 
 		controlador.initController();
 		vista.setVisible(true);
+		
+		EventQueue.invokeLater(() -> {
+	        try {
+	            DatabaseViewer frame = new DatabaseViewer();
+	            frame.setVisible(true);
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            JOptionPane.showMessageDialog(null, "Error al abrir el visor: " + e.getMessage());
+	        }
+	    });
 	}
 
 	public Planificar_Actividad_Admin_View() {
@@ -377,6 +391,10 @@ public class Planificar_Actividad_Admin_View extends JFrame {
 	
 	public JTextField getTxtFechaFinNS() {
 		return txtFechaFin_ns;
+	}
+	
+	public void setTxtFechaFinNS(String texto) {
+		txtFechaFin_ns.setText(texto);
 	}
 
 	// Necesitamos un getter para el controlador

@@ -1,5 +1,10 @@
 DROP TABLE IF EXISTS Instalaciones;
 DROP TABLE IF EXISTS PeriodosInscripcion;
+DROP TABLE IF EXISTS Actividades;
+DROP TABLE IF EXISTS Reservas;
+DROP TABLE IF EXISTS Usuarios;
+DROP TABLE IF EXISTS Socios;
+DROP TABLE IF EXISTS Horarios;
 
 CREATE TABLE IF NOT EXISTS Usuarios (
     dni VARCHAR(20) PRIMARY KEY,
@@ -40,6 +45,7 @@ CREATE TABLE IF NOT EXISTS Actividades (
     aforo INT NOT NULL,                
     fecha_inicio DATE,
     fecha_fin DATE,
+    fecha_fin_no_socios DATE,
     precio_socio DECIMAL(6,2),
     precio_no_socio DECIMAL(6,2),
     
