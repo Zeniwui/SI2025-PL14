@@ -1,25 +1,22 @@
 package si.pl14.util;
 
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Herramienta de depuración para visualizar el contenido de cualquier tabla.
- * Muestra los datos en formato tabular por consola, calculando anchos dinámicamente.
- */
 public class DatabaseViewer extends JFrame {
 
     private JComboBox<String> cbTablas;
+    private JTable tabla;
+    private DefaultTableModel modeloTabla;
     private Database db;
 
     public DatabaseViewer() {
@@ -30,33 +27,36 @@ public class DatabaseViewer extends JFrame {
 
     private void initialize() {
         setTitle("Visor de Base de Datos (Debug)");
-        setBounds(100, 100, 450, 150);
+        setBounds(100, 100, 800, 500);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        JPanel contentPane = new JPanel();
+        JPanel contentPane = new JPanel(new BorderLayout(0, 10));
         contentPane.setBorder(new EmptyBorder(10, 10, 10, 10));
-        contentPane.setLayout(new BorderLayout(0, 10));
         setContentPane(contentPane);
 
+        // Panel superior con selector y botón
         JPanel panelTop = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        
-        JLabel lblSeleccion = new JLabel("Selecciona Tabla:");
-        panelTop.add(lblSeleccion);
+        panelTop.add(new JLabel("Selecciona Tabla:"));
 
         cbTablas = new JComboBox<>();
         cbTablas.setPreferredSize(new Dimension(200, 25));
         panelTop.add(cbTablas);
 
-        JButton btnImprimir = new JButton("Ver Tabla en Consola");
-        btnImprimir.addActionListener(e -> imprimirTablaFormatoTabular());
-        panelTop.add(btnImprimir);
+        JButton btnVer = new JButton("Ver Tabla");
+        btnVer.addActionListener(e -> mostrarTablaEnVentana());
+        panelTop.add(btnVer);
 
-        contentPane.add(panelTop, BorderLayout.CENTER);
+        contentPane.add(panelTop, BorderLayout.NORTH);
 
-        JLabel lblInfo = new JLabel("<html><center>Los resultados aparecerán formateados en la consola de Eclipse.</center></html>");
-        lblInfo.setHorizontalAlignment(SwingConstants.CENTER);
-        contentPane.add(lblInfo, BorderLayout.SOUTH);
+        // Tabla vacía inicial
+        modeloTabla = new DefaultTableModel();
+        tabla = new JTable(modeloTabla);
+        tabla.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        tabla.setEnabled(false); // solo lectura
+
+        JScrollPane scrollPane = new JScrollPane(tabla);
+        contentPane.add(scrollPane, BorderLayout.CENTER);
     }
 
     private void cargarTablasDinamicamente() {
@@ -64,90 +64,44 @@ public class DatabaseViewer extends JFrame {
         try {
             conn = db.getConnection();
             DatabaseMetaData metaData = conn.getMetaData();
-            String[] types = {"TABLE"};
-            ResultSet rs = metaData.getTables(null, null, "%", types);
-
-            List<String> tablas = new ArrayList<>();
+            ResultSet rs = metaData.getTables(null, null, "%", new String[]{"TABLE"});
             while (rs.next()) {
                 String nombreTabla = rs.getString("TABLE_NAME");
-                if (!nombreTabla.startsWith("sqlite_")) {
-                    tablas.add(nombreTabla);
-                }
+                if (!nombreTabla.startsWith("sqlite_"))
+                    cbTablas.addItem(nombreTabla);
             }
-            
-            for (String t : tablas) {
-                cbTablas.addItem(t);
-            }
-
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "Error al cargar tablas: " + e.getMessage());
         } finally {
-            if (conn != null) {
-                try { conn.close(); } catch (SQLException e) { }
-            }
+            if (conn != null) try { conn.close(); } catch (SQLException e) { }
         }
     }
 
+    private void mostrarTablaEnVentana() {
+        String nombreTabla = (String) cbTablas.getSelectedItem();
+        if (nombreTabla == null) return;
 
-    private void imprimirTablaFormatoTabular() {
-        String tabla = (String) cbTablas.getSelectedItem();
-        if (tabla == null) return;
+        List<Map<String, Object>> filas = db.executeQueryMap("SELECT * FROM " + nombreTabla);
 
-        String sql = "SELECT * FROM " + tabla;
-        List<Map<String, Object>> filas = db.executeQueryMap(sql);
-
-        System.out.println("\n>>> TABLA: " + tabla.toUpperCase() + " (" + filas.size() + " registros)");
+        modeloTabla.setRowCount(0);
+        modeloTabla.setColumnCount(0);
 
         if (filas.isEmpty()) {
-            System.out.println("(Tabla vacía)");
+            JOptionPane.showMessageDialog(this, "La tabla está vacía.");
             return;
         }
 
+        // Añadir columnas
         List<String> columnas = new ArrayList<>(filas.get(0).keySet());
+        for (String col : columnas)
+            modeloTabla.addColumn(col.toUpperCase());
 
-        Map<String, Integer> anchos = new HashMap<>();
-        
-        for (String col : columnas) {
-            anchos.put(col, col.length());
-        }
-
+        // Añadir filas
         for (Map<String, Object> fila : filas) {
-            for (String col : columnas) {
-                String valor = String.valueOf(fila.get(col));
-                if (valor.length() > anchos.get(col)) {
-                    anchos.put(col, valor.length());
-                }
-            }
+            Object[] fila2 = columnas.stream()
+                .map(col -> fila.get(col))
+                .toArray();
+            modeloTabla.addRow(fila2);
         }
-
-        for (String col : columnas) {
-            anchos.put(col, anchos.get(col) + 3); 
-        }
-
-        printLine(columnas, anchos);
-        
-        for (String col : columnas) {
-            System.out.print("-".repeat(anchos.get(col) - 1) + " ");
-        }
-        System.out.println();
-
-        for (Map<String, Object> fila : filas) {
-            for (String col : columnas) {
-                String valor = String.valueOf(fila.get(col));
-                
-                String format = "%-" + anchos.get(col) + "s";
-                System.out.printf(format, valor);
-            }
-            System.out.println();
-        }
-        System.out.println();
-    }
-
-    private void printLine(List<String> columnas, Map<String, Integer> anchos) {
-        for (String col : columnas) {
-            String format = "%-" + anchos.get(col) + "s";
-            System.out.printf(format, col.toUpperCase());
-        }
-        System.out.println();
     }
 }

@@ -1,4 +1,4 @@
-package si.pl14.util;
+	package si.pl14.util;
 
 import java.awt.EventQueue;
 import javax.swing.JFrame;
@@ -80,7 +80,22 @@ public class SwingMain {
             }
         });
         frame.getContentPane().add(btnCrearPeriodo);
-    }
+    
+    
+ // --- BLOQUE PARA VISUALIZAR LOS DATOS DE LAS TABLAS ---
+    
+    JButton btnDebugBD = new JButton("Consultar Tablas (Debug)");
+    btnDebugBD.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+            // Abre la ventana de visualización
+            DatabaseViewer viewer = new DatabaseViewer();
+            viewer.setVisible(true);
+        }
+    });
+    frame.getContentPane().add(btnDebugBD);
+    
+    // ----------------------------------
+}
 
     public JFrame getFrame() { return this.frame; }
 }
