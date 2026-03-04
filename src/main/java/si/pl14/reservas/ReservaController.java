@@ -13,6 +13,7 @@ import javax.swing.JOptionPane;
 
 import si.pl14.model.InstalacionEntity;
 import si.pl14.model.ReservaEntity;
+import si.pl14.model.SocioDTO;
 import si.pl14.util.SwingUtil;
 import si.pl14.util.Util;
 
@@ -20,7 +21,7 @@ public class ReservaController {
 	private ReservaModel model;
 	private ReservaView view;
 	
-	private final int ID_SOCIO_ACTUAL = 1;
+	private Integer idSocioActual = null;
 	private final int HORAS_MAXIMAS_SEGUIDAS = 2;
 	private final int DIAS_MAXIMOS_ANTELACION = 30;
 	
@@ -57,6 +58,8 @@ public class ReservaController {
 		view.getCbInstalaciones().addActionListener(e -> SwingUtil.exceptionWrapper(() -> calcularYMostrarPrecio()));
 		view.getSpinHoraInicio().addChangeListener(e -> SwingUtil.exceptionWrapper(() -> calcularYMostrarPrecio()));
 		view.getSpinHoraFin().addChangeListener(e -> SwingUtil.exceptionWrapper(() -> calcularYMostrarPrecio()));
+		
+		view.getBtnBuscarSocio().addActionListener(e -> SwingUtil.exceptionWrapper(() -> buscarSocio()));
 	}
 	
 	private void getInstalaciones() {
@@ -114,6 +117,35 @@ public class ReservaController {
 	    }
 	}
 	
+	private void buscarSocio() {
+		String dni = view.getDniBusqueda();
+		
+		if (dni == null || dni.isEmpty()) {
+			view.setDatosSocio("Por favor, introduce un DNI para buscar.", true);
+			this.idSocioActual = null;
+			return;
+		}
+		
+		SocioDTO socio = model.getSocioByDni(dni);
+		
+		if (socio == null) {
+			view.setDatosSocio("No existe ningún socio con el DNI: " + dni, true);
+			this.idSocioActual = null;
+		} else {
+			String nombreCompleto = socio.getNombre() + " " + socio.getApellidos();
+			String info = "Socio: " + nombreCompleto + " - Pagos: " + socio.getEstadoPagos();
+			
+			// Lo mandamos a la vista (false = no es un error, saldrá en color normal)
+			view.setDatosSocio(info, false);
+			
+			// ¡MUY IMPORTANTE! Guardamos el ID del socio encontrado para usarlo en la reserva
+			this.idSocioActual = socio.getIdSocio();
+			
+			// Limpiamos cualquier mensaje de error anterior de la reserva
+			view.setTextoInformacion("");
+		}
+	}
+	
 	private void realizarReserva() {
 		Date fechaDate = view.getCalendarFecha().getDate();
 		
@@ -142,12 +174,13 @@ public class ReservaController {
 		} else {
 			metodoPago = "Cuota mensual";
 		}
-		
-		if (idInstalacionSeleccionada <= 0) {
+		if (this.idSocioActual == null) {
+			view.setTextoInformacion("DEBES BUSCAR Y SELECCIONAR UN SOCIO PRIMERO");
+		} else if (idInstalacionSeleccionada <= 0) {
 			view.setTextoInformacion("SELECCIONA UNA INSTALACIÓN");
 		} else if (horaInicioSeleccionada == -1 || horaFinSeleccionada == -1) {
 		    view.setTextoInformacion("Por favor, selecciona una hora de inicio y de fin.");
-		} else if(!model.estaAlCorriente(ID_SOCIO_ACTUAL)) {
+		} else if(!model.estaAlCorriente(idSocioActual)) {
 			view.setTextoInformacion("SOCIO CON PAGOS PENDIENTES. NO PUEDE RESERVAR");
 		} else if (diasAntelacion < 0) {
 			view.setTextoInformacion("NO SE PUEDE RESERVAR EN FECHAS PASADAS");
@@ -171,7 +204,7 @@ public class ReservaController {
 			reserva.setFecha(fechaSeleccionada);
 			reserva.setHoraInicio(horaInicioSeleccionada);
 			reserva.setHoraFin(horaFinSeleccionada);
-			reserva.setIdSocio(ID_SOCIO_ACTUAL);
+			reserva.setIdSocio(idSocioActual);
 			reserva.setCosteReserva(costeReserva);
 			reserva.setMetodoPago(metodoPago);
 			

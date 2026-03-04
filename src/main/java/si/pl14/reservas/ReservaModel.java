@@ -4,6 +4,7 @@ import java.util.List;
 
 import si.pl14.model.InstalacionEntity;
 import si.pl14.model.ReservaEntity;
+import si.pl14.model.SocioDTO;
 import si.pl14.model.SocioEntity;
 import si.pl14.util.ApplicationException;
 import si.pl14.util.Database;
@@ -146,6 +147,29 @@ public class ReservaModel {
 				"\n Método pago: " + reserva.getMetodoPago();
 		
 		return resguardo;
+	}
+	
+	/*
+	 * Obtiene el socio asociado al DNI pasado por parámetro
+	 */
+	public SocioDTO getSocioByDni (String dni) {
+		
+		String sql = "SELECT " +
+	             "s.id_socio AS idSocio, " +
+	             "u.nombre AS nombre, " +
+	             "u.apellidos AS apellidos, " +
+	             "s.estado_pagos AS estadoPagos " +
+	             "FROM Socios s " +
+	             "INNER JOIN Usuarios u ON s.dni = u.dni " +
+	             "WHERE u.dni = ?";
+		
+		List<SocioDTO> socios = db.executeQueryPojo(SocioDTO.class, sql, dni);
+		
+		if (socios.isEmpty()) {
+			return null; 
+		}
+		
+		return socios.get(0);		
 	}
 	
 }

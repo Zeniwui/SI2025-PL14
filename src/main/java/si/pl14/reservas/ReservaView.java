@@ -15,6 +15,9 @@ public class ReservaView {
 
     private JFrame frame;
 
+    private JTextField txtDniSocio;
+    private JButton btnBuscarSocio;
+    private JLabel lblNombreSocio;
     private JComboBox<Object> cbInstalaciones;
     private JCalendar calendarFecha;
     private JSpinner spinHoraInicio;
@@ -43,7 +46,7 @@ public class ReservaView {
 
     private void initialize() {
         frame = new JFrame();
-        frame.setTitle("Reservas Instalación - Socio");
+        frame.setTitle("Reservas Instalación - ADMIN");
         frame.setName("ReservaView");
         frame.setBounds(100, 100, 800, 800); 
         frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -67,27 +70,51 @@ public class ReservaView {
         JPanel cardPanel = new JPanel();
         cardPanel.setBackground(COLOR_PANEL);
         cardPanel.setBorder(new LineBorder(new Color(220, 220, 220), 1, true)); 
-        cardPanel.setLayout(new MigLayout("fill, insets 30", "[grow][grow]", "[][grow][][]"));
+        cardPanel.setLayout(new MigLayout("fill, insets 30", "[grow][grow]", "[][][grow][][]"));
         
         frame.getContentPane().add(cardPanel, "cell 0 1, grow");
 
+        // ==========================================
+        // SECCIÓN SUPERIOR (BÚSQUEDA SOCIO)
+        // ==========================================
+        JPanel panelSocio = new JPanel(new MigLayout("insets 0", "[][150!][][grow]", "[]"));
+        panelSocio.setOpaque(false);
+        
+        panelSocio.add(createLabel("DNI del Socio:"), "aligny center");
+        
+        txtDniSocio = new JTextField();
+        txtDniSocio.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        panelSocio.add(txtDniSocio, "growx, aligny center");
+        
+        btnBuscarSocio = new JButton("Buscar");
+        btnBuscarSocio.setName("btnBuscarSocio");
+        styleButton(btnBuscarSocio, COLOR_SECUNDARIO, Color.WHITE);
+        panelSocio.add(btnBuscarSocio, "aligny center");
+        
+        lblNombreSocio = new JLabel("Introduce un DNI para buscar...");
+        lblNombreSocio.setFont(new Font("Segoe UI", Font.ITALIC, 14));
+        lblNombreSocio.setForeground(new Color(150, 150, 150));
+        panelSocio.add(lblNombreSocio, "gapleft 20, aligny center");
+        
+        cardPanel.add(panelSocio, "cell 0 0 2 1, growx, gapbottom 20");
+        
         // ==========================================
         // SECCIÓN IZQUIERDA
         // ==========================================
 
         // -- Instalación --
         JLabel lblInstalacion = createLabel("Seleccione Instalación");
-        cardPanel.add(lblInstalacion, "cell 0 0, flowy, gapbottom 5");
+        cardPanel.add(lblInstalacion, "cell 0 1, flowy, gapbottom 5");
 
         cbInstalaciones = new JComboBox<>();
         cbInstalaciones.setName("cbInstalaciones");
         cbInstalaciones.setBackground(Color.WHITE);
         cbInstalaciones.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        cardPanel.add(cbInstalaciones, "cell 0 0, growx, gapbottom 20");
+        cardPanel.add(cbInstalaciones, "cell 0 1, growx, gapbottom 20");
 
         // -- Calendario --
         JLabel lblFecha = createLabel("Fecha de Reserva");
-        cardPanel.add(lblFecha, "cell 0 1, flowy, gapbottom 5, aligny top");
+        cardPanel.add(lblFecha, "cell 0 2, flowy, gapbottom 5, aligny top");
 
         JPanel calendarContainer = new JPanel(new BorderLayout());
         calendarContainer.setBorder(new LineBorder(new Color(230,230,230), 1));
@@ -99,11 +126,11 @@ public class ReservaView {
         calendarFecha.setWeekdayForeground(COLOR_SECUNDARIO);
         
         calendarContainer.add(calendarFecha, BorderLayout.CENTER);
-        cardPanel.add(calendarContainer, "cell 0 1, grow, gapbottom 20");
+        cardPanel.add(calendarContainer, "cell 0 2, grow, gapbottom 20");
 
         // -- Resumen --
         JLabel lblResumen = createLabel("Resumen de operación");
-        cardPanel.add(lblResumen, "cell 0 2, wrap"); 
+        cardPanel.add(lblResumen, "cell 0 3, wrap"); 
 
         txtResumen = new JTextArea();
         txtResumen.setName("txtResumen");
@@ -118,7 +145,7 @@ public class ReservaView {
 
         JScrollPane scrollPane = new JScrollPane(txtResumen);
         scrollPane.setBorder(null); 
-        cardPanel.add(scrollPane, "cell 0 3, grow, hmin 100, w :100%:");
+        cardPanel.add(scrollPane, "cell 0 4, grow, hmin 100, w :100%:");
 
         // ==========================================
         // SECCIÓN DERECHA
@@ -139,11 +166,11 @@ public class ReservaView {
             }
         });
 
-        cardPanel.add(lblFechaSeleccionada, "cell 1 1, flowy, aligny top, gapbottom 20");       
+        cardPanel.add(lblFechaSeleccionada, "cell 1 2, flowy, aligny top, gapbottom 20");       
         
         // -- Horarios --
         JLabel lblHorario = createLabel("Horario Disponible");
-        cardPanel.add(lblHorario, "cell 1 1, flowy, aligny top, gapbottom 10");
+        cardPanel.add(lblHorario, "cell 1 2, flowy, aligny top, gapbottom 10");
 
         JPanel panelHoras = new JPanel(new MigLayout("insets 0", "[]10[]10[]10[]", "[]"));
         panelHoras.setOpaque(false);
@@ -158,23 +185,23 @@ public class ReservaView {
         styleSpinner(spinHoraFin);
         panelHoras.add(spinHoraFin, "w 60!");
         
-        cardPanel.add(panelHoras, "cell 1 1, aligny top, wrap");
+        cardPanel.add(panelHoras, "cell 1 2, aligny top, wrap");
         
         // Etiqueta de Precio Total
         lblPrecioTotal = new JLabel("Precio Total: -- €");
         lblPrecioTotal.setFont(new Font("Segoe UI", Font.BOLD, 16));
         lblPrecioTotal.setForeground(COLOR_PRIMARIO);
-        cardPanel.add(lblPrecioTotal, "cell 1 1, flowy, gapy 10, wrap");
+        cardPanel.add(lblPrecioTotal, "cell 1 2, flowy, gapy 10, wrap");
         
         // Mensajes de información para las comprobaciones
         lblInformacion = new JLabel();
         lblInformacion.setForeground(new Color(231, 76, 60));
         lblInformacion.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        cardPanel.add(lblInformacion, "cell 1 1, flowy, wrap, w 300!, h 40!");
+        cardPanel.add(lblInformacion, "cell 1 2, flowy, wrap, w 300!, h 40!");
 
         // -- Pago --
         JLabel lblPago = createLabel("Método de Pago");
-        cardPanel.add(lblPago, "cell 1 2, flowy, gapbottom 5");
+        cardPanel.add(lblPago, "cell 1 3, flowy, gapbottom 5");
 
         rdbtnPagoInmediato = new JRadioButton("Pago inmediato (Tarjeta/Efectivo)");
         rdbtnPagoInmediato.setBackground(COLOR_PANEL);
@@ -189,8 +216,8 @@ public class ReservaView {
         grupoPago.add(rdbtnPagoInmediato);
         grupoPago.add(rdbtnCuotaMensual);
 
-        cardPanel.add(rdbtnPagoInmediato, "cell 1 2");
-        cardPanel.add(rdbtnCuotaMensual, "cell 1 2");
+        cardPanel.add(rdbtnPagoInmediato, "cell 1 3");
+        cardPanel.add(rdbtnCuotaMensual, "cell 1 3");
 
         // -- Botones de Acción --
         JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -208,7 +235,7 @@ public class ReservaView {
         panelBotones.add(btnCancelar);
         panelBotones.add(btnReservar);
 
-        cardPanel.add(panelBotones, "cell 1 3, growx, aligny bottom");
+        cardPanel.add(panelBotones, "cell 1 4, growx, aligny bottom");
     }
 
     private void actualizarLabelFecha(Date fecha) {
@@ -260,8 +287,16 @@ public class ReservaView {
         spinHoraInicio.setModel(new SpinnerListModel(horas));
         spinHoraFin.setModel(new SpinnerListModel(horas));
     }
+    
+    public void setDatosSocio(String mensaje, boolean esError) {
+        lblNombreSocio.setText(mensaje);
+        lblNombreSocio.setFont(new Font("Segoe UI", esError ? Font.ITALIC : Font.BOLD, 14));
+        lblNombreSocio.setForeground(esError ? new Color(231, 76, 60) : COLOR_TEXTO);
+    }
 
     public JFrame getFrame() { return this.frame; }
+    public String getDniBusqueda() { return this.txtDniSocio.getText().trim(); }
+    public JButton getBtnBuscarSocio() { return this.btnBuscarSocio; }
     public JComboBox<Object> getCbInstalaciones() { return this.cbInstalaciones; }
     public JCalendar getCalendarFecha() { return this.calendarFecha; }
     public JButton getBtnComprobar() { return this.btnComprobar; }
