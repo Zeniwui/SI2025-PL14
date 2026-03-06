@@ -3,6 +3,8 @@ package si.pl14.actividades;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 public class Lista_Actividades_Periodo_Controller {
 	private Lista_Actividades_Periodo_Model model;
 	private Lista_Actividades_Periodo_Admin_Vista view;
@@ -14,26 +16,27 @@ public class Lista_Actividades_Periodo_Controller {
 	}
 
 	public void initController() {
-		view.cargarPeriodos(model.obtenerPeriodos());
+    // Eliminar view.cargarPeriodos(...) ya que no lo usamos
 
-		view.getBtnConsultar().addActionListener(e -> {
-		    int id = view.getIdPeriodoSeleccionado();
-		    if (id != -1) {
-		        List<ActividadDTO> dtos = model.obtenerActividadesPorPeriodoDTO(id);
-		        
-		        // Convertimos la lista de DTOs a una lista de Object[] para la JTable
-		        List<Object[]> filasTabla = new ArrayList<>();
-		        for (ActividadDTO dto : dtos) {
-		            filasTabla.add(dto.toArray());
-		        }
-		        
-		        view.actualizarTabla(filasTabla);
-		    }
-		});
+    view.getBtnConsultar().addActionListener(e -> {
+        String fIni = view.getFechaInicioFiltro();
+        String fFin = view.getFechaFinFiltro();
 
-		// esto ya se enlazara con las demas historias
-		view.getBtnVolver().addActionListener(e -> view.dispose());
+        // Podrías añadir una validación básica aquí
+        if (!fIni.isEmpty() && !fFin.isEmpty()) {
+            List<ActividadDTO> dtos = model.obtenerActividadesPorRangoFechas(fIni, fFin);
+            
+            List<Object[]> filasTabla = new ArrayList<>();
+            for (ActividadDTO dto : dtos) {
+                filasTabla.add(dto.toArray());
+            }
+            view.actualizarTabla(filasTabla);
+        } else {
+            JOptionPane.showMessageDialog(view, "Por favor, introduce ambas fechas (AAAA-MM-DD)");
+        }
+    });
 
-		view.setVisible(true);
-	}
+    view.getBtnVolver().addActionListener(e -> view.dispose());
+    view.setVisible(true);
+}
 }
