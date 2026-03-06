@@ -18,6 +18,10 @@ public class Lista_Actividades_Periodo_Admin_Vista extends JFrame {
 	private JComboBox<String> cbPeriodo = new JComboBox<>();
 	private JButton btnConsultar = new JButton("Consultar");
 	private JButton btnVolver = new JButton("Volver");
+	private JTextField txtFechaInicioFiltro = new JTextField("2026-01-01");
+	private JTextField txtFechaFinFiltro = new JTextField("2026-12-31");
+	private JLabel lblDesde = new JLabel("Desde:");
+	private JLabel lblHasta = new JLabel("Hasta:");
 
 	public static void main(String[] args) {
 		try {
@@ -30,7 +34,7 @@ public class Lista_Actividades_Periodo_Admin_Vista extends JFrame {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		EventQueue.invokeLater(() -> {
 			try {
 				// MVC
@@ -52,12 +56,12 @@ public class Lista_Actividades_Periodo_Admin_Vista extends JFrame {
 
 	public Lista_Actividades_Periodo_Admin_Vista() {
 		// --- COLORES ---
-		Color bg_window = new Color(241, 245, 249); 
+		Color bg_window = new Color(241, 245, 249);
 		Color bg_card = Color.WHITE;
-		Color primary_indigo = new Color(79, 70, 229); 
-		Color text_dark = new Color(15, 23, 42); 
-		Color text_muted = new Color(100, 116, 139); 
-		Color border_ui = new Color(226, 232, 240); 
+		Color primary_indigo = new Color(79, 70, 229);
+		Color text_dark = new Color(15, 23, 42);
+		Color text_muted = new Color(100, 116, 139);
+		Color border_ui = new Color(226, 232, 240);
 		Color table_header_bg = new Color(30, 41, 59);
 
 		setTitle("Administración - Gestión de Actividades");
@@ -90,18 +94,15 @@ public class Lista_Actividades_Periodo_Admin_Vista extends JFrame {
 		// Tarjeta de Filtros
 		JPanel filterCard = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 15));
 		filterCard.setBackground(bg_card);
-		filterCard.setBorder(BorderFactory.createCompoundBorder(
-				new LineBorder(border_ui, 1, true), 
+		filterCard.setBorder(BorderFactory.createCompoundBorder(new LineBorder(border_ui, 1, true),
 				new EmptyBorder(10, 15, 10, 15)));
 
 		JLabel lblPeriodoLabel = new JLabel("Periodo lectivo:");
 		lblPeriodoLabel.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 14));
 		lblPeriodoLabel.setForeground(text_dark);
-		filterCard.add(lblPeriodoLabel);
 
 		cbPeriodo.setPreferredSize(new Dimension(320, 40));
 		cbPeriodo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-		filterCard.add(cbPeriodo);
 
 		// --- BOTÓN CONSULTAR ---
 		btnConsultar.setPreferredSize(new Dimension(160, 42));
@@ -116,9 +117,13 @@ public class Lista_Actividades_Periodo_Admin_Vista extends JFrame {
 		contentPane.add(northPanel, BorderLayout.NORTH);
 
 		// --- PANEL CENTRAL (ES LA TABLA) ---
-		String[] columnas = { "Nombre", "Tipo", "Instalación", "Duración", "Horarios", "F. Inicio", "F. Fin", "Plazas", "Socio", "General" };
+		String[] columnas = { "Nombre", "Tipo", "Instalación", "Duración", "Horarios", "F. Inicio", "F. Fin", "Plazas",
+				"Socio", "General" };
 		modelTabla = new DefaultTableModel(null, columnas) {
-			@Override public boolean isCellEditable(int r, int c) { return false; }
+			@Override
+			public boolean isCellEditable(int r, int c) {
+				return false;
+			}
 		};
 
 		tableResultados = new JTable(modelTabla);
@@ -134,7 +139,7 @@ public class Lista_Actividades_Periodo_Admin_Vista extends JFrame {
 		tableResultados.getTableHeader().setForeground(Color.WHITE);
 		tableResultados.getTableHeader().setFont(new Font("Segoe UI Bold", Font.BOLD, 13));
 		tableResultados.getTableHeader().setOpaque(false);
-		
+
 		tableResultados.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		int[] anchos = { 200, 100, 180, 90, 220, 100, 100, 70, 90, 90 };
 		for (int i = 0; i < anchos.length; i++) {
@@ -156,12 +161,24 @@ public class Lista_Actividades_Periodo_Admin_Vista extends JFrame {
 		btnVolver.setForeground(text_muted);
 		btnVolver.setFocusPainted(false);
 		btnVolver.setCursor(new Cursor(Cursor.HAND_CURSOR));
-		btnVolver.setBorder(BorderFactory.createCompoundBorder(
-				new LineBorder(border_ui, 1), 
-				new EmptyBorder(0, 15, 0, 15)));
+		btnVolver.setBorder(
+				BorderFactory.createCompoundBorder(new LineBorder(border_ui, 1), new EmptyBorder(0, 15, 0, 15)));
 
 		southPanel.add(btnVolver);
 		contentPane.add(southPanel, BorderLayout.SOUTH);
+
+		// Arreglos por la cancelacion de la HU
+		lblDesde.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 14));
+		filterCard.add(lblDesde);
+
+		txtFechaInicioFiltro.setPreferredSize(new Dimension(120, 35));
+		filterCard.add(txtFechaInicioFiltro);
+
+		lblHasta.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 14));
+		filterCard.add(lblHasta);
+
+		txtFechaFinFiltro.setPreferredSize(new Dimension(120, 35));
+		filterCard.add(txtFechaFinFiltro);
 	}
 
 	// Métodos para el Controlador
@@ -188,5 +205,14 @@ public class Lista_Actividades_Periodo_Admin_Vista extends JFrame {
 
 	public JButton getBtnVolver() {
 		return btnVolver;
+	}
+
+	// Arreglos por la cancelacion de la HU
+	public String getFechaInicioFiltro() {
+		return txtFechaInicioFiltro.getText();
+	}
+
+	public String getFechaFinFiltro() {
+		return txtFechaFinFiltro.getText();
 	}
 }
