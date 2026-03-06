@@ -1,6 +1,7 @@
 package si.pl14.reservas;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
@@ -155,6 +156,8 @@ public class ReservaController {
 		LocalDate fechaSeleccionadaLocal = fechaDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         LocalDate hoy = LocalDate.now();
         
+        int horaActual = LocalTime.now().getHour();
+        
         // Calculamos la diferencia en días para verificar que no se pueda reservar con mayor antelación que la descrita
         long diasAntelacion = ChronoUnit.DAYS.between(hoy, fechaSeleccionadaLocal);
 		
@@ -187,9 +190,18 @@ public class ReservaController {
 		
 		// Calculamos las horas totales
 		int horasAReservar = horaFinSeleccionada - horaInicioSeleccionada;
-		int horasYaReservadasDia = reservasSocioDia.stream().mapToInt(r -> r.getHoraFin() - r.getHoraInicio()).sum();
-		int horasYaReservadasMes = reservasSocioMes.stream().mapToInt(r -> r.getHoraFin() - r.getHoraInicio()).sum();
 		
+		// Calculamos las horas totales ya reservadas en el día
+		int horasYaReservadasDia = 0;
+		for (ReservaEntity r : reservasSocioDia) {
+			horasYaReservadasDia += (r.getHoraFin() - r.getHoraInicio());
+		}
+
+		// Calculamos las horas totales ya reservadas en el mes
+		int horasYaReservadasMes = 0;
+		for (ReservaEntity r : reservasSocioMes) {
+			horasYaReservadasMes += (r.getHoraFin() - r.getHoraInicio());
+		}
 		
 		if (idInstalacionSeleccionada <= 0) {									//Comprobamos que este seleccionada una instalacion
 			view.setTextoInformacion("SELECCIONA UNA INSTALACIÓN");
@@ -199,6 +211,8 @@ public class ReservaController {
 			view.setTextoInformacion("SOCIO CON PAGOS PENDIENTES. NO PUEDE RESERVAR");
 		} else if (diasAntelacion < 0) {										//Comprobamos que la fecha no sea un día anterior a hoy
 			view.setTextoInformacion("NO SE PUEDE RESERVAR EN FECHAS PASADAS");
+		} else if (diasAntelacion == 0 && horaInicioSeleccionada <= horaActual) {  //Comprobamos que la hora que quiere reservar para hoy no haya pasado ya
+			view.setTextoInformacion("NO PUEDES RESERVAR EN UNA HORA QUE YA HA PASADO");
 		} else if (diasAntelacion > DIAS_MAXIMOS_ANTELACION) {					//Comprobamos que los dias de antelación no superen el numero descrito como parametro
 			view.setTextoInformacion("SÓLO SE PUEDE RESERVAR CON " + DIAS_MAXIMOS_ANTELACION + " DÍAS DE ANTELACIÓN");
 		} else if (horaFinSeleccionada <= horaInicioSeleccionada)  {			//Comprobamos que la hora de inicio sea menor a la hora de fin
