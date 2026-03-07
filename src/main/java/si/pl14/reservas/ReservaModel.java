@@ -78,6 +78,34 @@ public class ReservaModel {
 	}
 	
 	/*
+	 * Obtiene las reservas de un socio en una fecha concreta
+	 */
+	public List<ReservaEntity> getReservasSocioEnDia(int idSocio, String fecha) {
+		String sql = "SELECT id_reserva AS idReserva, id_instalacion AS idInstalacion, " +
+                "id_socio AS idSocio, fecha, " +
+                "CAST(strftime('%H', hora_inicio) AS INTEGER) AS horaInicio, " +
+                "CAST(strftime('%H', hora_fin) AS INTEGER) AS horaFin, " +
+                "coste_reserva AS costeReserva, estado_pago AS estadoPago, metodo_pago AS metodoPago " +
+                "FROM Reservas WHERE id_socio = ? AND fecha = ?";
+		
+		return db.executeQueryPojo(ReservaEntity.class, sql, idSocio, fecha);
+	}
+	
+	/*
+	 * Obtiene las reservas de un socio en un mes concreto (formato YYYY-MM)
+	 */
+	public List<ReservaEntity> getReservasSocioEnMes(int idSocio, String mesAnio) {
+		String sql = "SELECT id_reserva AS idReserva, id_instalacion AS idInstalacion, " +
+                "id_socio AS idSocio, fecha, " +
+                "CAST(strftime('%H', hora_inicio) AS INTEGER) AS horaInicio, " +
+                "CAST(strftime('%H', hora_fin) AS INTEGER) AS horaFin, " +
+                "coste_reserva AS costeReserva, estado_pago AS estadoPago, metodo_pago AS metodoPago " +
+                "FROM Reservas WHERE id_socio = ? AND fecha LIKE ?";
+		
+		return db.executeQueryPojo(ReservaEntity.class, sql, idSocio, mesAnio + "%");
+	}
+	
+	/*
 	 * Comprueba las horas en las que hay reservas en una instalacion concreta para
 	 * evitar solapamientos
 	 */
@@ -135,10 +163,10 @@ public class ReservaModel {
 	/*
 	 * Generar resguardo de la reserva
 	 */
-	public String generarResguardo(ReservaEntity reserva) {
+	public String generarResguardo(ReservaEntity reserva, String nombreInstalacion) {
 		
 		String resguardo = "--- RESGUARDO DE RESERVA ---" +
-				"\n Instalación ID: " + reserva.getIdInstalacion() +
+				"\n Instalación: " + nombreInstalacion +
 				"\n Para socio: " + reserva.getIdSocio() +
 				"\n Para la fecha: " + reserva.getFecha() +
 				"\n Hora inicio: " + reserva.getHoraInicio() +

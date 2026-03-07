@@ -1,6 +1,7 @@
 package si.pl14.reservas;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
@@ -23,6 +24,8 @@ public class ReservaController {
 	
 	private Integer idSocioActual = null;
 	private final int HORAS_MAXIMAS_SEGUIDAS = 2;
+	private final int HORAS_MAXIMAS_DIA = 3;
+	private final int HORAS_MAXIMAS_MES = 8;
 	private final int DIAS_MAXIMOS_ANTELACION = 30;
 	
 	public ReservaController(ReservaModel m, ReservaView v) {
@@ -117,6 +120,39 @@ public class ReservaController {
 	    }
 	}
 	
+	private boolean superaHorasSeguidas(List<ReservaEntity> reservasDia, int nuevaHoraInicio, int nuevaHoraFin) {
+		boolean[] horasActivas = new boolean[24];
+		
+		// 1. Marcamos las horas que el socio ya tiene reservadas ese día
+		for (ReservaEntity r : reservasDia) {
+			for (int i = r.getHoraInicio(); i < r.getHoraFin(); i++) {
+				horasActivas[i] = true;
+			}
+		}
+		
+		// 2. Marcamos las horas que el socio quiere reservar ahora
+		for (int i = nuevaHoraInicio; i < nuevaHoraFin; i++) {
+			horasActivas[i] = true;
+		}
+		
+		// 3. Contamos cuál es el bloque máximo de horas consecutivas
+		int maxConsecutivas = 0;
+		int actualesConsecutivas = 0;
+		
+		for (int i = 0; i < 24; i++) {
+			if (horasActivas[i]) {
+				actualesConsecutivas++;
+				if (actualesConsecutivas > maxConsecutivas) {
+					maxConsecutivas = actualesConsecutivas;
+				}
+			} else {
+				actualesConsecutivas = 0;
+			}
+		}
+		
+		return maxConsecutivas > HORAS_MAXIMAS_SEGUIDAS;
+	}
+	
 	private void buscarSocio() {
 		String dni = view.getDniBusqueda();
 		
@@ -152,6 +188,8 @@ public class ReservaController {
 		LocalDate fechaSeleccionadaLocal = fechaDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         LocalDate hoy = LocalDate.now();
         
+        int horaActual = LocalTime.now().getHour();
+        
         // Calculamos la diferencia en días para verificar que no se pueda reservar con mayor antelación que la descrita
         long diasAntelacion = ChronoUnit.DAYS.between(hoy, fechaSeleccionadaLocal);
 		
@@ -169,6 +207,28 @@ public class ReservaController {
 		int horaFinSeleccionada = view.getHoraFin();
 		String metodoPago;
 		
+		// Extraemos el mes actual (YYYY-MM) a partir de la fecha seleccionada
+		String mesAnio = fechaSeleccionada.substring(0, 7); 
+		
+		// Obtenemos el historial de reservas de este socio para hoy y este mes
+		List<ReservaEntity> reservasSocioDia = model.getReservasSocioEnDia(idSocioActual, fechaSeleccionada);
+		List<ReservaEntity> reservasSocioMes = model.getReservasSocioEnMes(idSocioActual, mesAnio);
+		
+		// Calculamos las horas totales
+		int horasAReservar = horaFinSeleccionada - horaInicioSeleccionada;
+		
+		// Calculamos las horas totales ya reservadas en el día
+		int horasYaReservadasDia = 0;
+		for (ReservaEntity r : reservasSocioDia) {
+			horasYaReservadasDia += (r.getHoraFin() - r.getHoraInicio());
+		}
+
+		// Calculamos las horas totales ya reservadas en el mes
+		int horasYaReservadasMes = 0;
+		for (ReservaEntity r : reservasSocioMes) {
+			horasYaReservadasMes += (r.getHoraFin() - r.getHoraInicio());
+		}
+		
 		if (view.esPagoInmediato()) {
 			metodoPago = "Pago inmediato";
 		} else {
@@ -176,7 +236,7 @@ public class ReservaController {
 		}
 		if (this.idSocioActual == null) {
 			view.setTextoInformacion("DEBES BUSCAR Y SELECCIONAR UN SOCIO PRIMERO");
-		} else if (idInstalacionSeleccionada <= 0) {
+		} else if (idInstalacionSeleccionada <= 0) {								
 			view.setTextoInformacion("SELECCIONA UNA INSTALACIÓN");
 		} else if (horaInicioSeleccionada == -1 || horaFinSeleccionada == -1) {
 		    view.setTextoInformacion("Por favor, selecciona una hora de inicio y de fin.");
@@ -184,12 +244,20 @@ public class ReservaController {
 			view.setTextoInformacion("SOCIO CON PAGOS PENDIENTES. NO PUEDE RESERVAR");
 		} else if (diasAntelacion < 0) {
 			view.setTextoInformacion("NO SE PUEDE RESERVAR EN FECHAS PASADAS");
+		} else if (diasAntelacion == 0 && horaInicioSeleccionada <= horaActual) {  
+			view.setTextoInformacion("NO PUEDES RESERVAR EN UNA HORA QUE YA HA PASADO");
 		} else if (diasAntelacion > DIAS_MAXIMOS_ANTELACION) {
 			view.setTextoInformacion("SÓLO SE PUEDE RESERVAR CON " + DIAS_MAXIMOS_ANTELACION + " DÍAS DE ANTELACIÓN");
 		} else if (horaFinSeleccionada <= horaInicioSeleccionada)  {
 			view.setTextoInformacion("LA HORA DE INICIO DEBE SER ANTERIOR A LA HORA DE FIN");
 		} else if ((horaFinSeleccionada - horaInicioSeleccionada) > HORAS_MAXIMAS_SEGUIDAS) {
 			view.setTextoInformacion("NO SE PERMITE RESERVAR MAS DE " + HORAS_MAXIMAS_SEGUIDAS + " HORAS SEGUIDAS");
+		} else if (superaHorasSeguidas(reservasSocioDia, horaInicioSeleccionada, horaFinSeleccionada)) {	
+			view.setTextoInformacion("NO SE PERMITE RESERVAR MÁS DE " + HORAS_MAXIMAS_SEGUIDAS + " HORAS SEGUIDAS");
+		} else if ((horasYaReservadasDia + horasAReservar) > HORAS_MAXIMAS_DIA) {							
+			view.setTextoInformacion("LÍMITE DIARIO: NO SE PUEDEN RESERVAR MÁS DE " + HORAS_MAXIMAS_DIA + " HORAS AL DÍA");
+		} else if ((horasYaReservadasMes + horasAReservar) > HORAS_MAXIMAS_MES) {							
+			view.setTextoInformacion("LÍMITE MENSUAL: NO SE PUEDEN RESERVAR MÁS DE " + HORAS_MAXIMAS_MES + " HORAS AL MES");
 		} else if (!model.estaLibreAEsasHoras(fechaSeleccionada, horaInicioSeleccionada, horaFinSeleccionada, idInstalacionSeleccionada)) {
 			view.setTextoInformacion("LA INSTALACIÓN NO ESTÁ DISPONIBLE EN ESE HORARIO");
 		} else {
@@ -216,7 +284,7 @@ public class ReservaController {
 			
 			model.realizarReserva(reserva);
 			
-			String textoResguardo = model.generarResguardo(reserva);
+			String textoResguardo = model.generarResguardo(reserva, instalacionSeleccionada.getNombre());
 			view.setTextoResumen(textoResguardo);
 			
 			SwingUtil.showMessage("Reserva realizada con éxito.\n\n" + textoResguardo, 
