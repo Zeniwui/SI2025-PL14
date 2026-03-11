@@ -25,7 +25,7 @@ public class Lista_Actividades_Periodo_Model {
 				+ " (SELECT h.hora_inicio FROM Horarios h WHERE h.id_actividad = a.id_actividad LIMIT 1) as h_ini, "
 				+ " (SELECT h.hora_fin FROM Horarios h WHERE h.id_actividad = a.id_actividad LIMIT 1) as h_fin "
 				+ " FROM Actividades a " + " LEFT JOIN Instalaciones i ON a.id_instalacion = i.id_instalacion "
-				+ " WHERE a.fecha_inicio >= ? AND a.fecha_fin <= ?"; // Filtro por fechas
+				+ " WHERE a.fecha_inicio >= ? AND a.fecha_fin <= ?";
 
 		List<Object[]> resultados = db.executeQueryArray(sql, inicio, fin);
 

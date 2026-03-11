@@ -23,7 +23,6 @@ public class ActividadDTO {
 
     public String getDuracion() {
         try {
-            // El error solía dar aquí si hIni o hFin llegaban vacíos o en índices incorrectos
             if (hIni == null || hFin == null || hIni.isEmpty()) return "N/A";
             long minutos = java.time.Duration.between(java.time.LocalTime.parse(hIni), java.time.LocalTime.parse(hFin)).toMinutes();
             return (minutos / 60) + "h " + (minutos % 60) + "min";
@@ -34,7 +33,7 @@ public class ActividadDTO {
         return new Object[]{
             nombre,
             tipo,
-            instalacion,      // <--- Añadido a la tabla
+            instalacion, 
             getDuracion(),
             horarios != null ? horarios : "Sin horario",
             fechaInicio,
@@ -45,7 +44,6 @@ public class ActividadDTO {
         };
     }
     
-    // Getters necesarios para el controller...
     public String getNombre() { return nombre; }
     public String getFechaInicio() { return fechaInicio; }
     public String getFechaFin() { return fechaFin; }

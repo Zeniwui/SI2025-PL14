@@ -16,13 +16,12 @@ public class Lista_Actividades_Periodo_Controller {
 	}
 
 	public void initController() {
-    // Eliminar view.cargarPeriodos(...) ya que no lo usamos
+    // Eliminar view.cargarPeriodos(...) ya que no se usa
 
     view.getBtnConsultar().addActionListener(e -> {
         String fIni = view.getFechaInicioFiltro();
         String fFin = view.getFechaFinFiltro();
 
-        // Podrías añadir una validación básica aquí
         if (!fIni.isEmpty() && !fFin.isEmpty()) {
             List<ActividadDTO> dtos = model.obtenerActividadesPorRangoFechas(fIni, fFin);
             

@@ -207,7 +207,6 @@ public class Lista_Actividades_Periodo_Admin_Vista extends JFrame {
 		return btnVolver;
 	}
 
-	// Arreglos por la cancelacion de la HU
 	public String getFechaInicioFiltro() {
 		return txtFechaInicioFiltro.getText();
 	}
