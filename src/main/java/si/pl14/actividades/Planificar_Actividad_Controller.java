@@ -61,7 +61,6 @@ public class Planificar_Actividad_Controller {
 		            
 		            view.getTxtFechaInicio().setText(inicioSocios);
 		            view.getTxtFechaFin().setText(finSocios_iniNS);
-		            view.getTxtFechaFinNS().setText(finNoSocios);
 
 		            // 2. Actualizamos el label de información inferior con el desglose completo
 		            view.setTextoFechas("<html><b>Periodo Socios:</b> " + inicioSocios + " al " + finSocios_iniNS + 
@@ -113,7 +112,6 @@ public class Planificar_Actividad_Controller {
 
 	    actividad.setFechaInicio(view.getFechaInicio());
 	    actividad.setFechaFin(view.getFechaFin());
-	    actividad.setFechaFinNS(view.getTxtFechaFinNS().getText()); 
 
 	    actividad.setIdInstalacion(view.getIdInstalacionSeleccionada());
 	    actividad.setIdPeriodo(view.getIdPeriodoSeleccionado());

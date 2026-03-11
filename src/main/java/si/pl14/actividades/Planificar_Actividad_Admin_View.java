@@ -18,7 +18,6 @@ public class Planificar_Actividad_Admin_View extends JFrame {
 	private JTextField txtAforo = new JTextField("20");
 	private JTextField txtFechaInicio = new JTextField("2026-03-01");
 	private JTextField txtFechaFin = new JTextField("2026-06-30");
-	private JTextField txtFechaFin_ns = new JTextField("2026-07-30");
 	private JTextField txtCuotaSocio = new JTextField("15.50");
 	private JTextField txtCuotaNoSocio = new JTextField("25.00");
 	private JTextField txtHoraInicio = new JTextField("10:00");
@@ -54,9 +53,8 @@ public class Planificar_Actividad_Admin_View extends JFrame {
 	private JLabel lblNoSocio = new JLabel("No Socio:");
 	private JSeparator separator = new JSeparator();
 	private JButton btnEliminarHorario = new JButton("ELIMINAR SELECCIONADO");
-	private JLabel lblIniSocios = new JLabel("Inicio Socios:");
-	private JLabel lblFinSocios = new JLabel("Fin Socios = Ini. No Soc:");
-	private JLabel lblFinNS = new JLabel("Fin No Socios:");
+	private JLabel lblIniSocios = new JLabel("Inicio:");
+	private JLabel lblFinSocios = new JLabel("Fin:");
 
 	public static void main(String[] args) {
 		try {
@@ -158,15 +156,6 @@ public class Planificar_Actividad_Admin_View extends JFrame {
 
 		txtFechaFin.setBounds(160, 245, 110, 30);
 		contentPane.add(txtFechaFin);
-
-		// fin periodo no socios
-		lblFinNS.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-		lblFinNS.setForeground(azul);
-		lblFinNS.setBounds(30, 280, 110, 15);
-		contentPane.add(lblFinNS);
-
-		txtFechaFin_ns.setBounds(30, 295, 110, 30);
-		contentPane.add(txtFechaFin_ns);
 
 		lblPeriodo.setFont(boldFont);
 		lblPeriodo.setForeground(azul);
@@ -387,14 +376,6 @@ public class Planificar_Actividad_Admin_View extends JFrame {
 
 	public JTextField getTxtFechaFin() {
 		return txtFechaFin;
-	}
-	
-	public JTextField getTxtFechaFinNS() {
-		return txtFechaFin_ns;
-	}
-	
-	public void setTxtFechaFinNS(String texto) {
-		txtFechaFin_ns.setText(texto);
 	}
 
 	// Necesitamos un getter para el controlador

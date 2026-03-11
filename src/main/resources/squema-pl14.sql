@@ -45,7 +45,6 @@ CREATE TABLE IF NOT EXISTS Actividades (
     aforo INT NOT NULL,                
     fecha_inicio DATE,
     fecha_fin DATE,
-    fecha_fin_no_socios DATE,
     precio_socio DECIMAL(6,2),
     precio_no_socio DECIMAL(6,2),
     
