@@ -27,8 +27,8 @@ public class Planificar_Actividad_Model {
 			try {
 				// insertar Actividad
 				String sqlAct = "INSERT INTO Actividades (nombre, descripcion, id_instalacion, aforo, "
-				        + "fecha_inicio, fecha_fin, fecha_fin_no_socios, precio_socio, precio_no_socio, id_periodo) "
-				        + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+				        + "fecha_inicio, fecha_fin, precio_socio, precio_no_socio, id_periodo) "
+				        + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 				int idActividadGenerated;
 				try (PreparedStatement pst = conn.prepareStatement(sqlAct, Statement.RETURN_GENERATED_KEYS)) {
@@ -38,10 +38,9 @@ public class Planificar_Actividad_Model {
 				    pst.setInt(4, actividad.getAforo());
 				    pst.setDate(5, java.sql.Date.valueOf(actividad.getFechaInicio())); // Inicio Socios
 				    pst.setDate(6, java.sql.Date.valueOf(actividad.getFechaFin()));    // Fin Socios
-				    pst.setDate(7, java.sql.Date.valueOf(actividad.getFechaFinNS())); // Fin No Socios (NUEVO)
-				    pst.setFloat(8, (float) actividad.getPrecioSocio());
-				    pst.setFloat(9, (float) actividad.getPrecioNoSocio());
-				    pst.setInt(10, actividad.getIdPeriodo());
+				    pst.setFloat(7, (float) actividad.getPrecioSocio());
+				    pst.setFloat(8, (float) actividad.getPrecioNoSocio());
+				    pst.setInt(9, actividad.getIdPeriodo());
 				    pst.executeUpdate();
 
 					ResultSet rs = pst.getGeneratedKeys();
@@ -53,6 +52,11 @@ public class Planificar_Actividad_Model {
 
 				// insertar Horarios tras verificar disponibilidad
 				String sqlHor = "INSERT INTO Horarios (id_actividad, dia_semana, hora_inicio, hora_fin) VALUES (?, ?, ?, ?)";
+				String sqlReserva = "INSERT INTO Reservas (id_instalacion, fecha, hora_inicio, hora_fin, id_actividad) VALUES (?, ?, ?, ?, ?)";
+				
+				LocalDate start = LocalDate.parse(actividad.getFechaInicio());
+	            LocalDate end = LocalDate.parse(actividad.getFechaFin());
+	            
 				for (HorarioEntity h : horarios) {
 					if (!isInstalacionLibre(conn, actividad.getIdInstalacion(), h)) {
 						throw new ApplicationException("Conflicto: La instalación está ocupada el " + h.getDiaSemana()
@@ -60,11 +64,32 @@ public class Planificar_Actividad_Model {
 					}
 					try (PreparedStatement pstH = conn.prepareStatement(sqlHor)) {
 						pstH.setInt(1, idActividadGenerated);
-						pstH.setString(2, h.getDiaSemana());
+						pstH.setString(2, h.getDiaSemana().toUpperCase());
 						pstH.setString(3, h.getHoraInicio());
 						pstH.setString(4, h.getHoraFin());
 						pstH.executeUpdate();
 					}
+					
+					java.time.DayOfWeek diaBuscado = traducirDiaSemana(h.getDiaSemana());
+					
+					for (LocalDate date = start; !date.isAfter(end); date = date.plusDays(1)) {
+	                    if (date.getDayOfWeek() == diaBuscado) {
+	                        // Verificamos si la pista está libre para este día concreto
+	                        if (!isPistaLibreParaFecha(conn, actividad.getIdInstalacion(), date.toString(), h.getHoraInicio(), h.getHoraFin())) {
+	                            throw new ApplicationException("Conflicto: La instalación está ocupada el " + date + " (" + h.getDiaSemana() + ")");
+	                        }
+
+	                        try (PreparedStatement pstR = conn.prepareStatement(sqlReserva)) {
+	                            pstR.setInt(1, actividad.getIdInstalacion());
+	                            pstR.setString(2, date.toString()); // Formato AAAA-MM-DD
+	                            pstR.setString(3, h.getHoraInicio());
+	                            pstR.setString(4, h.getHoraFin());
+	                            pstR.setInt(5, idActividadGenerated);
+	                            pstR.executeUpdate();
+	                        }
+	                    }
+	                }
+					
 				}
 				conn.commit();
 			} catch (Exception e) {
@@ -130,7 +155,6 @@ public class Planificar_Actividad_Model {
 		// Fechas
 		LocalDate inicio = null;
 		LocalDate fin = null;
-		LocalDate finNS = null;
 
 		if (a.getFechaInicio() == null || a.getFechaInicio().isEmpty()) {
 			errores.add("- La fecha de inicio es obligatoria.");
@@ -157,20 +181,6 @@ public class Planificar_Actividad_Model {
 
 		if (inicio != null && fin != null && !fin.isAfter(inicio)) {
 			errores.add("- La fecha de fin debe ser posterior a la de inicio.");
-		}
-		
-		if (a.getFechaFinNS() == null || a.getFechaFinNS().isEmpty()) {
-		    errores.add("- La fecha de fin para no socios es obligatoria.");
-		} else {
-		    try {
-		        finNS = LocalDate.parse(a.getFechaFinNS());
-		    } catch (DateTimeParseException e) {
-		        errores.add("- Formato de fecha de fin no socios inválido.");
-		    }
-		}
-		
-		if (fin != null && finNS != null && !finNS.isAfter(fin)) {
-		    errores.add("- La fecha de fin para no socios debe ser posterior al fin de periodo de socios.");
 		}
 
 		// Si hay errores, lanzamos la excepción con la lista unida por saltos de línea
@@ -203,5 +213,31 @@ public class Planificar_Actividad_Model {
 			return lista.get(0);
 		}
 		return null;
+	}
+	
+	private java.time.DayOfWeek traducirDiaSemana(String dia) {
+	    switch (dia.toLowerCase()) {
+	        case "lunes": return java.time.DayOfWeek.MONDAY;
+	        case "martes": return java.time.DayOfWeek.TUESDAY;
+	        case "miércoles": case "miercoles": return java.time.DayOfWeek.WEDNESDAY;
+	        case "jueves": return java.time.DayOfWeek.THURSDAY;
+	        case "viernes": return java.time.DayOfWeek.FRIDAY;
+	        case "sábado": case "sabado": return java.time.DayOfWeek.SATURDAY;
+	        case "domingo": return java.time.DayOfWeek.SUNDAY;
+	        default: throw new IllegalArgumentException("Día no válido: " + dia);
+	    }
+	}
+	
+	private boolean isPistaLibreParaFecha(Connection conn, int idInstalacion, String fecha, String hIni, String hFin) throws SQLException {
+	    String sql = "SELECT COUNT(*) FROM Reservas WHERE id_instalacion = ? AND fecha = ? " +
+	                 "AND ((hora_inicio < ? AND hora_fin > ?))";
+	    try (PreparedStatement pst = conn.prepareStatement(sql)) {
+	        pst.setInt(1, idInstalacion);
+	        pst.setString(2, fecha);
+	        pst.setString(3, hFin);
+	        pst.setString(4, hIni);
+	        ResultSet rs = pst.executeQuery();
+	        return rs.next() && rs.getInt(1) == 0;
+	    }
 	}
 }

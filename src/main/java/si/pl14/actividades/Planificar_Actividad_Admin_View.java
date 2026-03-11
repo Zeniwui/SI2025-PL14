@@ -378,12 +378,10 @@ public class Planificar_Actividad_Admin_View extends JFrame {
 		return txtFechaFin;
 	}
 
-	// Necesitamos un getter para el controlador
 	public JButton getBtnEliminarHorario() {
 		return btnEliminarHorario;
 	}
 
-	// Necesitamos saber qué índice hay seleccionado en la JList
 	public int getIndiceHorarioSeleccionado() {
 		return listHorariosVista.getSelectedIndex();
 	}

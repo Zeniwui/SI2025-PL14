@@ -92,7 +92,6 @@ public class Planificar_Actividad_Controller {
 	}
 
 	public void initView() {
-		// Hace visible la ventana
 		view.setVisible(true);
 	}
 
