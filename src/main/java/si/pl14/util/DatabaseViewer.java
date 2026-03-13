@@ -149,8 +149,4 @@ public class DatabaseViewer extends JFrame {
         }
         System.out.println();
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> refs/remotes/origin/ListaActividades

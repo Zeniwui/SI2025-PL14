@@ -1,4 +1,4 @@
-package si.pl14.actividades;
+package si.pl14.actividadesEmma;
 
 import java.util.ArrayList;
 import java.util.List;
