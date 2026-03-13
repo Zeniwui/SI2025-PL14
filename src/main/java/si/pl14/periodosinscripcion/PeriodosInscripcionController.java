@@ -15,13 +15,13 @@ import javax.swing.event.DocumentListener;
  *  3. "Confirmar periodo" valida (en el modelo), guarda en BD,
  *     refresca la tabla y resetea el formulario.
  */
-public class PeriodosInscripciónController {
+public class PeriodosInscripcionController {
 
-    private final PeriodosInscripciónModel model;
-    private final PeriodosInscripciónView  view;
+    private final PeriodosInscripcionModel model;
+    private final PeriodosInscripcionView  view;
 
-    public PeriodosInscripciónController(PeriodosInscripciónModel m,
-                                          PeriodosInscripciónView  v) {
+    public PeriodosInscripcionController(PeriodosInscripcionModel m,
+                                          PeriodosInscripcionView  v) {
         this.model = m;
         this.view  = v;
     }
@@ -52,9 +52,9 @@ public class PeriodosInscripciónController {
     private void confirmar() {
         String nombre = view.getNombreValor();
         String desc   = view.getDescripcionValor();
-        String iniS   = PeriodosInscripciónView.fechaValor(view.getTxtInicioSocios());
-        String finS   = PeriodosInscripciónView.fechaValor(view.getTxtFinSocios());
-        String finN   = PeriodosInscripciónView.fechaValor(view.getTxtFinNoSocios());
+        String iniS   = PeriodosInscripcionView.fechaValor(view.getTxtInicioSocios());
+        String finS   = PeriodosInscripcionView.fechaValor(view.getTxtFinSocios());
+        String finN   = PeriodosInscripcionView.fechaValor(view.getTxtFinNoSocios());
 
         PeriodoInscripcionEntity creado = model.crearPeriodo(nombre, desc, iniS, finS, finN);
         view.mostrarExito(creado.getNombre());
@@ -69,9 +69,9 @@ public class PeriodosInscripciónController {
         view.actualizarResumen(
             view.getNombreValor(),
             view.getDescripcionValor(),
-            PeriodosInscripciónView.fechaValor(view.getTxtInicioSocios()),
-            PeriodosInscripciónView.fechaValor(view.getTxtFinSocios()),
-            PeriodosInscripciónView.fechaValor(view.getTxtFinNoSocios())
+            PeriodosInscripcionView.fechaValor(view.getTxtInicioSocios()),
+            PeriodosInscripcionView.fechaValor(view.getTxtFinSocios()),
+            PeriodosInscripcionView.fechaValor(view.getTxtFinNoSocios())
         );
     }
 }

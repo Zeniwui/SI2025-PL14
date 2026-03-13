@@ -19,7 +19,7 @@ import java.util.List;
  *   5. No puede existir otro periodo con el mismo nombre.
  *   6. No se pueden superar MAX_PERIODOS periodos en total.
  */
-public class PeriodosInscripciónModel {
+public class PeriodosInscripcionModel {
 
     private static final DateTimeFormatter FMT_ISO  = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DateTimeFormatter FMT_DISP = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -30,7 +30,7 @@ public class PeriodosInscripciónModel {
 
     private final Database db = new Database();
 
-    public PeriodosInscripciónModel() {
+    public PeriodosInscripcionModel() {
         db.createDatabase(true);
         migrarColumnaDescripcion();
     }

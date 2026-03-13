@@ -20,7 +20,7 @@ import java.util.List;
  *   - Fecha Fin Socios
  *   - Fecha Fin No Socios
  */
-public class PeriodosInscripciónView {
+public class PeriodosInscripcionView {
 
     // ── Paleta ────────────────────────────────────────────────────────────────
     private static final Color AZUL      = new Color(30, 100, 180);
@@ -58,7 +58,7 @@ public class PeriodosInscripciónView {
     private final JTable            tablaPeriodos;
 
     // ── Constructor ───────────────────────────────────────────────────────────
-    public PeriodosInscripciónView() {
+    public PeriodosInscripcionView() {
         frame = new JDialog((Frame) null, "Crear periodo de inscripcion", true);
         frame.setSize(640, 720);
         frame.setMinimumSize(new Dimension(580, 660));
@@ -125,8 +125,8 @@ public class PeriodosInscripciónView {
         g.gridx = 0; g.gridy = 2; g.gridwidth = 2; g.weightx = 1.0;
         g.insets = new Insets(10, 4, 4, 4);
         form.add(separador("Fechas del periodo  (cada sub-periodo debe durar más de "
-            + PeriodosInscripciónModel.MIN_DIAS_PERIODO + " días y menos de "
-            + PeriodosInscripciónModel.MAX_DIAS_PERIODO + " días)"), g);
+            + PeriodosInscripcionModel.MIN_DIAS_PERIODO + " días y menos de "
+            + PeriodosInscripcionModel.MAX_DIAS_PERIODO + " días)"), g);
 
         // Separador 2
         g.gridx = 0; g.gridy = 3; g.gridwidth = 2; g.weightx = 1.0;
@@ -378,9 +378,9 @@ public class PeriodosInscripciónView {
                 p.getIdPeriodo(),
                 p.getNombre(),
                 p.getDescripcion() != null ? p.getDescripcion() : "",
-                PeriodosInscripciónModel.isoADisplay(p.getInicioSocios()),
-                PeriodosInscripciónModel.isoADisplay(p.getFinSocios()),
-                PeriodosInscripciónModel.isoADisplay(p.getFinNoSocios())
+                PeriodosInscripcionModel.isoADisplay(p.getInicioSocios()),
+                PeriodosInscripcionModel.isoADisplay(p.getFinSocios()),
+                PeriodosInscripcionModel.isoADisplay(p.getFinNoSocios())
             });
         }
     }
