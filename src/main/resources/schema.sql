@@ -93,3 +93,12 @@ CREATE TABLE IF NOT EXISTS Horarios (
     hora_fin     TIME        NOT NULL,
     FOREIGN KEY (id_actividad) REFERENCES Actividades(id_actividad) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS Inscripciones (
+    id_inscripcion INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_socio       INTEGER NOT NULL,
+    id_actividad   INTEGER NOT NULL,
+    fecha_inscripcion DATE DEFAULT CURRENT_DATE,
+    FOREIGN KEY (id_socio) REFERENCES Socios(id_socio),
+    FOREIGN KEY (id_actividad) REFERENCES Actividades(id_actividad)
+);
