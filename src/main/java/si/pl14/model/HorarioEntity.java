@@ -1,4 +1,6 @@
-package si.pl14.actividades;
+package si.pl14.model;
+
+//clase para getters y setters de los elementos de la tabla "horario" de la base de datos
 
 public class HorarioEntity {
 	private int idHorario;

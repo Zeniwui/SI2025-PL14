@@ -1,6 +1,9 @@
-package si.pl14.actividades;
+package si.pl14.actividadesEmma;
 
 public class ActividadDTO {
+	
+	// DTO para la HU de "crear actividad como administrador"
+	// sirve para transportar datos entre la app y la bbdd
 
 	// parametros
 	private int id;

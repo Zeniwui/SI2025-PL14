@@ -1,14 +1,18 @@
-package si.pl14.actividades;
+package si.pl14.actividadesEmma;
 
 import java.sql.*;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
 import si.pl14.model.ActividadEntity;
+import si.pl14.model.HorarioEntity;
 import si.pl14.util.ApplicationException;
 import si.pl14.util.Database;
+
+// clase model para la HU de "crear actividad como administrador"
 
 public class Planificar_Actividad_Model {
 

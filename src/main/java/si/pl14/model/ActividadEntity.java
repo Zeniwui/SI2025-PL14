@@ -1,5 +1,7 @@
 package si.pl14.model;
 
+// clase para getters y setters de los elementos de la tabla "actividad" de la base de datos
+
 public class ActividadEntity {
 	private int idActividad;
     private String nombre;

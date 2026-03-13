@@ -24,7 +24,8 @@ CREATE TABLE IF NOT EXISTS Socios (
 
 CREATE TABLE IF NOT EXISTS PeriodosInscripcion (
     id_periodo INTEGER PRIMARY KEY AUTOINCREMENT,
-    nombre VARCHAR(50) NOT NULL,        
+    nombre VARCHAR(50) NOT NULL,
+    descripcion TEXT,        
     inicio_socios DATE NOT NULL,
     fin_socios DATE NOT NULL,
     fin_no_socios DATE NOT NULL

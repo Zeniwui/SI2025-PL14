@@ -35,8 +35,8 @@ INSERT INTO Socios (id_socio, dni, contrasena) VALUES (1, '12345678A', '123');
 INSERT INTO Reservas (id_instalacion, fecha, hora_inicio, hora_fin, id_socio)
 VALUES (1, '2026-06-01', '10:30', '11:30', 1);
 
-INSERT INTO PeriodosInscripcion (nombre, inicio_socios, fin_socios, fin_no_socios) 
-VALUES ('Campaña Verano 2026', '2026-05-01', '2026-05-15', '2026-05-30');
+INSERT INTO PeriodosInscripcion (nombre, descripcion,inicio_socios, fin_socios, fin_no_socios) 
+VALUES ('Campaña Verano 2026','periodo de mayo en el año 2026' ,'2026-05-01', '2026-05-15', '2026-05-30');
 INSERT INTO PeriodosInscripcion (nombre, inicio_socios, fin_socios, fin_no_socios) 
 VALUES ('Curso Escolar 2026-27', '2026-09-01', '2026-09-10', '2026-09-25');
 INSERT INTO PeriodosInscripcion (nombre, inicio_socios, fin_socios, fin_no_socios) 

@@ -1,6 +1,8 @@
-package si.pl14.actividades;
+package si.pl14.actividadesEmma;
 
 import javax.swing.*;
+
+
 import javax.swing.border.EmptyBorder;
 
 import si.pl14.util.DatabaseViewer;
@@ -9,6 +11,8 @@ import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.util.List;
+
+//clase view para la HU de "crear actividad como administrador"
 
 public class Planificar_Actividad_Admin_View extends JFrame {
 

@@ -1,4 +1,6 @@
-package si.pl14.actividades;
+package si.pl14.actividadesEmma;
+
+// controlador para la HU de "crear actividad como administrador"
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,6 +8,7 @@ import java.util.List;
 import javax.swing.JOptionPane;
 
 import si.pl14.model.ActividadEntity;
+import si.pl14.model.HorarioEntity;
 import si.pl14.util.ApplicationException;
 
 public class Planificar_Actividad_Controller {
