@@ -8,9 +8,9 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
-import si.pl14.reservas.ReservaController;
-import si.pl14.reservas.ReservaModel;
-import si.pl14.reservas.ReservaView;
+import si.pl14.reservasAdmin.ReservaController;
+import si.pl14.reservasAdmin.ReservaModel;
+import si.pl14.reservasAdmin.ReservaView;
 
 /**
  * Punto de entrada principal que incluye botones para la ejecucion de las pantallas 

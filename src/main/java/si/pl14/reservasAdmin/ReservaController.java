@@ -1,4 +1,4 @@
-package si.pl14.reservas;
+package si.pl14.reservasAdmin;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -63,6 +63,8 @@ public class ReservaController {
 		view.getSpinHoraFin().addChangeListener(e -> SwingUtil.exceptionWrapper(() -> calcularYMostrarPrecio()));
 		
 		view.getBtnBuscarSocio().addActionListener(e -> SwingUtil.exceptionWrapper(() -> buscarSocio()));
+		
+		view.getBtnCancelar().addActionListener(e -> view.getFrame().dispose());
 	}
 	
 	private void getInstalaciones() {
