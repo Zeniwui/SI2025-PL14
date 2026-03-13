@@ -3,15 +3,42 @@ package si.pl14.model;
 public class ReservaEntity {
 	private int idReserva;
 	private int idInstalacion;
-	private String fecha;
+	private String fechaReserva;
 	private int horaInicio;
 	private int horaFin;
 	
 	private Integer idSocio;
 	private Integer idActividad;
 	
+	private float costeReserva;
 	private String estado;
-	private String fechaReserva;
+	private String metodoPago;
+	
+	public float getCosteReserva() {
+		return costeReserva;
+	}
+	public void setCosteReserva(float costeReserva) {
+		this.costeReserva = costeReserva;
+	}
+	public String getEstadoPago() {
+		return estado;
+	}
+	public void setEstadoPago(String estadoPago) {
+		this.estado = estadoPago;
+	}
+	public String getMetodoPago() {
+		return metodoPago;
+	}
+	public void setMetodoPago(String metodoPago) {
+		this.metodoPago = metodoPago;
+	}
+	public String getFechaCreacion() {
+		return fechaCreacion;
+	}
+	public void setFechaCreacion(String fechaCreacion) {
+		this.fechaCreacion = fechaCreacion;
+	}
+	private String fechaCreacion;
 	
 	public int getIdReserva() {
 		return idReserva;
@@ -26,10 +53,10 @@ public class ReservaEntity {
 		this.idInstalacion = idInstalacion;
 	}
 	public String getFecha() {
-		return fecha;
+		return fechaReserva;
 	}
 	public void setFecha(String fecha) {
-		this.fecha = fecha;
+		this.fechaReserva = fecha;
 	}
 	public int getHoraInicio() {
 		return horaInicio;
@@ -55,6 +82,7 @@ public class ReservaEntity {
 	public void setIdActividad(Integer idActividad) {
 		this.idActividad = idActividad;
 	}
+	
 	public String getEstado() {
 		return estado;
 	}
@@ -67,4 +95,5 @@ public class ReservaEntity {
 	public void setFechaReserva(String fechaReserva) {
 		this.fechaReserva = fechaReserva;
 	}
+
 }

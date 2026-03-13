@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 DROP TABLE IF EXISTS Instalaciones;
 DROP TABLE IF EXISTS PeriodosInscripcion;
 DROP TABLE IF EXISTS Actividades;
@@ -5,6 +6,16 @@ DROP TABLE IF EXISTS Reservas;
 DROP TABLE IF EXISTS Usuarios;
 DROP TABLE IF EXISTS Socios;
 DROP TABLE IF EXISTS Horarios;
+=======
+DROP TABLE IF EXISTS Horarios;
+DROP TABLE IF EXISTS Reservas;
+DROP TABLE IF EXISTS Actividades;
+DROP TABLE IF EXISTS Socios;
+DROP TABLE IF EXISTS Usuarios;
+DROP TABLE IF EXISTS Instalaciones;
+DROP TABLE IF EXISTS PeriodosInscripcion;
+
+>>>>>>> refs/remotes/origin/ListaActividades
 
 CREATE TABLE IF NOT EXISTS Usuarios (
     dni VARCHAR(20) PRIMARY KEY,
@@ -41,6 +52,7 @@ CREATE TABLE IF NOT EXISTS Instalaciones (
 CREATE TABLE IF NOT EXISTS Actividades (
     id_actividad INTEGER PRIMARY KEY AUTOINCREMENT,
     nombre VARCHAR(100) NOT NULL,
+    tipo VARCHAR(50),
     descripcion TEXT,
     id_instalacion INT NOT NULL,
     aforo INT NOT NULL,                
