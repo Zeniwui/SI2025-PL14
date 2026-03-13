@@ -78,6 +78,7 @@ public class AdminView {
                 	break;
                 case 5:
                 	PeriodosInscripcionController controllerPeriodosInscripcion = new PeriodosInscripcionController(new PeriodosInscripcionModel(), new PeriodosInscripcionView());
+                	controllerPeriodosInscripcion.initController();
                 	break;
                 case 6:
                 	break;
