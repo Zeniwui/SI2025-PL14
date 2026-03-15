@@ -1,4 +1,4 @@
-package inscripcionesSocio;
+package si.pl14.inscripcionesSocio;
 
 import java.awt.Color;
 import java.awt.Cursor;
