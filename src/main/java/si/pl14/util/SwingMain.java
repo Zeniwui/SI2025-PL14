@@ -1,14 +1,17 @@
 package si.pl14.util;
 
 import java.awt.EventQueue;
-import javax.swing.JFrame;
-
-import si.pl14.ejemplos.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import javax.swing.JFrame;
+
+import si.pl14.visualizareservas.VisualizarReservasSocioController;
+import si.pl14.visualizareservas.VisualizarReservasSocioModel;
+import si.pl14.visualizareservas.VisualizarReservasSocioView;
+
 
 /**
  * Punto de entrada principal que incluye botones para la ejecucion de las pantallas 
@@ -51,17 +54,36 @@ public class SwingMain {
 		frame = new JFrame();
 		frame.setTitle("Main");
 		frame.setBounds(0, 0, 287, 185);
-		frame.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);		
 		
-		JButton btnEjecutarTkrun = new JButton("Ejecutar giis.demo.tkrun");
-		btnEjecutarTkrun.addActionListener(new ActionListener() { //NOSONAR codigo autogenerado
+		JButton btnAdmin = new JButton("Entrar al panel de administrador");
+		btnAdmin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				CarrerasController controller=new CarrerasController(new CarrerasModel(), new CarrerasView());
-				controller.initController();
+				new AdminView();
 			}
 		});
 		frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
-		frame.getContentPane().add(btnEjecutarTkrun);
+		frame.getContentPane().add(btnAdmin);
+		
+		JButton btnSocio = new JButton("Entrar al panel de socio");
+		btnSocio.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new SociosView();
+			}
+		});
+		frame.getContentPane().add(btnSocio);
+		
+		JButton btnVisualizarReservas = new JButton("Socio: Visualizar mis reservas en un periodo");
+		btnVisualizarReservas.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				VisualizarReservasSocioController controller = new VisualizarReservasSocioController(
+					new VisualizarReservasSocioModel(),
+					new VisualizarReservasSocioView()
+				);
+				controller.initController();
+			}
+		});
+		frame.getContentPane().add(btnVisualizarReservas);
 		
 			
 		JButton btnInicializarBaseDeDatos = new JButton("Inicializar Base de Datos en Blanco");
@@ -82,6 +104,20 @@ public class SwingMain {
 			}
 		});
 		frame.getContentPane().add(btnCargarDatosIniciales);
+		
+		// --- BLOQUE PARA VISUALIZAR LOS DATOS DE LAS TABLAS ---
+        
+        JButton btnDebugBD = new JButton("Consultar Tablas (Debug)");
+        btnDebugBD.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // Abre la ventana de visualización
+                DatabaseViewer viewer = new DatabaseViewer();
+                viewer.setVisible(true);
+            }
+        });
+        frame.getContentPane().add(btnDebugBD);
+        
+        // ----------------------------------
 	}
 
 	public JFrame getFrame() { return this.frame; }
