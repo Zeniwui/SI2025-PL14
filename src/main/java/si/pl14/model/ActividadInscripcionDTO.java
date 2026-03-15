@@ -2,7 +2,7 @@ package si.pl14.model;
 
 import java.util.Date;
 
-public class InscripcionActividadDTO {
+public class ActividadInscripcionDTO {
     private int idActividad;
     private String nombre;
     private String instalacion;
