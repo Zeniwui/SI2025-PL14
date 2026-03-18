@@ -5,6 +5,8 @@
 -- ─────────────────────────────────────────────────────────────────
 
 -- borrado en orden inverso para respetar las claves foraneas
+DROP TABLE IF EXISTS Pagos;
+DROP TABLE IF EXISTS Inscripciones;
 DROP TABLE IF EXISTS Horarios;
 DROP TABLE IF EXISTS Reservas;
 DROP TABLE IF EXISTS Actividades;
