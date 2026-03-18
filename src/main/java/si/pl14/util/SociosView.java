@@ -8,6 +8,9 @@ import java.awt.event.ActionListener;
 
 // Importa aquí tus clases del MVC
 import si.pl14.reservas.ReservaModel;
+import si.pl14.inscripcionesSocio.InscripcionSocioController;
+import si.pl14.inscripcionesSocio.InscripcionSocioModel;
+import si.pl14.inscripcionesSocio.InscripcionSocioView;
 import si.pl14.reservas.ReservaController;
 import si.pl14.reservas.ReservaView;
 
@@ -42,6 +45,7 @@ public class SociosView {
         cbHistorias.addItem("Seleccionar historia de usuario");
         cbHistorias.addItem("HU1: Reservar instalacion para fecha determinada");
         cbHistorias.addItem("HU2: Ver disponibilidad de las instalaciones");
+        cbHistorias.addItem("HU3: Inscribirse a una actividad");
         
         panel.add(cbHistorias, BorderLayout.CENTER);
 
@@ -61,6 +65,9 @@ public class SociosView {
                 	break;
                 case 2:
                 	break;
+                case 3:
+                	InscripcionSocioController controllerInscripcion = new InscripcionSocioController(new InscripcionSocioModel(), new InscripcionSocioView());
+                	controllerInscripcion.initController();
                 }
             }
         });

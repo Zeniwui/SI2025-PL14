@@ -59,6 +59,7 @@ public class InscripcionSocioModel {
 	 * Realiza la inscripcion
 	 * */
 	public void realizarInscripcion(int idSocio, ActividadInscripcionDTO actividad) {
+				// Comprobaciones para que el socio se pueda inscribir
 				if (!estaAlCorriente(idSocio)) {
 					throw new ApplicationException("No puedes inscribirte: No estás al corriente de pago.");
 				}
@@ -71,10 +72,24 @@ public class InscripcionSocioModel {
 					throw new ApplicationException("El aforo máximo para esta actividad se ha completado.");
 				}
 				
-				String sql = "INSERT INTO Inscripciones (id_socio, id_actividad, fecha_inscripcion) VALUES (?, ?, CURRENT_DATE)";
-				db.executeUpdate(sql, idSocio, actividad.getIdActividad());
+				// Insertamos la inscripción
+				String sqlInscripcion = "INSERT INTO Inscripciones (id_socio, id_actividad, fecha_inscripcion, precio_inscripcion) VALUES (?, ?, CURRENT_DATE, ?)";
+				db.executeUpdate(sqlInscripcion, idSocio, actividad.getIdActividad(), actividad.getPrecioSocio());
 				
+				String sqlGetId = "SELECT last_insert_rowid()";
+				List<Object[]> res = db.executeQueryArray(sqlGetId);
+				int idInscripcion = ((Number) res.get(0)[0]).intValue();
+				
+				// Generamos el pago y lo insertamos
+				String concepto = "Cuota actividad: " + actividad.getNombre();
+				String metodoPago = "Cuota Mensual";
+				
+				String sqlPago = "INSERT INTO Pagos (id_socio, monto, metodo_pago, estado_pago, concepto, id_inscripcion) VALUES (?, ?, ?, 'Pendiente', ?, ?)";
+				db.executeUpdate(sqlPago, idSocio, actividad.getPrecioSocio(), metodoPago, concepto, idInscripcion);
+				
+				// Generamos el resguardo
 				generaResguardoInscripcion(idSocio, actividad.getNombre(), actividad.getPrecioSocio());
+				
 	}
 	
 	/*
