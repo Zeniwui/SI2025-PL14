@@ -56,7 +56,7 @@ public class Planificar_Actividad_Model {
 
 				// insertar Horarios tras verificar disponibilidad
 				String sqlHor = "INSERT INTO Horarios (id_actividad, dia_semana, hora_inicio, hora_fin) VALUES (?, ?, ?, ?)";
-				String sqlReserva = "INSERT INTO Reservas (id_instalacion, fecha, hora_inicio, hora_fin, id_actividad) VALUES (?, ?, ?, ?, ?)";
+				//String sqlReserva = "INSERT INTO Reservas (id_instalacion, fecha, hora_inicio, hora_fin, id_actividad) VALUES (?, ?, ?, ?, ?)";
 				
 				LocalDate start = LocalDate.parse(actividad.getFechaInicio());
 	            LocalDate end = LocalDate.parse(actividad.getFechaFin());
@@ -83,14 +83,14 @@ public class Planificar_Actividad_Model {
 	                            throw new ApplicationException("Conflicto: La instalación está ocupada el " + date + " (" + h.getDiaSemana() + ")");
 	                        }
 
-	                        try (PreparedStatement pstR = conn.prepareStatement(sqlReserva)) {
-	                            pstR.setInt(1, actividad.getIdInstalacion());
-	                            pstR.setString(2, date.toString()); // Formato AAAA-MM-DD
-	                            pstR.setString(3, h.getHoraInicio());
-	                            pstR.setString(4, h.getHoraFin());
-	                            pstR.setInt(5, idActividadGenerated);
-	                            pstR.executeUpdate();
-	                        }
+	                        //try (PreparedStatement pstR = conn.prepareStatement(sqlReserva)) {
+	                           // pstR.setInt(1, actividad.getIdInstalacion());
+	                           // pstR.setString(2, date.toString()); // Formato AAAA-MM-DD
+	                           // pstR.setString(3, h.getHoraInicio());
+	                           // pstR.setString(4, h.getHoraFin());
+	                           // pstR.setInt(5, idActividadGenerated);
+	                           // pstR.executeUpdate();
+	                       // }
 	                    }
 	                }
 					

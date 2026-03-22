@@ -1,21 +1,18 @@
-<<<<<<< HEAD
-DROP TABLE IF EXISTS Instalaciones;
-DROP TABLE IF EXISTS PeriodosInscripcion;
-DROP TABLE IF EXISTS Actividades;
-DROP TABLE IF EXISTS Reservas;
-DROP TABLE IF EXISTS Usuarios;
-DROP TABLE IF EXISTS Socios;
-DROP TABLE IF EXISTS Horarios;
-=======
-DROP TABLE IF EXISTS Horarios;
-DROP TABLE IF EXISTS Reservas;
-DROP TABLE IF EXISTS Actividades;
-DROP TABLE IF EXISTS Socios;
-DROP TABLE IF EXISTS Usuarios;
-DROP TABLE IF EXISTS Instalaciones;
-DROP TABLE IF EXISTS PeriodosInscripcion;
 
->>>>>>> refs/remotes/origin/ListaActividades
+DROP TABLE IF EXISTS Instalaciones;
+DROP TABLE IF EXISTS PeriodosInscripcion;
+DROP TABLE IF EXISTS Actividades;
+DROP TABLE IF EXISTS Reservas;
+DROP TABLE IF EXISTS Usuarios;
+DROP TABLE IF EXISTS Socios;
+DROP TABLE IF EXISTS Horarios;
+DROP TABLE IF EXISTS Horarios;
+DROP TABLE IF EXISTS Reservas;
+DROP TABLE IF EXISTS Actividades;
+DROP TABLE IF EXISTS Socios;
+DROP TABLE IF EXISTS Usuarios;
+DROP TABLE IF EXISTS Instalaciones;
+DROP TABLE IF EXISTS PeriodosInscripcion;
 
 CREATE TABLE IF NOT EXISTS Usuarios (
     dni VARCHAR(20) PRIMARY KEY,

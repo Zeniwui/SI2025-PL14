@@ -1,8 +1,6 @@
-<<<<<<< HEAD
+
 -- Limpieza de tablas en orden inverso a las FK
-=======
 -- 1. LIMPIEZA DE TABLAS
->>>>>>> refs/remotes/origin/ListaActividades
 DELETE FROM Horarios;
 DELETE FROM Reservas;
 DELETE FROM Actividades;
@@ -11,7 +9,6 @@ DELETE FROM PeriodosInscripcion;
 DELETE FROM Socios;
 DELETE FROM Usuarios;
 
-<<<<<<< HEAD
 INSERT INTO Instalaciones (id_instalacion, nombre, tipo, coste_hora) VALUES (1, 'Pista de Tenis 1', 'Exterior', 10.0);
 INSERT INTO Instalaciones (id_instalacion, nombre, tipo, coste_hora) VALUES (2, 'Piscina Climatizada', 'Interior', 15.5);
 INSERT INTO Instalaciones (id_instalacion, nombre, tipo, coste_hora) VALUES (3, 'Sala de Musculación', 'Interior', 5.0);
@@ -46,7 +43,7 @@ INSERT INTO PeriodosInscripcion (nombre, inicio_socios, fin_socios, fin_no_socio
 VALUES ('Curso Escolar 2026-27', '2026-09-01', '2026-09-10', '2026-09-25');
 INSERT INTO PeriodosInscripcion (nombre, inicio_socios, fin_socios, fin_no_socios) 
 VALUES ('Intensivo Pascua 2026', '2026-03-01', '2026-03-07', '2026-03-15');
-=======
+
 -- 2. INSTALACIONES
 INSERT INTO Instalaciones (nombre, tipo, coste_hora) VALUES ('Pista de Tenis 1', 'Exterior', 10.0);
 INSERT INTO Instalaciones (nombre, tipo, coste_hora) VALUES ('Piscina Climatizada', 'Interior', 15.5);
@@ -67,11 +64,7 @@ INSERT INTO PeriodosInscripcion (nombre, inicio_socios, fin_socios, fin_no_socio
 VALUES ('Temporada Primavera', '2026-03-01', '2026-03-15', '2026-05-30');
 
 -- 4. USUARIOS Y SOCIOS
-INSERT INTO Usuarios (dni, nombre, apellidos, telefono, email) 
-VALUES ('12345678A', 'Juan', 'Pérez García', 600123456, 'juan.perez@email.com');
 
-INSERT INTO Socios (id_socio, dni, contrasena, estado_pagos) 
-VALUES (1, '12345678A', 'password123', 'Al Corriente');
 
 -- 5. ACTIVIDADES (Incluyendo columna 'tipo')
 INSERT INTO Actividades (nombre, tipo, descripcion, id_instalacion, aforo, fecha_inicio, fecha_fin, precio_socio, precio_no_socio, id_periodo) 
@@ -148,4 +141,3 @@ INSERT INTO Horarios (id_actividad, dia_semana, hora_inicio, hora_fin)
 SELECT id_actividad, 'Miércoles', '19:00', '20:00' FROM Actividades WHERE nombre = 'Entrenamiento Funcional';
 INSERT INTO Horarios (id_actividad, dia_semana, hora_inicio, hora_fin) 
 SELECT id_actividad, 'Viernes', '19:00', '20:00' FROM Actividades WHERE nombre = 'Entrenamiento Funcional';
->>>>>>> refs/remotes/origin/ListaActividades
