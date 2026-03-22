@@ -1,146 +1,211 @@
 package si.pl14.reservasEmma;
 
 import javax.swing.*;
+
 import si.pl14.util.Database;
 import si.pl14.util.DatabaseViewer;
 
 import java.awt.EventQueue;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
+import java.time.*;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Reserva_Instalacion_Admin_Controller {
 
-	private Reserva_Instalacion_Admin_View view;
-	private Reserva_Instalacion_Admin_Model model;
+    private Reserva_Instalacion_Admin_View view;
+    private Reserva_Instalacion_Admin_Model model;
 
-	public Reserva_Instalacion_Admin_Controller(Reserva_Instalacion_Admin_View view,
-			Reserva_Instalacion_Admin_Model model) {
-		this.view = view;
-		this.model = model;
-		initController();
-	}
+    public Reserva_Instalacion_Admin_Controller(Reserva_Instalacion_Admin_View view, Reserva_Instalacion_Admin_Model model) {
+        this.view = view;
+        this.model = model;
+        initController();
+    }
 
-	private void initController() {
-		for (String a : model.getActividades()) {
-			view.getCbActividades().addItem(a);
-		}
+    private void initController() {
+        for (String a : model.getActividades()) view.getCbActividades().addItem(a);
+        view.getCbActividades().addActionListener(e -> cargarDatosActividad());
+        view.getBtnCambiarInstalacion().addActionListener(e -> cambiarInstalacion());
+        view.getBtnVerConflictos().addActionListener(e -> mostrarConflictos());
+        view.getBtnGestionarHorarios().addActionListener(e -> gestionarHorarios());
+        view.getBtnCrearReservas().addActionListener(e -> crearReservas());
+        if (view.getCbActividades().getItemCount() > 0) cargarDatosActividad();
+    }
 
-		view.getCbActividades().addActionListener(e -> cargarDatosActividad());
-		view.getBtnCambiarInstalacion().addActionListener(e -> cambiarInstalacion());
-		view.getBtnVerConflictos().addActionListener(e -> mostrarConflictos());
-		view.getBtnCambiarHorario().addActionListener(e -> {
-			String[] dias = { "LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO", "DOMINGO" };
-			String nuevoDia = (String) JOptionPane.showInputDialog(view, "Nuevo día:", "Cambiar Horario",
-					JOptionPane.QUESTION_MESSAGE, null, dias, dias[0]);
-			String nuevaIni = JOptionPane.showInputDialog(view, "Nueva Hora Inicio (HH:mm):", "10:00");
-			String nuevaFin = JOptionPane.showInputDialog(view, "Nueva Hora Fin (HH:mm):", "11:30");
+    private void cargarDatosActividad() {
+        int idAct = getSelectedIdActividad();
+        String[] d = model.getDatosActividad(idAct);
+        if (d[0] != null) {
+            view.getLblInstalacionActual().setText(d[0]);
+            view.getTxtFiltroInicio().setText(d[2]);
+            view.getTxtFiltroFin().setText(d[3]);
+            List<String[]> h = model.getHorariosActividad(idAct);
+            StringBuilder sb = new StringBuilder();
+            for (String[] row : h) sb.append(row[0]).append(": ").append(row[1]).append("-").append(row[2]).append("\n");
+            view.getTxtHorariosActuales().setText(sb.toString());
+            view.getModelConflictos().setRowCount(0);
+        }
+    }
 
-			if (nuevoDia != null && nuevaIni != null && nuevaFin != null) {
-				int idAct = getSelectedIdActividad();
-				if (model.actualizarHorarioActividad(idAct, nuevoDia, nuevaIni, nuevaFin)) {
-					JOptionPane.showMessageDialog(view,
-							"Horario base actualizado. Pulsa 'Ver Conflictos' para verificar el nuevo escenario.");
-					cargarDatosActividad();
-				}
-			}
-		});
+    private void gestionarHorarios() {
+        String[] opciones = {"Añadir Nuevo Horario", "Eliminar Horario Existente"};
+        int seleccion = JOptionPane.showOptionDialog(view, "Elija una acción:", "Gestión de Horarios", 
+                JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, opciones, opciones[0]);
 
-		// Carga inicial
-		if (view.getCbActividades().getItemCount() > 0)
-			cargarDatosActividad();
-	}
+        if (seleccion == 0) añadirNuevo();
+        else if (seleccion == 1) eliminarExistente();
+    }
 
-	private void cargarDatosActividad() {
-		int idAct = getSelectedIdActividad();
-		String[] datos = model.getDatosActividad(idAct);
+    private void añadirNuevo() {
+        String[] dias = {"LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO", "DOMINGO"};
+        String d = (String) JOptionPane.showInputDialog(view, "Día:", "Nuevo Horario", JOptionPane.QUESTION_MESSAGE, null, dias, dias[0]);
+        String ini = JOptionPane.showInputDialog(view, "Hora Inicio (HH:mm):", "10:00");
+        String fin = JOptionPane.showInputDialog(view, "Hora Fin (HH:mm):", "11:30");
 
-		if (datos[0] != null) {
-			// Actualizar labels de la nueva vista
-			view.getLblInstalacionActual().setText(datos[0]);
+        if (d != null && ini != null && fin != null) {
+            if (validarHoras(ini, fin)) {
+                model.insertarNuevoHorario(getSelectedIdActividad(), d, ini, fin);
+                cargarDatosActividad();
+            }
+        }
+    }
 
-			// Cargar horarios en el TextArea
-			List<String[]> horarios = model.getHorariosActividad(idAct);
-			StringBuilder sb = new StringBuilder();
-			for (String[] h : horarios) {
-				sb.append(h[0]).append(": ").append(h[1]).append(" a ").append(h[2]).append("\n");
-			}
-			view.getTxtHorariosActuales().setText(sb.toString());
+    private void eliminarExistente() {
+        List<String[]> lista = model.getHorariosActividad(getSelectedIdActividad());
+        if (lista.isEmpty()) return;
+        String[] ops = new String[lista.size()];
+        for(int i=0; i<lista.size(); i++) ops[i] = lista.get(i)[0] + " " + lista.get(i)[1] + "-" + lista.get(i)[2];
+        
+        String sel = (String) JOptionPane.showInputDialog(view, "Borrar:", "Eliminar", JOptionPane.QUESTION_MESSAGE, null, ops, ops[0]);
+        if (sel != null) {
+            String[] parts = sel.split(" ");
+            String[] times = parts[1].split("-");
+            model.eliminarHorario(getSelectedIdActividad(), parts[0], times[0], times[1]);
+            cargarDatosActividad();
+        }
+    }
 
-			// Limpiar tabla al cambiar de actividad para evitar confusión
-			view.getModelConflictos().setRowCount(0);
-		}
-	}
+    private boolean validarHoras(String ini, String fin) {
+        try {
+            LocalTime t1 = LocalTime.parse(ini);
+            LocalTime t2 = LocalTime.parse(fin);
+            if (!t1.isBefore(t2)) {
+                JOptionPane.showMessageDialog(view, "Error: El inicio debe ser antes que el fin.");
+                return false;
+            }
+            return true;
+        } catch (DateTimeParseException e) {
+            JOptionPane.showMessageDialog(view, "Error: Formato HH:mm (ej 09:30)");
+            return false;
+        }
+    }
 
-	private void cambiarInstalacion() {
-		List<String> opciones = model.getInstalaciones();
-		String seleccion = (String) JOptionPane.showInputDialog(view, "Selecciona una nueva instalación:",
-				"Cambiar Instalación", JOptionPane.QUESTION_MESSAGE, null, opciones.toArray(), opciones.get(0));
+    private void mostrarConflictos() {
+        view.getModelConflictos().setRowCount(0);
+        int idAct = getSelectedIdActividad();
+        String[] d = model.getDatosActividad(idAct);
+        List<String[]> c = model.buscarConflictosDetallados(Integer.parseInt(d[1]), view.getTxtFiltroInicio().getText(), view.getTxtFiltroFin().getText(), idAct);
+        if (c.isEmpty()) view.getModelConflictos().addRow(new String[]{"-", "-", "LIBRE: Pista disponible"});
+        else for (String[] row : c) view.getModelConflictos().addRow(row);
+    }
 
-		if (seleccion != null) {
-			int newIdInst = Integer.parseInt(seleccion.split(" - ")[0]);
-			int idAct = getSelectedIdActividad();
+    private void crearReservas() {
+        int idAct = getSelectedIdActividad();
+        String[] d = model.getDatosActividad(idAct);
+        String fI = view.getTxtFiltroInicio().getText();
+        String fF = view.getTxtFiltroFin().getText();
+        
+        if (!model.buscarConflictosDetallados(Integer.parseInt(d[1]), fI, fF, idAct).isEmpty()) {
+            JOptionPane.showMessageDialog(view, "No se puede: existen conflictos."); return;
+        }
 
-			if (model.actualizarInstalacion(idAct, newIdInst)) {
-				JOptionPane.showMessageDialog(view, "Instalación actualizada.");
-				cargarDatosActividad(); // Refrescar vista
-			} else {
-				JOptionPane.showMessageDialog(view, "Error al actualizar la base de datos.");
-			}
-		}
-	}
+        List<String[]> horarios = model.getHorariosActividad(idAct);
+        List<String[]> reservas = new ArrayList<>();
+        LocalDate start = LocalDate.parse(fI);
+        LocalDate end = LocalDate.parse(fF);
 
-	private void mostrarConflictos() {
-		view.getModelConflictos().setRowCount(0);
-		int idAct = getSelectedIdActividad();
-		String[] datos = model.getDatosActividad(idAct);
-		if (datos[1] == null)
-			return;
-		List<String[]> conflictos = model.buscarConflictosDetallados(Integer.parseInt(datos[1]), datos[2], datos[3],
-				idAct);
-		if (conflictos.isEmpty()) {
-			view.getModelConflictos().addRow(new String[] { "-", "-", "SIN CONFLICTOS: La pista está libre" });
-			JOptionPane.showMessageDialog(view, "Instalación disponible para el horario seleccionado.",
-					"Verificación Exitosa", JOptionPane.INFORMATION_MESSAGE);
-		} else {
-			// Llenar tabla con los problemas encontrados
-			for (String[] c : conflictos) {
-				view.getModelConflictos().addRow(c);
-			}
+        for (String[] h : horarios) {
+            DayOfWeek dow = DayOfWeek.valueOf(traducir(h[0]));
+            for (LocalDate date = start; !date.isAfter(end); date = date.plusDays(1)) {
+                if (date.getDayOfWeek() == dow) reservas.add(new String[]{date.toString(), h[1], h[2]});
+            }
+        }
+        if (model.insertarReservasGeneradas(Integer.parseInt(d[1]), idAct, reservas))
+            JOptionPane.showMessageDialog(view, "Reservas creadas: " + reservas.size());
+    }
 
-			JOptionPane.showMessageDialog(view,
-					"Se han detectado " + conflictos.size() + " colisiones de horario.\n"
-							+ "Por favor, cambie la instalación o el horario para poder guardar.",
-					"Conflicto de Reservas", JOptionPane.WARNING_MESSAGE);
-		}
-	}
+    private String traducir(String d) {
+        if(d.equals("MIERCOLES")) return "WEDNESDAY";
+        if(d.equals("SABADO")) return "SATURDAY";
+        if(d.equals("DOMINGO")) return "SUNDAY";
+        if(d.equals("JUEVES")) return "THURSDAY";
+        if(d.equals("MARTES")) return "TUESDAY";
+        if(d.equals("VIERNES")) return "FRIDAY";
+        return "MONDAY";
+    }
 
-	private int getSelectedIdActividad() {
-		String seleccion = (String) view.getCbActividades().getSelectedItem();
-		return (seleccion == null) ? -1 : Integer.parseInt(seleccion.split(" - ")[0]);
-	}
+    private int getSelectedIdActividad() {
+        return Integer.parseInt(((String) view.getCbActividades().getSelectedItem()).split(" - ")[0]);
+    }
+    
+    private void cambiarInstalacion() {
+        // Obtener la lista de instalaciones del modelo
+        List<String> opciones = model.getInstalaciones();
+        
+        if (opciones.isEmpty()) {
+            JOptionPane.showMessageDialog(view, "No hay instalaciones configuradas en el sistema.");
+            return;
+        }
 
-	public static void main(String[] args) {
-		Database db = new Database();
-		db.createDatabase(false);
-		db.loadDatabase();
+        String seleccion = (String) JOptionPane.showInputDialog(
+                view, 
+                "Seleccione la nueva instalación para esta actividad:",
+                "Cambiar Instalación", 
+                JOptionPane.QUESTION_MESSAGE, 
+                null, 
+                opciones.toArray(), 
+                opciones.get(0)
+        );
 
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (Exception e) {
-		}
+        // Si el usuario no canceló, procesar el cambio
+        if (seleccion != null) {
+            try {
+                int newIdInst = Integer.parseInt(seleccion.split(" - ")[0]);
+                int idAct = getSelectedIdActividad();
 
-		Reserva_Instalacion_Admin_View view = new Reserva_Instalacion_Admin_View();
-		Reserva_Instalacion_Admin_Model model = new Reserva_Instalacion_Admin_Model();
+                if (model.actualizarInstalacion(idAct, newIdInst)) {
+                    JOptionPane.showMessageDialog(view, "Instalación actualizada correctamente.");
+                    
+                    // Actualizamos el texto de la instalación en la vista
+                    String nombreInst = seleccion.split(" - ")[1];
+                    view.getLblInstalacionActual().setText(nombreInst);
+                    
+                    // Limpiamos la tabla de conflictos porque el escenario ha cambiado
+                    view.getModelConflictos().setRowCount(0);
+                } else {
+                    JOptionPane.showMessageDialog(view, "Error al actualizar la instalación en la base de datos.");
+                }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(view, "Error al procesar la selección: " + e.getMessage());
+            }
+        }
+    }
+    
+    public static void main(String[] args) {
+        Database db = new Database();
+        db.createDatabase(false);
+        db.loadDatabase();
 
-		new Reserva_Instalacion_Admin_Controller(view, model);
+        try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); } catch (Exception e) {}
 
-		view.setVisible(true);
-		view.setLocationRelativeTo(null);
+        Reserva_Instalacion_Admin_View view = new Reserva_Instalacion_Admin_View();
+        Reserva_Instalacion_Admin_Model model = new Reserva_Instalacion_Admin_Model();
 
-		EventQueue.invokeLater(() -> {
-			new DatabaseViewer().setVisible(true);
-		});
-	}
+        new Reserva_Instalacion_Admin_Controller(view, model);
+
+        view.setVisible(true);
+        view.setLocationRelativeTo(null);
+
+        EventQueue.invokeLater(() -> new DatabaseViewer().setVisible(true));
+    }
 }
