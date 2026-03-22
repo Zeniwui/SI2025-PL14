@@ -8,10 +8,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
-import si.pl14.visualizareservas.VisualizarReservasSocioController;
-import si.pl14.visualizareservas.VisualizarReservasSocioModel;
-import si.pl14.visualizareservas.VisualizarReservasSocioView;
-
 
 /**
  * Punto de entrada principal que incluye botones para la ejecucion de las pantallas 
@@ -72,18 +68,6 @@ public class SwingMain {
 			}
 		});
 		frame.getContentPane().add(btnSocio);
-
-		JButton btnVisualizarReservas = new JButton("Socio: Visualizar mis reservas en un periodo");
-		btnVisualizarReservas.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				VisualizarReservasSocioController controller = new VisualizarReservasSocioController(
-					new VisualizarReservasSocioModel(),
-					new VisualizarReservasSocioView()
-				);
-				controller.initController();
-			}
-		});
-		frame.getContentPane().add(btnVisualizarReservas);
 		
 			
 		JButton btnInicializarBaseDeDatos = new JButton("Inicializar Base de Datos en Blanco");

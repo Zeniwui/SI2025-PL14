@@ -1,4 +1,3 @@
-
 package si.pl14.util;
 
 import javax.swing.*;
@@ -11,6 +10,9 @@ import java.awt.event.ActionListener;
 import si.pl14.reservas.ReservaModel;
 import si.pl14.reservas.ReservaController;
 import si.pl14.reservas.ReservaView;
+import si.pl14.visualizareservas.VisualizarReservasSocioController;
+import si.pl14.visualizareservas.VisualizarReservasSocioModel;
+import si.pl14.visualizareservas.VisualizarReservasSocioView;
 
 public class SociosView {
 
@@ -43,6 +45,7 @@ public class SociosView {
         cbHistorias.addItem("Seleccionar historia de usuario");
         cbHistorias.addItem("HU1: Reservar instalacion para fecha determinada");
         cbHistorias.addItem("HU2: Ver disponibilidad de las instalaciones");
+        cbHistorias.addItem("HU3: Visualizar mis reservas en un periodo de tiempo");
         
         panel.add(cbHistorias, BorderLayout.CENTER);
 
@@ -61,6 +64,14 @@ public class SociosView {
                 	controllerReserva.initController();
                 	break;
                 case 2:
+                	break;
+                case 3:
+                	VisualizarReservasSocioController controllerVisualizarReservas =
+                		new VisualizarReservasSocioController(
+                			new VisualizarReservasSocioModel(),
+                			new VisualizarReservasSocioView()
+                		);
+                	controllerVisualizarReservas.initController();
                 	break;
                 }
             }
