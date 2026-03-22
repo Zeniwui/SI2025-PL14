@@ -226,7 +226,8 @@ public class VisualizarReservasSocioView {
             try {
                 LocalDate ld = LocalDate.parse(fechaRaw);
                 fechaFmt  = ld.format(FMT_FECHA_TABLA);
-                String dia = ld.getDayOfWeek().getDisplayName(TextStyle.SHORT, new Locale("es", "ES"));
+                @SuppressWarnings("deprecation")
+				String dia = ld.getDayOfWeek().getDisplayName(TextStyle.SHORT, new Locale("es", "ES"));
                 diaSemana = Character.toUpperCase(dia.charAt(0)) + dia.substring(1).replace(".", "");
             } catch (Exception ignored) {}
 
