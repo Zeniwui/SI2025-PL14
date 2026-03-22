@@ -14,7 +14,6 @@ public class VisualizarReservasSocioModel {
 
     public VisualizarReservasSocioModel() {
         db.createDatabase(true);
-        db.loadDatabase();
     }
 
     public List<InstalacionEntity> getInstalaciones() {
