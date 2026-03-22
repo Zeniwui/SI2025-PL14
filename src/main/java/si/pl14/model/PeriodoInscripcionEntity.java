@@ -3,6 +3,7 @@ package si.pl14.model;
 public class PeriodoInscripcionEntity {
 	private int idPeriodo;
 	private String nombre;
+	private String descripcion;
 	private String inicioSocios;
 	private String finSocios;
 	private String finNoSocios;
@@ -36,6 +37,13 @@ public class PeriodoInscripcionEntity {
 	}
 	public void setFinNoSocios(String finNoSocios) {
 		this.finNoSocios = finNoSocios;
+	}
+	public void setDescripcion(String descripcion) {
+		this.descripcion =descripcion;
+		
+	}
+	public String getDescripcion() {
+		return descripcion;
 	}
 	
 }

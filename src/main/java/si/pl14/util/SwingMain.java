@@ -72,7 +72,7 @@ public class SwingMain {
 			}
 		});
 		frame.getContentPane().add(btnSocio);
-		
+
 		JButton btnVisualizarReservas = new JButton("Socio: Visualizar mis reservas en un periodo");
 		btnVisualizarReservas.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
