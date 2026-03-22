@@ -1,6 +1,5 @@
 package si.pl14.visualizareservas;
 
-
 import si.pl14.model.InstalacionEntity;
 
 import javax.swing.*;
@@ -12,20 +11,8 @@ import java.time.format.TextStyle;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * Vista para la historia de usuario "Visualizar mis reservas durante un periodo de tiempo".
- *
- * Estructura:
- *   - Cabecera: titulo + boton cerrar
- *   - Panel de busqueda: Instalacion (combo) + Fecha Inicio + Fecha Fin + boton Confirmar
- *   - Panel de resultados: cabecera informativa + tabla con scroll
- *
- * Los Object[] que recibe mostrarResultados() siguen los indices definidos
- * en el javadoc de VisualizarReservasSocioModel.getReservas().
- */
 public class VisualizarReservasSocioView {
 
-    // ── Paleta de colores (consistente con el resto del proyecto) ─────────────
     static final Color COLOR_PRIMARIO       = new Color(30, 100, 180);
     static final Color COLOR_FILA_PAR       = new Color(235, 244, 255);
     static final Color COLOR_FILA_PAGADO    = new Color(235, 255, 235);
@@ -37,7 +24,6 @@ public class VisualizarReservasSocioView {
 
     private static final DateTimeFormatter FMT_FECHA_TABLA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    // ── Componentes expuestos al controlador ──────────────────────────────────
     private final JDialog                    frame;
     private final JComboBox<InstalacionItem> cmbInstalacion;
     private final JTextField                 txtFechaInicio;
@@ -46,12 +32,8 @@ public class VisualizarReservasSocioView {
     private final JButton                    btnCerrar;
     private final JPanel                     panelResultados;
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Constructor
-    // ─────────────────────────────────────────────────────────────────────────
-
     public VisualizarReservasSocioView() {
-        frame = new JDialog((Frame) null, "Mis Reservas — Socio", true);
+        frame = new JDialog((Frame) null, "Mis Reservas - Socio", true);
         frame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         frame.setMinimumSize(new Dimension(820, 540));
         frame.setSize(980, 640);
@@ -61,7 +43,6 @@ public class VisualizarReservasSocioView {
         root.setBorder(new EmptyBorder(14, 14, 14, 14));
         root.setBackground(Color.WHITE);
 
-        // ── Cabecera ─────────────────────────────────────────────────────────
         JPanel cabecera = new JPanel(new BorderLayout());
         cabecera.setBackground(Color.WHITE);
         cabecera.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, COLOR_PRIMARIO));
@@ -83,7 +64,6 @@ public class VisualizarReservasSocioView {
         cabecera.add(lblTitulo, BorderLayout.CENTER);
         cabecera.add(btnCerrar, BorderLayout.EAST);
 
-        // ── Panel de busqueda ─────────────────────────────────────────────────
         JPanel panelBusqueda = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 8));
         panelBusqueda.setBackground(new Color(245, 248, 255));
         panelBusqueda.setBorder(BorderFactory.createCompoundBorder(
@@ -102,7 +82,7 @@ public class VisualizarReservasSocioView {
         sep.setPreferredSize(new Dimension(1, 26));
         sep.setForeground(new Color(180, 210, 255));
 
-        JLabel lblBusqueda = new JLabel("Busqueda —");
+        JLabel lblBusqueda = new JLabel("Busqueda:");
         lblBusqueda.setFont(new Font("Segoe UI", Font.BOLD, 13));
         lblBusqueda.setForeground(COLOR_PRIMARIO);
 
@@ -140,12 +120,11 @@ public class VisualizarReservasSocioView {
         panelBusqueda.add(txtFechaFin);
         panelBusqueda.add(btnConfirmar);
 
-        // ── Panel de resultados ───────────────────────────────────────────────
         panelResultados = new JPanel(new BorderLayout());
         panelResultados.setBackground(Color.WHITE);
-        panelResultados.add(crearPanelBienvenida(), BorderLayout.CENTER);
+        panelResultados.add(crearPanelCentrado("Consulta tus reservas",
+            "Introduce un rango de fechas y pulsa Confirmar para ver tus reservas."), BorderLayout.CENTER);
 
-        // ── Montaje final ─────────────────────────────────────────────────────
         JPanel norte = new JPanel(new BorderLayout(0, 8));
         norte.setBackground(Color.WHITE);
         norte.add(cabecera,      BorderLayout.NORTH);
@@ -156,33 +135,19 @@ public class VisualizarReservasSocioView {
         frame.add(root);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Metodos llamados desde el Controller
-    // ─────────────────────────────────────────────────────────────────────────
-
-    /** Rellena el combo. La primera opcion es "Todas las instalaciones" (id=0). */
     public void setInstalaciones(List<InstalacionEntity> lista) {
         cmbInstalacion.removeAllItems();
-        cmbInstalacion.addItem(new InstalacionItem(0, "— Todas las instalaciones —"));
+        cmbInstalacion.addItem(new InstalacionItem(0, "Todas las instalaciones"));
         for (InstalacionEntity i : lista) {
             cmbInstalacion.addItem(new InstalacionItem(i.getIdInstalacion(), i.getNombre()));
         }
     }
 
-    /**
-     * Renderiza los resultados en el panel central.
-     *
-     * Cada Object[] de la lista sigue los indices del Model:
-     *   [0] id_reserva  [1] fecha  [2] hora_inicio  [3] hora_fin
-     *   [4] estado_pago [5] metodo_pago  [6] coste_reserva
-     *   [7] fecha_creacion  [8] nombre_instalacion
-     */
     public void mostrarResultados(List<Object[]> reservas,
                                    String fechaInicio, String fechaFin,
                                    String nombreInstalacion) {
         panelResultados.removeAll();
 
-        // ── Cabecera de resultados ────────────────────────────────────────────
         JPanel cabRes = new JPanel(new BorderLayout(0, 2));
         cabRes.setBackground(new Color(240, 246, 255));
         cabRes.setBorder(BorderFactory.createCompoundBorder(
@@ -190,14 +155,14 @@ public class VisualizarReservasSocioView {
             new EmptyBorder(8, 12, 8, 12)
         ));
 
-        JLabel lblTitRes = new JLabel("  Mis Reservas — " + nombreInstalacion);
+        JLabel lblTitRes = new JLabel("  Mis Reservas - " + nombreInstalacion);
         lblTitRes.setFont(new Font("Segoe UI", Font.BOLD, 14));
         lblTitRes.setForeground(COLOR_PRIMARIO);
 
         JPanel infoPeriodo = new JPanel(new FlowLayout(FlowLayout.LEFT, 16, 0));
         infoPeriodo.setBackground(new Color(240, 246, 255));
 
-        JLabel lblPeriodo = new JLabel(fechaInicio + "  ->  " + fechaFin);
+        JLabel lblPeriodo = new JLabel(fechaInicio + " -> " + fechaFin);
         lblPeriodo.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         lblPeriodo.setForeground(new Color(60, 60, 60));
 
@@ -214,29 +179,24 @@ public class VisualizarReservasSocioView {
         cabRes.add(lblTitRes,   BorderLayout.NORTH);
         cabRes.add(infoPeriodo, BorderLayout.SOUTH);
 
-        // ── Cuerpo ────────────────────────────────────────────────────────────
         JComponent cuerpo = reservas.isEmpty()
-            ? crearPanelSinResultados()
+            ? crearPanelCentrado("Sin reservas en este periodo",
+                "No se han encontrado reservas en el rango de fechas seleccionado.")
             : crearTablaResultados(reservas);
 
         panelResultados.add(cabRes,  BorderLayout.NORTH);
         panelResultados.add(cuerpo,  BorderLayout.CENTER);
-        if (!reservas.isEmpty()) {
+        if (!reservas.isEmpty())
             panelResultados.add(crearLeyenda(), BorderLayout.SOUTH);
-        }
 
         panelResultados.revalidate();
         panelResultados.repaint();
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Tabla de resultados — formatea los Object[] directamente
-    // ─────────────────────────────────────────────────────────────────────────
-
     private JScrollPane crearTablaResultados(List<Object[]> reservas) {
-        String[] cabeceras  = {"Fecha", "Dia", "Inicio", "Fin", "Instalacion",
-                                "Estado pago", "Metodo pago", "Coste", "Reservado el"};
-        double[] pesosCols  = {0, 0.4, 0, 0, 1.2, 0.6, 0.6, 0, 1.0};
+        String[] cabeceras = {"Fecha", "Dia", "Inicio", "Fin", "Instalacion",
+                               "Estado pago", "Metodo pago", "Coste", "Reservado el"};
+        double[] pesosCols = {0, 0.4, 0, 0, 1.2, 0.6, 0.6, 0, 1.0};
 
         JPanel tabla = new JPanel(new GridBagLayout());
         tabla.setBackground(Color.WHITE);
@@ -245,7 +205,6 @@ public class VisualizarReservasSocioView {
         gc.fill   = GridBagConstraints.HORIZONTAL;
         gc.insets = new Insets(2, 4, 2, 4);
 
-        // Fila de cabecera
         for (int col = 0; col < cabeceras.length; col++) {
             gc.gridx = col; gc.gridy = 0; gc.weightx = pesosCols[col];
             JLabel h = new JLabel("  " + cabeceras[col]);
@@ -257,12 +216,10 @@ public class VisualizarReservasSocioView {
             tabla.add(h, gc);
         }
 
-        // Filas de datos
         double totalCoste = 0;
         for (int i = 0; i < reservas.size(); i++) {
             Object[] r = reservas.get(i);
 
-            // [1] Fecha: "yyyy-MM-dd" → "dd/MM/yyyy" y dia de la semana
             String fechaRaw  = r[1] != null ? r[1].toString() : "";
             String fechaFmt  = fechaRaw;
             String diaSemana = "";
@@ -271,19 +228,17 @@ public class VisualizarReservasSocioView {
                 fechaFmt  = ld.format(FMT_FECHA_TABLA);
                 String dia = ld.getDayOfWeek().getDisplayName(TextStyle.SHORT, new Locale("es", "ES"));
                 diaSemana = Character.toUpperCase(dia.charAt(0)) + dia.substring(1).replace(".", "");
-            } catch (Exception ignored) { /* deja el raw si el formato falla */ }
+            } catch (Exception ignored) {}
 
-            // [2][3] Horas: "HH:mm:ss" → "HH:mm"
-            String hIni = formatHora(r[2]);
-            String hFin = formatHora(r[3]);
-
-            String estado  = r[4] != null ? r[4].toString() : "-";
-            String metodo  = r[5] != null ? r[5].toString() : "-";
-            double costeVal = toDouble(r[6]);
-            totalCoste += costeVal;
-            String coste         = String.format("%.2f EUR", costeVal);
-            String fechaCreacion = r[7] != null ? r[7].toString() : "-";
-            String instalacion   = r[8] != null ? r[8].toString() : "-";
+            String hIni      = formatHora(r[2]);
+            String hFin      = formatHora(r[3]);
+            String estado    = r[4] != null ? r[4].toString() : "-";
+            String metodo    = r[5] != null ? r[5].toString() : "-";
+            double costeVal  = toDouble(r[6]);
+            totalCoste      += costeVal;
+            String coste          = String.format("%.2f EUR", costeVal);
+            String fechaCreacion  = r[7] != null ? r[7].toString() : "-";
+            String instalacion    = r[8] != null ? r[8].toString() : "-";
 
             Color bgFila      = calcularColorFila(estado, i);
             Color colorEstado = calcularColorEstado(estado);
@@ -306,14 +261,13 @@ public class VisualizarReservasSocioView {
             }
         }
 
-        // Fila de totales
-        int    filaTot = reservas.size() + 1;
-        Color  bgTotal = new Color(215, 230, 255);
+        int   filaTot = reservas.size() + 1;
+        Color bgTotal = new Color(215, 230, 255);
         for (int col = 0; col < cabeceras.length; col++) {
             gc.gridx = col; gc.gridy = filaTot; gc.weightx = pesosCols[col];
-            String texto = (col == 0)
+            String texto = col == 0
                 ? "  TOTAL  (" + reservas.size() + " reserva" + (reservas.size() != 1 ? "s" : "") + ")"
-                : (col == 7) ? String.format("  %.2f EUR", totalCoste) : "";
+                : col == 7 ? String.format("  %.2f EUR", totalCoste) : "";
             JLabel lbl = new JLabel(texto);
             lbl.setFont(FONT_BOLD);
             lbl.setForeground(col == 7 ? new Color(0, 80, 0) : COLOR_PRIMARIO);
@@ -333,20 +287,6 @@ public class VisualizarReservasSocioView {
         return scroll;
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Paneles de estado vacio / bienvenida
-    // ─────────────────────────────────────────────────────────────────────────
-
-    private JPanel crearPanelBienvenida() {
-        return crearPanelCentrado("Consulta tus reservas",
-            "Introduce un rango de fechas y pulsa <b>Confirmar</b> para ver tus reservas.");
-    }
-
-    private JPanel crearPanelSinResultados() {
-        return crearPanelCentrado("Sin reservas en este periodo",
-            "No se han encontrado reservas en el rango de fechas seleccionado.");
-    }
-
     private JPanel crearPanelCentrado(String titulo, String descripcion) {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(new Color(245, 248, 255));
@@ -364,8 +304,7 @@ public class VisualizarReservasSocioView {
         lblTit.setForeground(COLOR_PRIMARIO);
         lblTit.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JLabel lblDesc = new JLabel("<html><center>" + descripcion + "</center></html>",
-            SwingConstants.CENTER);
+        JLabel lblDesc = new JLabel("<html><center>" + descripcion + "</center></html>", SwingConstants.CENTER);
         lblDesc.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         lblDesc.setForeground(new Color(90, 90, 90));
         lblDesc.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -373,14 +312,9 @@ public class VisualizarReservasSocioView {
         tarjeta.add(lblTit);
         tarjeta.add(Box.createVerticalStrut(8));
         tarjeta.add(lblDesc);
-
         panel.add(tarjeta);
         return panel;
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Leyenda de colores
-    // ─────────────────────────────────────────────────────────────────────────
 
     private JPanel crearLeyenda() {
         JPanel leyenda = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 4));
@@ -406,11 +340,6 @@ public class VisualizarReservasSocioView {
         return p;
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Utilidades de formato (antes en el DTO, ahora aqui donde se usan)
-    // ─────────────────────────────────────────────────────────────────────────
-
-    /** "HH:mm:ss" o entero de hora → "HH:mm". */
     private static String formatHora(Object o) {
         if (o == null) return "--:--";
         String s = o.toString().trim();
@@ -443,10 +372,6 @@ public class VisualizarReservasSocioView {
         return new Color(100, 100, 100);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Getters para el Controller
-    // ─────────────────────────────────────────────────────────────────────────
-
     public JDialog    getFrame()          { return frame; }
     public JButton    getBtnConfirmar()   { return btnConfirmar; }
     public JButton    getBtnCerrar()      { return btnCerrar; }
@@ -456,10 +381,6 @@ public class VisualizarReservasSocioView {
     public InstalacionItem getInstalacionSeleccionada() {
         return (InstalacionItem) cmbInstalacion.getSelectedItem();
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Clase interna: item del combo de instalaciones
-    // ─────────────────────────────────────────────────────────────────────────
 
     public static class InstalacionItem {
         private final int    id;
