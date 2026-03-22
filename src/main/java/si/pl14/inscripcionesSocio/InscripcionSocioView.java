@@ -78,15 +78,6 @@ public class InscripcionSocioView {
         lblTitulo.setForeground(COLOR_SECUNDARIO);
         panelHeader.add(lblTitulo, "cell 0 0");
         
-        JButton btnCerrar = new JButton("X");
-        btnCerrar.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        btnCerrar.setForeground(COLOR_SECUNDARIO);
-        btnCerrar.setContentAreaFilled(false);
-        btnCerrar.setBorderPainted(false);
-        btnCerrar.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnCerrar.addActionListener(e -> frame.dispose());
-        panelHeader.add(btnCerrar, "cell 1 0, alignx right");
-        
         frame.getContentPane().add(panelHeader, "cell 0 0, growx");
 
         // --- 2. LISTA DE ACTIVIDADES (TABLA) ---

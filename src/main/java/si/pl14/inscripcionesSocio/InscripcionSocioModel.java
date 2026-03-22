@@ -87,9 +87,6 @@ public class InscripcionSocioModel {
 				String sqlPago = "INSERT INTO Pagos (id_socio, monto, metodo_pago, estado_pago, concepto, id_inscripcion) VALUES (?, ?, ?, 'Pendiente', ?, ?)";
 				db.executeUpdate(sqlPago, idSocio, actividad.getPrecioSocio(), metodoPago, concepto, idInscripcion);
 				
-				// Generamos el resguardo
-				generaResguardoInscripcion(idSocio, actividad.getNombre(), actividad.getPrecioSocio());
-				
 	}
 	
 	/*

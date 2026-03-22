@@ -14,7 +14,7 @@ public class InscripcionSocioController {
 	private InscripcionSocioView view;
 	
 	private List<ActividadInscripcionDTO> actividadesActuales;
-	private final int ID_SOCIO_ACTUAL = 2;
+	private final int ID_SOCIO_ACTUAL = 1;
 	
 	public InscripcionSocioController(InscripcionSocioModel m, InscripcionSocioView v) {
 		model = m;
@@ -84,9 +84,17 @@ public class InscripcionSocioController {
 
 		model.realizarInscripcion(ID_SOCIO_ACTUAL, actividadSeleccionada);
 		
-		SwingUtil.showMessage("¡Inscripción formalizada con éxito!\nEl coste (" + actividadSeleccionada.getPrecioSocio() + 
-                              "€) se añadirá a tu próxima cuota mensual.\nSe ha generado el resguardo.", 
-                              "Inscripción Confirmada", JOptionPane.INFORMATION_MESSAGE);
+		String resguardo = model.generaResguardoInscripcion(
+				ID_SOCIO_ACTUAL, 
+				actividadSeleccionada.getNombre(), 
+				actividadSeleccionada.getPrecioSocio()
+		);
+		
+		SwingUtil.showMessage(
+				"¡Inscripción formalizada con éxito!\nEl coste se añadirá a tu próxima cuota mensual.\n\n" + resguardo, 
+                "Inscripción Confirmada", 
+                JOptionPane.INFORMATION_MESSAGE
+        );
 		
 		cargarTablaActividades();
 		view.limpiarResumen();
