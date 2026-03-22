@@ -65,8 +65,8 @@ public class VisualizarReservasSocioController {
         if (fechaInicio.isBefore(LocalDate.now().minusYears(1)))
             throw new ApplicationException("No se pueden consultar reservas de hace mas de un año.");
         
-        if (fechaFin.isAfter(LocalDate.now().plusMonths(3)))
-            throw new ApplicationException("No se pueden consultar reservas de mas de 3 meses en el futuro.");
+        if (fechaFin.isAfter(LocalDate.now().plusMonths(1)))
+            throw new ApplicationException("No se pueden consultar reservas de mas de 1 mes en el futuro.");
         
         if (fechaInicio.isEqual(fechaFin))
             throw new ApplicationException("La fecha de inicio y la fecha de fin no pueden ser iguales.");
