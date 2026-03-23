@@ -5,48 +5,23 @@ import si.pl14.util.Database;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Modelo para la historia de usuario
- * "Como socio quiero ver el estado de mis pagos de reservas y actividades".
- *
- * Devuelve todos los cargos del socio (pasados y pendientes), diferenciando
- * si el cargo es de una reserva o de una actividad.
- *
- * Indices de cada Object[] devuelto por getCargos():
- *   [0] tipo          (String)  "Reserva" | "Actividad"
- *   [1] estado_pago   (String)  "Pagado" | "Pendiente" | "Cuota" ...
- *   [2] fecha         (String)  "yyyy-MM-dd"
- *   [3] metodo_pago   (String)  puede ser null → se muestra "—"
- *   [4] coste_reserva (Double)
- */
 public class EstadoPagosSocioModel {
 
     private final Database db = new Database();
 
-    /**
-     * ID del socio autenticado.
-     * Valor 1 = "Carlos Gomez" (primer socio de datos de prueba).
-     */
+    // ID del socio autenticado. Valor 1 = "Carlos Gomez" (datos de prueba).
     public static final int ID_SOCIO_ACTUAL = 1;
 
     public EstadoPagosSocioModel() {
         db.createDatabase(true);
     }
 
-    // -------------------------------------------------------------------------
-    // Consulta principal
-    // -------------------------------------------------------------------------
-
     /**
      * Devuelve todos los cargos del socio en el rango [fechaDesde, fechaHasta],
-     * tanto de reservas propias como de actividades en las que esta inscrito,
-     * ordenados por fecha.
-     *
-     * @param fechaDesde formato "yyyy-MM-dd"
-     * @param fechaHasta formato "yyyy-MM-dd"
+     * tanto de reservas propias como de actividades, ordenados por fecha.
+     * Indices del Object[]: [0] tipo, [1] estado_pago, [2] fecha, [3] metodo_pago, [4] coste_reserva
      */
     public List<Object[]> getCargos(String fechaDesde, String fechaHasta) {
-        // Reservas directas del socio
         String sqlReservas =
             "SELECT 'Reserva'           AS tipo, " +
             "       estado_pago, " +
@@ -57,9 +32,6 @@ public class EstadoPagosSocioModel {
             "WHERE id_socio = ? " +
             "  AND fecha >= ? AND fecha <= ?";
 
-        // Actividades: reservas generadas por actividades en las que el socio
-        // esta inscrito (id_actividad no nulo, id_socio nulo en Reservas,
-        // pero el socio aparece en Inscripciones)
         String sqlActividades =
             "SELECT 'Actividad'         AS tipo, " +
             "       r.estado_pago, " +
@@ -75,7 +47,6 @@ public class EstadoPagosSocioModel {
         resultado.addAll(db.executeQueryArray(sqlReservas,    ID_SOCIO_ACTUAL, fechaDesde, fechaHasta));
         resultado.addAll(db.executeQueryArray(sqlActividades, ID_SOCIO_ACTUAL, fechaDesde, fechaHasta));
 
-        // Ordenar por fecha (campo [2], String "yyyy-MM-dd" — orden lexicografico correcto)
         resultado.sort((a, b) -> {
             String fa = a[2] != null ? a[2].toString() : "";
             String fb = b[2] != null ? b[2].toString() : "";
@@ -85,10 +56,6 @@ public class EstadoPagosSocioModel {
         return resultado;
     }
 
-    /**
-     * Calcula el importe total pendiente (estado_pago = 'Pendiente') del socio
-     * en el rango dado.
-     */
     public double getTotalPendiente(String fechaDesde, String fechaHasta) {
         String sql =
             "SELECT COALESCE(SUM(coste_reserva), 0) " +

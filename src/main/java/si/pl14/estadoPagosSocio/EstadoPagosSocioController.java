@@ -13,36 +13,22 @@ import java.time.format.TextStyle;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * Controlador para la historia de usuario
- * "Como socio quiero ver el estado de mis pagos de reservas y actividades".
- *
- * Construye el dialogo Swing directamente, sin clase View separada.
- *
- * Criterios de aceptacion:
- *   1. Muestra todos los cargos del socio (pasados y pendientes).
- *   2. Diferencia si el cargo es de una reserva o de una actividad.
- *   3. Cada cargo muestra su estado actual.
- *   4. Muestra el importe total pendiente.
- *   5. Las fechas por defecto son: inicio = dia 1 del mes actual, fin = hoy.
- */
 public class EstadoPagosSocioController {
 
     private static final DateTimeFormatter FMT_ENTRADA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter FMT_ISO     = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DateTimeFormatter FMT_TABLA   = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    private static final Color COLOR_PRIMARIO        = new Color(30, 100, 180);
-    private static final Color COLOR_FILA_PAR        = new Color(235, 244, 255);
-    private static final Color COLOR_FILA_PAGADO     = new Color(235, 255, 235);
-    private static final Color COLOR_FILA_PENDIENTE  = new Color(255, 250, 225);
-    private static final Color COLOR_FILA_ACTIVIDAD  = new Color(240, 235, 255);
-    private static final Font  FONT_NORMAL           = new Font("Segoe UI", Font.PLAIN, 13);
-    private static final Font  FONT_BOLD             = new Font("Segoe UI", Font.BOLD, 12);
+    private static final Color COLOR_PRIMARIO       = new Color(30, 100, 180);
+    private static final Color COLOR_FILA_PAR       = new Color(235, 244, 255);
+    private static final Color COLOR_FILA_PAGADO    = new Color(235, 255, 235);
+    private static final Color COLOR_FILA_PENDIENTE = new Color(255, 250, 225);
+    private static final Color COLOR_FILA_ACTIVIDAD = new Color(240, 235, 255);
+    private static final Font  FONT_NORMAL          = new Font("Segoe UI", Font.PLAIN, 13);
+    private static final Font  FONT_BOLD            = new Font("Segoe UI", Font.BOLD, 12);
 
     private final EstadoPagosSocioModel model;
 
-    // Componentes del dialogo
     private JDialog    frame;
     private JTextField txtFechaInicio;
     private JTextField txtFechaFin;
@@ -53,10 +39,6 @@ public class EstadoPagosSocioController {
         this.model = model;
         buildView();
     }
-
-    // -------------------------------------------------------------------------
-    // Construccion del dialogo
-    // -------------------------------------------------------------------------
 
     private void buildView() {
         frame = new JDialog((Frame) null, "Estado de Pagos — Socio", true);
@@ -69,7 +51,6 @@ public class EstadoPagosSocioController {
         root.setBorder(new EmptyBorder(14, 14, 14, 14));
         root.setBackground(Color.WHITE);
 
-        // ── Cabecera ─────────────────────────────────────────────────────────
         JPanel cabecera = new JPanel(new BorderLayout());
         cabecera.setBackground(Color.WHITE);
         cabecera.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, COLOR_PRIMARIO));
@@ -91,12 +72,11 @@ public class EstadoPagosSocioController {
         cabecera.add(lblTitulo, BorderLayout.CENTER);
         cabecera.add(btnCerrar, BorderLayout.EAST);
 
-        // ── Panel de busqueda con fechas por defecto ──────────────────────────
         // Por defecto: inicio = dia 1 del mes actual, fin = hoy
-        LocalDate hoy         = LocalDate.now();
-        LocalDate inicioMes   = hoy.withDayOfMonth(1);
-        String    defInicio   = inicioMes.format(FMT_ENTRADA);
-        String    defFin      = hoy.format(FMT_ENTRADA);
+        LocalDate hoy       = LocalDate.now();
+        LocalDate inicioMes = hoy.withDayOfMonth(1);
+        String    defInicio = inicioMes.format(FMT_ENTRADA);
+        String    defFin    = hoy.format(FMT_ENTRADA);
 
         JPanel panelBusqueda = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 8));
         panelBusqueda.setBackground(new Color(245, 248, 255));
@@ -133,14 +113,12 @@ public class EstadoPagosSocioController {
         panelBusqueda.add(txtFechaFin);
         panelBusqueda.add(btnConfirmar);
 
-        // ── Panel de resultados (pre-cargado con las fechas por defecto) ──────
         panelResultados = new JPanel(new BorderLayout());
         panelResultados.setBackground(Color.WHITE);
         panelResultados.add(crearPanelCentrado("Consulta tus pagos",
             "Pulse <b>Confirmar</b> para ver el estado de tus pagos en el periodo indicado."),
             BorderLayout.CENTER);
 
-        // ── Montaje ───────────────────────────────────────────────────────────
         JPanel norte = new JPanel(new BorderLayout(0, 8));
         norte.setBackground(Color.WHITE);
         norte.add(cabecera,      BorderLayout.NORTH);
@@ -151,24 +129,13 @@ public class EstadoPagosSocioController {
         frame.add(root);
     }
 
-    // -------------------------------------------------------------------------
-    // Punto de entrada publico
-    // -------------------------------------------------------------------------
-
     public void initController() {
         btnConfirmar.addActionListener(e -> SwingUtil.exceptionWrapper(this::accionConfirmar));
         txtFechaInicio.addActionListener(e -> SwingUtil.exceptionWrapper(this::accionConfirmar));
         txtFechaFin.addActionListener(e -> SwingUtil.exceptionWrapper(this::accionConfirmar));
-
-        // Cargar automaticamente con las fechas por defecto al abrir
         SwingUtil.exceptionWrapper(this::accionConfirmar);
-
         frame.setVisible(true);
     }
-
-    // -------------------------------------------------------------------------
-    // Accion confirmar
-    // -------------------------------------------------------------------------
 
     private void accionConfirmar() {
         String textoInicio = txtFechaInicio.getText().trim();
@@ -191,28 +158,30 @@ public class EstadoPagosSocioController {
         } catch (DateTimeParseException e) {
             throw new ApplicationException("La fecha de fin no tiene el formato correcto (dd/MM/yyyy).");
         }
+
         if (fechaFin.isBefore(fechaInicio))
             throw new ApplicationException("La fecha de fin no puede ser anterior a la fecha de inicio.");
+        if (fechaInicio.isBefore(LocalDate.now().minusYears(1)))
+            throw new ApplicationException("No se pueden consultar pagos de hace mas de un año.");
+        if (fechaFin.isAfter(LocalDate.now().plusMonths(1)))
+            throw new ApplicationException("No se pueden consultar pagos de mas de 1 mes en el futuro.");
+        if (fechaInicio.isEqual(fechaFin))
+            throw new ApplicationException("La fecha de inicio y la fecha de fin no pueden ser iguales.");
 
         String isoInicio = fechaInicio.format(FMT_ISO);
         String isoFin    = fechaFin.format(FMT_ISO);
 
-        List<Object[]> cargos        = model.getCargos(isoInicio, isoFin);
+        List<Object[]> cargos         = model.getCargos(isoInicio, isoFin);
         double         totalPendiente = model.getTotalPendiente(isoInicio, isoFin);
 
         mostrarResultados(cargos, textoInicio, textoFin, totalPendiente);
     }
-
-    // -------------------------------------------------------------------------
-    // Renderizado de resultados
-    // -------------------------------------------------------------------------
 
     private void mostrarResultados(List<Object[]> cargos,
                                     String fechaInicio, String fechaFin,
                                     double totalPendiente) {
         panelResultados.removeAll();
 
-        // ── Cabecera de resultados ────────────────────────────────────────────
         JPanel cabRes = new JPanel(new BorderLayout(0, 2));
         cabRes.setBackground(new Color(240, 246, 255));
         cabRes.setBorder(BorderFactory.createCompoundBorder(
@@ -234,15 +203,12 @@ public class EstadoPagosSocioController {
         lblContador.setFont(new Font("Segoe UI", Font.ITALIC, 12));
         lblContador.setForeground(cargos.isEmpty() ? Color.GRAY : new Color(0, 100, 0));
 
-        // Importe pendiente — siempre visible en la cabecera
-        JLabel lblPendiente = new JLabel(
-            "  Pendiente: " + String.format("%.2f EUR", totalPendiente));
+        JLabel lblPendiente = new JLabel("  Pendiente: " + String.format("%.2f EUR", totalPendiente));
         lblPendiente.setFont(new Font("Segoe UI", Font.BOLD, 13));
         lblPendiente.setForeground(totalPendiente > 0 ? new Color(180, 80, 0) : new Color(0, 120, 0));
 
         infoFila.add(lblContador);
         infoFila.add(lblPendiente);
-
         cabRes.add(lblTitRes, BorderLayout.NORTH);
         cabRes.add(infoFila,  BorderLayout.SOUTH);
 
@@ -260,12 +226,7 @@ public class EstadoPagosSocioController {
         panelResultados.repaint();
     }
 
-    // -------------------------------------------------------------------------
-    // Tabla de cargos
-    // -------------------------------------------------------------------------
-
     private JScrollPane crearTabla(List<Object[]> cargos) {
-        // Columnas: Tipo | Estado | Fecha | Metodo pago | Coste
         String[] cabeceras = {"Tipo", "Estado", "Fecha", "Metodo pago", "Coste"};
         double[] pesos     = {0.5, 0.5, 0, 0.6, 0};
 
@@ -276,7 +237,6 @@ public class EstadoPagosSocioController {
         gc.fill   = GridBagConstraints.HORIZONTAL;
         gc.insets = new Insets(2, 4, 2, 4);
 
-        // Fila de cabecera
         for (int col = 0; col < cabeceras.length; col++) {
             gc.gridx = col; gc.gridy = 0; gc.weightx = pesos[col];
             JLabel h = new JLabel("  " + cabeceras[col]);
@@ -288,8 +248,7 @@ public class EstadoPagosSocioController {
             tabla.add(h, gc);
         }
 
-        // Filas de datos
-        double totalCoste    = 0;
+        double totalCoste     = 0;
         double totalPendiente = 0;
 
         for (int i = 0; i < cargos.size(); i++) {
@@ -298,7 +257,6 @@ public class EstadoPagosSocioController {
             String tipo   = c[0] != null ? c[0].toString() : "-";
             String estado = c[1] != null ? c[1].toString() : "-";
 
-            // Fecha: "yyyy-MM-dd" → "dd/MM/yyyy"
             String fechaRaw = c[2] != null ? c[2].toString() : "";
             String fechaFmt = fechaRaw;
             try {
@@ -335,27 +293,16 @@ public class EstadoPagosSocioController {
             }
         }
 
-        // Fila de totales
         int   filaTot = cargos.size() + 1;
         Color bgTotal = new Color(215, 230, 255);
-
         for (int col = 0; col < cabeceras.length; col++) {
             gc.gridx = col; gc.gridy = filaTot; gc.weightx = pesos[col];
-            String texto;
-            Color  color;
-            if (col == 0) {
-                texto = "  TOTAL  (" + cargos.size() + " cargo" + (cargos.size() != 1 ? "s" : "") + ")";
-                color = COLOR_PRIMARIO;
-            } else if (col == 4) {
-                texto = String.format("  %.2f EUR", totalCoste);
-                color = new Color(0, 80, 0);
-            } else {
-                texto = "";
-                color = COLOR_PRIMARIO;
-            }
+            String texto = col == 0
+                ? "  TOTAL  (" + cargos.size() + " cargo" + (cargos.size() != 1 ? "s" : "") + ")"
+                : col == 4 ? String.format("  %.2f EUR", totalCoste) : "";
             JLabel lbl = new JLabel(texto);
             lbl.setFont(FONT_BOLD);
-            lbl.setForeground(color);
+            lbl.setForeground(col == 4 ? new Color(0, 80, 0) : COLOR_PRIMARIO);
             lbl.setOpaque(true);
             lbl.setBackground(bgTotal);
             lbl.setBorder(BorderFactory.createCompoundBorder(
@@ -365,27 +312,15 @@ public class EstadoPagosSocioController {
             tabla.add(lbl, gc);
         }
 
-        // Fila de pendiente destacada
         int   filaPend = cargos.size() + 2;
         Color bgPend   = new Color(255, 245, 210);
-
         for (int col = 0; col < cabeceras.length; col++) {
             gc.gridx = col; gc.gridy = filaPend; gc.weightx = pesos[col];
-            String texto;
-            Color  color;
-            if (col == 0) {
-                texto = "  PENDIENTE";
-                color = new Color(160, 80, 0);
-            } else if (col == 4) {
-                texto = String.format("  %.2f EUR", totalPendiente);
-                color = new Color(160, 80, 0);
-            } else {
-                texto = "";
-                color = COLOR_PRIMARIO;
-            }
+            String texto = col == 0 ? "  PENDIENTE"
+                : col == 4 ? String.format("  %.2f EUR", totalPendiente) : "";
             JLabel lbl = new JLabel(texto);
             lbl.setFont(FONT_BOLD);
-            lbl.setForeground(color);
+            lbl.setForeground(new Color(160, 80, 0));
             lbl.setOpaque(true);
             lbl.setBackground(bgPend);
             lbl.setBorder(BorderFactory.createCompoundBorder(
@@ -402,10 +337,6 @@ public class EstadoPagosSocioController {
         return scroll;
     }
 
-    // -------------------------------------------------------------------------
-    // Helpers de UI
-    // -------------------------------------------------------------------------
-
     private JPanel crearPanelCentrado(String titulo, String descripcion) {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(new Color(245, 248, 255));
@@ -420,8 +351,7 @@ public class EstadoPagosSocioController {
         lblTit.setFont(new Font("Segoe UI", Font.BOLD, 16));
         lblTit.setForeground(COLOR_PRIMARIO);
         lblTit.setAlignmentX(Component.CENTER_ALIGNMENT);
-        JLabel lblDesc = new JLabel("<html><center>" + descripcion + "</center></html>",
-            SwingConstants.CENTER);
+        JLabel lblDesc = new JLabel("<html><center>" + descripcion + "</center></html>", SwingConstants.CENTER);
         lblDesc.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         lblDesc.setForeground(new Color(90, 90, 90));
         lblDesc.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -455,10 +385,6 @@ public class EstadoPagosSocioController {
         p.add(lbl);
         return p;
     }
-
-    // -------------------------------------------------------------------------
-    // Utilidades de formato y color
-    // -------------------------------------------------------------------------
 
     private static double toDouble(Object o) {
         if (o == null) return 0.0;
