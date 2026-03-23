@@ -28,11 +28,7 @@ INSERT INTO Inscripciones (id_socio, id_actividad) VALUES
 
 INSERT INTO Reservas (id_instalacion, fecha, hora_inicio, hora_fin, id_socio, id_actividad, coste_reserva, estado_pago, metodo_pago) VALUES
 (4, '2026-03-04', '10:00:00', '11:00:00', NULL, 4, 12.00, 'Pagado', 'Efectivo'),
-(4, '2026-03-11', '10:00:00', '11:00:00', NULL, 4, 12.00, 'Pendiente', NULL),
-(4, '2026-03-18', '10:00:00', '11:00:00', NULL, 4, 12.00, 'Pendiente', NULL),
-(4, '2026-03-05', '11:00:00', '12:00:00', NULL, 5, 14.00, 'Pagado', 'Tarjeta'),
-(4, '2026-03-12', '11:00:00', '12:00:00', NULL, 5, 14.00, 'Pendiente', NULL),
-(4, '2026-03-19', '11:00:00', '12:00:00', NULL, 5, 14.00, 'Pendiente', NULL);
+(4, '2026-03-05', '11:00:00', '12:00:00', NULL, 5, 14.00, 'Pagado', 'Tarjeta');
 
 INSERT INTO Reservas (id_instalacion, fecha, hora_inicio, hora_fin, id_socio, id_actividad, coste_reserva, estado_pago, metodo_pago) VALUES
 (1, '2026-02-27', '09:00:00', '10:00:00', 1, NULL, 12.00, 'Pagado', 'Tarjeta'),

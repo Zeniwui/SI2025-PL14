@@ -57,15 +57,32 @@ public class EstadoPagosSocioModel {
     }
 
     public double getTotalPendiente(String fechaDesde, String fechaHasta) {
-        String sql =
+        String sqlReservas =
             "SELECT COALESCE(SUM(coste_reserva), 0) " +
             "FROM Reservas " +
             "WHERE id_socio = ? " +
             "  AND estado_pago = 'Pendiente' " +
             "  AND fecha >= ? AND fecha <= ?";
-        List<Object[]> rows = db.executeQueryArray(sql, ID_SOCIO_ACTUAL, fechaDesde, fechaHasta);
-        if (rows.isEmpty() || rows.get(0)[0] == null) return 0.0;
-        Object v = rows.get(0)[0];
-        return v instanceof Number ? ((Number) v).doubleValue() : Double.parseDouble(v.toString());
+
+        String sqlActividades =
+            "SELECT COALESCE(SUM(r.coste_reserva), 0) " +
+            "FROM Reservas r " +
+            "JOIN Inscripciones i ON r.id_actividad = i.id_actividad " +
+            "WHERE i.id_socio = ? " +
+            "  AND r.estado_pago = 'Pendiente' " +
+            "  AND r.fecha >= ? AND r.fecha <= ?";
+
+        double total = 0.0;
+        List<Object[]> r1 = db.executeQueryArray(sqlReservas,    ID_SOCIO_ACTUAL, fechaDesde, fechaHasta);
+        List<Object[]> r2 = db.executeQueryArray(sqlActividades, ID_SOCIO_ACTUAL, fechaDesde, fechaHasta);
+        if (!r1.isEmpty() && r1.get(0)[0] != null) total += toDouble(r1.get(0)[0]);
+        if (!r2.isEmpty() && r2.get(0)[0] != null) total += toDouble(r2.get(0)[0]);
+        return total;
+    }
+
+    private static double toDouble(Object o) {
+        if (o == null) return 0.0;
+        if (o instanceof Number) return ((Number) o).doubleValue();
+        try { return Double.parseDouble(o.toString()); } catch (Exception e) { return 0.0; }
     }
 }
