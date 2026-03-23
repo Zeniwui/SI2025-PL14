@@ -92,14 +92,31 @@ public class InscripcionSocioModel {
 	/*
 	 * Genera un resguardo con los datos de la inscripcion para el socio
 	 * */
-	public String generaResguardoInscripcion(int idSocio, String nombreActividad, double precio) {
+	public String generaResguardoInscripcion(String nombreSocio, String nombreActividad, double precio) {
 		String fecha = new SimpleDateFormat("dd-MM-yyyy HH:mm").format(new Date());
 		String resguardo = "=== RESGUARDO DE INSCRIPCIÓN ===\n" +
-                           "ID Socio: " + idSocio + "\n" +
+                           "Socio: " + nombreSocio + "\n" +
                            "Actividad: " + nombreActividad + "\n" +
                            "Cuota mensual añadida: " + precio + " €\n" +
                            "Fecha de operación: " + fecha + "\n" +
                            "===============================";
 		return resguardo;
+	}
+	
+	/*
+	 * Obtiene el nombre completo de un socio por su ID
+	 */
+	public String getNombreSocioById(int idSocio) {
+		String sql = "SELECT u.nombre, u.apellidos " +
+                     "FROM Usuarios u " +
+                     "INNER JOIN Socios s ON u.dni = s.dni " +
+                     "WHERE s.id_socio = ?";
+		
+		List<Object[]> res = db.executeQueryArray(sql, idSocio);
+		
+		if (!res.isEmpty()) {
+			return res.get(0)[0] + " " + res.get(0)[1];
+		}
+		return "Socio Desconocido";
 	}
 }

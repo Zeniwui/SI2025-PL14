@@ -15,6 +15,7 @@ public class InscripcionSocioController {
 	
 	private List<ActividadInscripcionDTO> actividadesActuales;
 	private final int ID_SOCIO_ACTUAL = 1;
+	private String nombreSocioActual;
 	
 	public InscripcionSocioController(InscripcionSocioModel m, InscripcionSocioView v) {
 		model = m;
@@ -24,6 +25,8 @@ public class InscripcionSocioController {
 	}
 	
 	public void initView() {
+		this.nombreSocioActual = model.getNombreSocioById(ID_SOCIO_ACTUAL);
+		
 		this.cargarTablaActividades();
 		
 		view.getFrame().setVisible(true);
@@ -85,7 +88,7 @@ public class InscripcionSocioController {
 		model.realizarInscripcion(ID_SOCIO_ACTUAL, actividadSeleccionada);
 		
 		String resguardo = model.generaResguardoInscripcion(
-				ID_SOCIO_ACTUAL, 
+				nombreSocioActual, 
 				actividadSeleccionada.getNombre(), 
 				actividadSeleccionada.getPrecioSocio()
 		);
