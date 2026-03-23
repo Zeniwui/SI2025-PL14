@@ -5,6 +5,8 @@
 -- ─────────────────────────────────────────────────────────────────
 
 -- borrado en orden inverso para respetar las claves foraneas
+DROP TABLE IF EXISTS Pagos;
+DROP TABLE IF EXISTS Inscripciones;
 DROP TABLE IF EXISTS Horarios;
 DROP TABLE IF EXISTS Reservas;
 DROP TABLE IF EXISTS Actividades;
@@ -99,6 +101,30 @@ CREATE TABLE IF NOT EXISTS Inscripciones (
     id_socio       INTEGER NOT NULL,
     id_actividad   INTEGER NOT NULL,
     fecha_inscripcion DATE DEFAULT CURRENT_DATE,
+    precio_inscripcion DECIMAL(10,2),
     FOREIGN KEY (id_socio) REFERENCES Socios(id_socio),
     FOREIGN KEY (id_actividad) REFERENCES Actividades(id_actividad)
+);
+
+CREATE TABLE IF NOT EXISTS Pagos (
+    id_pago          INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_socio         INTEGER       NOT NULL,
+    monto            DECIMAL(10,2) NOT NULL,
+    fecha_pago       DATETIME      DEFAULT CURRENT_TIMESTAMP,
+    metodo_pago      VARCHAR(20)   NOT NULL,
+    estado_pago      VARCHAR(20)   DEFAULT 'Pendiente',
+    concepto         VARCHAR(100),
+    
+    id_reserva       INTEGER       NULL,
+    id_inscripcion   INTEGER       NULL,
+    
+    FOREIGN KEY (id_socio)       REFERENCES Socios(id_socio),
+    FOREIGN KEY (id_reserva)     REFERENCES Reservas(id_reserva) ON DELETE SET NULL,
+    FOREIGN KEY (id_inscripcion) REFERENCES Inscripciones(id_inscripcion) ON DELETE SET NULL,
+    
+    CONSTRAINT chk_origen_pago CHECK (
+        (id_reserva IS NOT NULL AND id_inscripcion IS NULL) OR
+        (id_reserva IS NULL AND id_inscripcion IS NOT NULL) OR
+        (id_reserva IS NULL AND id_inscripcion IS NULL)
+    )
 );
