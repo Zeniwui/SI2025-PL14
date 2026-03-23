@@ -1,6 +1,7 @@
 package si.pl14.reservas;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
@@ -187,6 +188,8 @@ public class ReservaController {
 		LocalDate fechaSeleccionadaLocal = fechaDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         LocalDate hoy = LocalDate.now();
         
+        int horaActual = LocalTime.now().getHour();
+        
         // Calculamos la diferencia en días para verificar que no se pueda reservar con mayor antelación que la descrita
         long diasAntelacion = ChronoUnit.DAYS.between(hoy, fechaSeleccionadaLocal);
 		
@@ -219,9 +222,18 @@ public class ReservaController {
 		
 		// Calculamos las horas totales
 		int horasAReservar = horaFinSeleccionada - horaInicioSeleccionada;
-		int horasYaReservadasDia = reservasSocioDia.stream().mapToInt(r -> r.getHoraFin() - r.getHoraInicio()).sum();
-		int horasYaReservadasMes = reservasSocioMes.stream().mapToInt(r -> r.getHoraFin() - r.getHoraInicio()).sum();
 		
+		// Calculamos las horas totales ya reservadas en el día
+		int horasYaReservadasDia = 0;
+		for (ReservaEntity r : reservasSocioDia) {
+			horasYaReservadasDia += (r.getHoraFin() - r.getHoraInicio());
+		}
+
+		// Calculamos las horas totales ya reservadas en el mes
+		int horasYaReservadasMes = 0;
+		for (ReservaEntity r : reservasSocioMes) {
+			horasYaReservadasMes += (r.getHoraFin() - r.getHoraInicio());
+		}
 		
 		if(!model.estaAlCorriente(ID_SOCIO_ACTUAL)) {					
 			view.setTextoInformacion("SOCIO CON PAGOS PENDIENTES. NO PUEDE RESERVAR");
