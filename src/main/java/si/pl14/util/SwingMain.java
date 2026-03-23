@@ -8,9 +8,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
-import si.pl14.estadoPagosSocio.EstadoPagosSocioController;
-import si.pl14.estadoPagosSocio.EstadoPagosSocioModel;
-
 
 /**
  * Punto de entrada principal que incluye botones para la ejecucion de las pantallas 
@@ -71,16 +68,6 @@ public class SwingMain {
 			}
 		});
 		frame.getContentPane().add(btnSocio);
-
-		JButton btnEstadoPagos = new JButton("Socio: Ver estado de mis pagos");
-		btnEstadoPagos.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				EstadoPagosSocioController controller =
-					new EstadoPagosSocioController(new EstadoPagosSocioModel());
-				controller.initController();
-			}
-		});
-		frame.getContentPane().add(btnEstadoPagos);
 		
 			
 		JButton btnInicializarBaseDeDatos = new JButton("Inicializar Base de Datos en Blanco");

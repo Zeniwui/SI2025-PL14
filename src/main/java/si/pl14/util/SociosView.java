@@ -10,6 +10,8 @@ import java.awt.event.ActionListener;
 import si.pl14.reservas.ReservaModel;
 import si.pl14.reservas.ReservaController;
 import si.pl14.reservas.ReservaView;
+import si.pl14.estadoPagosSocio.EstadoPagosSocioController;
+import si.pl14.estadoPagosSocio.EstadoPagosSocioModel;
 
 public class SociosView {
 
@@ -42,6 +44,8 @@ public class SociosView {
         cbHistorias.addItem("Seleccionar historia de usuario");
         cbHistorias.addItem("HU1: Reservar instalacion para fecha determinada");
         cbHistorias.addItem("HU2: Ver disponibilidad de las instalaciones");
+        cbHistorias.addItem("HU3: Visualizar mis reservas en un periodo de tiempo");
+        cbHistorias.addItem("HU4: Ver estado de mis pagos de reservas y actividades");
         
         panel.add(cbHistorias, BorderLayout.CENTER);
 
@@ -60,6 +64,13 @@ public class SociosView {
                 	controllerReserva.initController();
                 	break;
                 case 2:
+                	break;
+                case 3:
+                	break;
+                case 4:
+                	EstadoPagosSocioController controllerEstadoPagos =
+                		new EstadoPagosSocioController(new EstadoPagosSocioModel());
+                	controllerEstadoPagos.initController();
                 	break;
                 }
             }
