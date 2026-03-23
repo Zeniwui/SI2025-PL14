@@ -141,7 +141,7 @@ public class ReservaModel {
 	/*
 	 * Realiza la reserva y la guarda en la base de datos
 	 */
-	public void realizarReserva(ReservaEntity reserva) {
+	public void realizarReserva(ReservaEntity reserva, String nombreInstalacion) {
 		String sql = "INSERT INTO Reservas (id_instalacion, fecha, hora_inicio, hora_fin, id_socio, coste_reserva, estado_pago, metodo_pago) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 	    
@@ -158,16 +158,35 @@ public class ReservaModel {
 	        reserva.getEstadoPago(),
 	        reserva.getMetodoPago()
 	    );
+	    
+	    String sqlGetId = "SELECT MAX(id_reserva) FROM Reservas";
+		List<Object[]> res = db.executeQueryArray(sqlGetId);
+		int idReserva = ((Number) res.get(0)[0]).intValue();
+		
+		// 3. Insertar el registro en la tabla Pagos asociado a esta reserva
+		String concepto = "Reserva instalación: " + nombreInstalacion;
+		
+		String sqlPago = "INSERT INTO Pagos (id_socio, monto, metodo_pago, estado_pago, concepto, id_reserva) " +
+				"VALUES (?, ?, ?, ?, ?, ?)";
+		
+		db.executeUpdate(sqlPago, 
+				reserva.getIdSocio(),
+				reserva.getCosteReserva(),
+				reserva.getMetodoPago(),
+				reserva.getEstadoPago(), // "Pagado" o "Pendiente" según lo que eligió el admin
+				concepto,
+				idReserva
+		);
 	}
 	
 	/*
 	 * Generar resguardo de la reserva
 	 */
-	public String generarResguardo(ReservaEntity reserva, String nombreInstalacion) {
+	public String generarResguardo(ReservaEntity reserva, String nombreInstalacion, String nombreSocio) {
 		
 		String resguardo = "--- RESGUARDO DE RESERVA ---" +
 				"\n Instalación: " + nombreInstalacion +
-				"\n Para socio: " + reserva.getIdSocio() +
+				"\n Para socio: " + nombreSocio +
 				"\n Para la fecha: " + reserva.getFecha() +
 				"\n Hora inicio: " + reserva.getHoraInicio() +
 				"\n Hora fin: " + reserva.getHoraFin() + 

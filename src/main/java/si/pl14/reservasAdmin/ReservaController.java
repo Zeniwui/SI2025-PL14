@@ -23,6 +23,7 @@ public class ReservaController {
 	private ReservaView view;
 	
 	private Integer idSocioActual = null;
+	private String nombreSocioActual = null;
 	private final int HORAS_MAXIMAS_SEGUIDAS = 2;
 	private final int HORAS_MAXIMAS_DIA = 3;
 	private final int HORAS_MAXIMAS_MES = 8;
@@ -173,13 +174,11 @@ public class ReservaController {
 			String nombreCompleto = socio.getNombre() + " " + socio.getApellidos();
 			String info = "Socio: " + nombreCompleto + " - Pagos: " + socio.getEstadoPagos();
 			
-			// Lo mandamos a la vista (false = no es un error, saldrá en color normal)
 			view.setDatosSocio(info, false);
 			
-			// ¡MUY IMPORTANTE! Guardamos el ID del socio encontrado para usarlo en la reserva
 			this.idSocioActual = socio.getIdSocio();
+			this.nombreSocioActual = nombreCompleto;
 			
-			// Limpiamos cualquier mensaje de error anterior de la reserva
 			view.setTextoInformacion("");
 		}
 	}
@@ -308,9 +307,9 @@ public class ReservaController {
 			    reserva.setEstadoPago("Pendiente");
 			}
 			
-			model.realizarReserva(reserva);
+			model.realizarReserva(reserva, instalacionSeleccionada.getNombre());
 			
-			String textoResguardo = model.generarResguardo(reserva, instalacionSeleccionada.getNombre());
+			String textoResguardo = model.generarResguardo(reserva, instalacionSeleccionada.getNombre(), nombreSocioActual);
 			view.setTextoResumen(textoResguardo);
 			
 			SwingUtil.showMessage("Reserva realizada con éxito.\n\n" + textoResguardo, 
