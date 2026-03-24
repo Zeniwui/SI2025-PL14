@@ -29,7 +29,6 @@ public class VisualizarReservasSocioView {
     private final JTextField                 txtFechaInicio;
     private final JTextField                 txtFechaFin;
     private final JButton                    btnConfirmar;
-    private final JButton                    btnCerrar;
     private final JPanel                     panelResultados;
 
     public VisualizarReservasSocioView() {
@@ -52,17 +51,7 @@ public class VisualizarReservasSocioView {
         lblTitulo.setForeground(COLOR_PRIMARIO);
         lblTitulo.setBorder(new EmptyBorder(0, 0, 6, 0));
 
-        btnCerrar = new JButton("X");
-        btnCerrar.setName("btnCerrar");
-        btnCerrar.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        btnCerrar.setForeground(Color.RED);
-        btnCerrar.setBorderPainted(false);
-        btnCerrar.setContentAreaFilled(false);
-        btnCerrar.setFocusPainted(false);
-        btnCerrar.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
         cabecera.add(lblTitulo, BorderLayout.CENTER);
-        cabecera.add(btnCerrar, BorderLayout.EAST);
 
         JPanel panelBusqueda = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 8));
         panelBusqueda.setBackground(new Color(245, 248, 255));
@@ -143,7 +132,7 @@ public class VisualizarReservasSocioView {
         }
     }
 
-    public void mostrarResultados(List<Object[]> reservas,
+    public void mostrarResultados(List<ReservasSocioDTO> reservas,
                                    String fechaInicio, String fechaFin,
                                    String nombreInstalacion) {
         panelResultados.removeAll();
@@ -193,7 +182,7 @@ public class VisualizarReservasSocioView {
         panelResultados.repaint();
     }
 
-    private JScrollPane crearTablaResultados(List<Object[]> reservas) {
+    private JScrollPane crearTablaResultados(List<ReservasSocioDTO> reservas) {
         String[] cabeceras = {"Fecha", "Dia", "Inicio", "Fin", "Instalacion",
                                "Estado pago", "Metodo pago", "Coste", "Reservado el"};
         double[] pesosCols = {0, 0.4, 0, 0, 1.2, 0.6, 0.6, 0, 1.0};
@@ -218,28 +207,29 @@ public class VisualizarReservasSocioView {
 
         double totalCoste = 0;
         for (int i = 0; i < reservas.size(); i++) {
-            Object[] r = reservas.get(i);
+            ReservasSocioDTO r = reservas.get(i);
 
-            String fechaRaw  = r[1] != null ? r[1].toString() : "";
+            String fechaRaw  = r.getFecha();
             String fechaFmt  = fechaRaw;
             String diaSemana = "";
             try {
                 LocalDate ld = LocalDate.parse(fechaRaw);
                 fechaFmt  = ld.format(FMT_FECHA_TABLA);
-                @SuppressWarnings("deprecation")
-				String dia = ld.getDayOfWeek().getDisplayName(TextStyle.SHORT, new Locale("es", "ES"));
+                String dia = ld.getDayOfWeek().getDisplayName(TextStyle.SHORT, new Locale("es", "ES"));
                 diaSemana = Character.toUpperCase(dia.charAt(0)) + dia.substring(1).replace(".", "");
-            } catch (Exception ignored) {}
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
-            String hIni      = formatHora(r[2]);
-            String hFin      = formatHora(r[3]);
-            String estado    = r[4] != null ? r[4].toString() : "-";
-            String metodo    = r[5] != null ? r[5].toString() : "-";
-            double costeVal  = toDouble(r[6]);
-            totalCoste      += costeVal;
-            String coste          = String.format("%.2f EUR", costeVal);
-            String fechaCreacion  = r[7] != null ? r[7].toString() : "-";
-            String instalacion    = r[8] != null ? r[8].toString() : "-";
+            String hIni     = formatHora(r.getHoraInicio());
+            String hFin     = formatHora(r.getHoraFin());
+            String estado   = r.getEstadoPago();
+            String metodo   = r.getMetodoPago();
+            double costeVal = r.getCosteReserva();
+            totalCoste     += costeVal;
+            String coste         = String.format("%.2f EUR", costeVal);
+            String fechaCreacion = r.getFechaCreacion();
+            String instalacion   = r.getNombreInstalacion();
 
             Color bgFila      = calcularColorFila(estado, i);
             Color colorEstado = calcularColorEstado(estado);
@@ -291,7 +281,6 @@ public class VisualizarReservasSocioView {
     private JPanel crearPanelCentrado(String titulo, String descripcion) {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(new Color(245, 248, 255));
-
         JPanel tarjeta = new JPanel();
         tarjeta.setLayout(new BoxLayout(tarjeta, BoxLayout.Y_AXIS));
         tarjeta.setBackground(Color.WHITE);
@@ -299,17 +288,14 @@ public class VisualizarReservasSocioView {
             BorderFactory.createLineBorder(COLOR_PRIMARIO, 2, true),
             new EmptyBorder(28, 48, 28, 48)
         ));
-
         JLabel lblTit = new JLabel(titulo, SwingConstants.CENTER);
         lblTit.setFont(new Font("Segoe UI", Font.BOLD, 16));
         lblTit.setForeground(COLOR_PRIMARIO);
         lblTit.setAlignmentX(Component.CENTER_ALIGNMENT);
-
         JLabel lblDesc = new JLabel("<html><center>" + descripcion + "</center></html>", SwingConstants.CENTER);
         lblDesc.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         lblDesc.setForeground(new Color(90, 90, 90));
         lblDesc.setAlignmentX(Component.CENTER_ALIGNMENT);
-
         tarjeta.add(lblTit);
         tarjeta.add(Box.createVerticalStrut(8));
         tarjeta.add(lblDesc);
@@ -341,9 +327,8 @@ public class VisualizarReservasSocioView {
         return p;
     }
 
-    private static String formatHora(Object o) {
-        if (o == null) return "--:--";
-        String s = o.toString().trim();
+    private static String formatHora(String s) {
+        if (s == null || s.isEmpty()) return "--:--";
         if (s.contains(":")) {
             String[] p = s.split(":");
             return p[0] + ":" + p[1];
@@ -353,12 +338,6 @@ public class VisualizarReservasSocioView {
         } catch (NumberFormatException e) {
             return s;
         }
-    }
-
-    private static double toDouble(Object o) {
-        if (o == null) return 0.0;
-        if (o instanceof Number) return ((Number) o).doubleValue();
-        try { return Double.parseDouble(o.toString()); } catch (Exception e) { return 0.0; }
     }
 
     private static Color calcularColorFila(String estado, int fila) {
@@ -375,7 +354,6 @@ public class VisualizarReservasSocioView {
 
     public JDialog    getFrame()          { return frame; }
     public JButton    getBtnConfirmar()   { return btnConfirmar; }
-    public JButton    getBtnCerrar()      { return btnCerrar; }
     public JTextField getTxtFechaInicio() { return txtFechaInicio; }
     public JTextField getTxtFechaFin()    { return txtFechaFin; }
 

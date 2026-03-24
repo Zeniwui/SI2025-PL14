@@ -3,7 +3,6 @@ package si.pl14.visualizareservas;
 import si.pl14.util.ApplicationException;
 import si.pl14.util.SwingUtil;
 import si.pl14.visualizareservas.VisualizarReservasSocioView.InstalacionItem;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -27,9 +26,6 @@ public class VisualizarReservasSocioController {
     public void initController() {
         view.getBtnConfirmar().addActionListener(
             e -> SwingUtil.exceptionWrapper(this::accionConfirmar));
-
-        view.getBtnCerrar().addActionListener(
-            e -> view.getFrame().dispose());
 
         view.getTxtFechaInicio().addActionListener(
             e -> SwingUtil.exceptionWrapper(this::accionConfirmar));
@@ -68,8 +64,6 @@ public class VisualizarReservasSocioController {
         if (fechaFin.isAfter(LocalDate.now().plusMonths(1)))
             throw new ApplicationException("No se pueden consultar reservas de mas de 1 mes en el futuro.");
         
-        if (fechaInicio.isEqual(fechaFin))
-            throw new ApplicationException("La fecha de inicio y la fecha de fin no pueden ser iguales.");
 
         if (fechaFin.isBefore(fechaInicio))
             throw new ApplicationException("La fecha de fin no puede ser anterior a la fecha de inicio.");
@@ -78,7 +72,7 @@ public class VisualizarReservasSocioController {
         int    idInstalacion     = (item != null) ? item.getId()     : 0;
         String nombreInstalacion = (item != null) ? item.getNombre() : "Todas las instalaciones";
 
-        List<Object[]> reservas = model.getReservas(
+        List<ReservasSocioDTO> reservas = model.getReservas(
             idInstalacion,
             fechaInicio.format(FMT_ISO),
             fechaFin.format(FMT_ISO)

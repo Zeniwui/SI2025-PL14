@@ -22,7 +22,7 @@ public class VisualizarReservasSocioModel {
         return db.executeQueryPojo(InstalacionEntity.class, sql);
     }
 
-    public List<Object[]> getReservas(int idInstalacion, String fechaDesde, String fechaHasta) {
+    public List<ReservasSocioDTO> getReservas(int idInstalacion, String fechaDesde, String fechaHasta) {
         StringBuilder sql = new StringBuilder(
             "SELECT r.id_reserva, " +
             "       r.fecha, " +
@@ -51,6 +51,25 @@ public class VisualizarReservasSocioModel {
 
         sql.append(" ORDER BY r.fecha, r.hora_inicio");
 
-        return db.executeQueryArray(sql.toString(), params.toArray());
+        List<Object[]> filas = db.executeQueryArray(sql.toString(), params.toArray());
+        return mapearDTO(filas);
+    }
+
+    private List<ReservasSocioDTO> mapearDTO(List<Object[]> filas) {
+        List<ReservasSocioDTO> lista = new ArrayList<>();
+        for (Object[] f : filas) {
+            ReservasSocioDTO dto = new ReservasSocioDTO();
+            dto.setIdReserva(f[0] instanceof Number ? ((Number) f[0]).intValue() : 0);
+            dto.setFecha(f[1] != null ? f[1].toString() : "");
+            dto.setHoraInicio(f[2] != null ? f[2].toString() : "");
+            dto.setHoraFin(f[3] != null ? f[3].toString() : "");
+            dto.setEstadoPago(f[4] != null ? f[4].toString() : "-");
+            dto.setMetodoPago(f[5] != null ? f[5].toString() : "-");
+            dto.setCosteReserva(f[6] instanceof Number ? ((Number) f[6]).doubleValue() : 0.0);
+            dto.setFechaCreacion(f[7] != null ? f[7].toString() : "-");
+            dto.setNombreInstalacion(f[8] != null ? f[8].toString() : "-");
+            lista.add(dto);
+        }
+        return lista;
     }
 }
