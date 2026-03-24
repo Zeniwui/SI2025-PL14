@@ -14,8 +14,9 @@ public class Generacion_Automatica_Model {
 
     public List<String> getActividadesPendientes() {
         List<String> actividades = new ArrayList<>();
-        String sql = "SELECT id_actividad, nombre FROM Actividades " +
-                     "WHERE id_actividad NOT IN (SELECT DISTINCT id_actividad FROM Reservas WHERE id_actividad IS NOT NULL)";
+        // SUGERENCIA APLICADA: Uso de NOT EXISTS para evitar problemas con valores NULL
+        String sql = "SELECT a.id_actividad, a.nombre FROM Actividades a " +
+                     "WHERE NOT EXISTS (SELECT 1 FROM Reservas r WHERE r.id_actividad = a.id_actividad)";
         try (Connection con = getConnection(); PreparedStatement pst = con.prepareStatement(sql); ResultSet rs = pst.executeQuery()) {
             while (rs.next()) {
                 actividades.add(rs.getInt("id_actividad") + " - " + rs.getString("nombre"));
@@ -76,9 +77,8 @@ public class Generacion_Automatica_Model {
         String delReservaSql = "DELETE FROM Reservas WHERE id_reserva = ?";
         
         try (Connection con = getConnection()) {
-            con.setAutoCommit(false); // Transacción
+            con.setAutoCommit(false); 
             try {
-                // Consultar el estado_pago y coste_reserva de la tabla Reservas
                 try (PreparedStatement pCheck = con.prepareStatement(selectPagoSql)) {
                     pCheck.setInt(1, idReserva);
                     ResultSet rs = pCheck.executeQuery();
@@ -86,7 +86,6 @@ public class Generacion_Automatica_Model {
                         String estado = rs.getString("estado_pago");
                         double coste = rs.getDouble("coste_reserva");
                         
-                        // Si estaba pagado, indicamos que requiere devolución
                         if ("Pagado".equalsIgnoreCase(estado) || "Completado".equalsIgnoreCase(estado)) {
                             infoPago = "Devolución pendiente (" + coste + "€)";
                         } else {
@@ -95,7 +94,6 @@ public class Generacion_Automatica_Model {
                     }
                 } 
                 
-                // Borrar la reserva para liberar la instalación
                 try (PreparedStatement pDel = con.prepareStatement(delReservaSql)) {
                     pDel.setInt(1, idReserva);
                     pDel.executeUpdate();

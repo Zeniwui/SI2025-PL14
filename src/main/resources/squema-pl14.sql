@@ -6,7 +6,6 @@ DROP TABLE IF EXISTS Usuarios;
 DROP TABLE IF EXISTS Instalaciones;
 DROP TABLE IF EXISTS PeriodosInscripcion;
 
-
 CREATE TABLE IF NOT EXISTS Usuarios (
     dni VARCHAR(20) PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
@@ -49,7 +48,6 @@ CREATE TABLE IF NOT EXISTS Actividades (
     fecha_fin DATE,
     precio_socio DECIMAL(6,2),
     precio_no_socio DECIMAL(6,2),
-    
     id_periodo INT,
     
     FOREIGN KEY (id_instalacion) REFERENCES Instalaciones(id_instalacion),
@@ -57,34 +55,23 @@ CREATE TABLE IF NOT EXISTS Actividades (
 );
 
 CREATE TABLE IF NOT EXISTS Reservas (
-
     id_reserva INTEGER PRIMARY KEY AUTOINCREMENT,
     id_instalacion INTEGER NOT NULL,
     fecha DATE NOT NULL,				
     hora_inicio TIME NOT NULL,
     hora_fin TIME NOT NULL,
-
-
     id_socio INTEGER NULL,
     id_actividad INTEGER NULL,
-
     coste_reserva DECIMAL(10, 2) DEFAULT 0,
-
-
     estado_pago VARCHAR(20) DEFAULT 'Pendiente',
-    
     metodo_pago VARCHAR(20),
-
     fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (id_instalacion) REFERENCES Instalaciones(id_instalacion),
-    
     FOREIGN KEY (id_socio) REFERENCES Socios(id_socio) ON DELETE SET NULL,
-    
     FOREIGN KEY (id_actividad) REFERENCES Actividades(id_actividad) ON DELETE CASCADE,
 
     CONSTRAINT chk_horas_validas CHECK (hora_fin > hora_inicio),
-
     CONSTRAINT chk_origen_unico CHECK (
         (id_socio IS NOT NULL AND id_actividad IS NULL) OR  
         (id_socio IS NULL AND id_actividad IS NOT NULL)	    
@@ -100,7 +87,4 @@ CREATE TABLE IF NOT EXISTS Horarios (
     
     FOREIGN KEY (id_actividad) REFERENCES Actividades(id_actividad) ON DELETE CASCADE
 );
-
-
-
 

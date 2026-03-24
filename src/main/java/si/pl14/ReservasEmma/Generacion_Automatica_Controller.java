@@ -5,7 +5,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 import si.pl14.util.Database;
-//import si.pl14.util.DatabaseViewer;
 
 public class Generacion_Automatica_Controller {
 
@@ -57,7 +56,6 @@ public class Generacion_Automatica_Controller {
             for (String[] h : horarios) {
                 DayOfWeek diaHorario = traducirDia(h[0]);
                 
-                // Si el día de la semana coincide con el horario estipulado
                 if (date.getDayOfWeek() == diaHorario) {
                     String fechaStr = date.toString();
                     
@@ -65,32 +63,37 @@ public class Generacion_Automatica_Controller {
                     String hFin = h[2];
                     String franja = h[0].toUpperCase() + " (" + hIni + " - " + hFin + ")";
 
-                    // Comprobar quién hay
                     List<String[]> ocupantes = model.comprobarOcupacion(idInst, fechaStr, hIni, hFin);
                     boolean chocaConActividad = false;
 
+                    // PRIMERA PASADA: Comprobar si hay una actividad (y abortar el slot si la hay)
                     for (String[] ocu : ocupantes) {
                         if (ocu[0].equals("ACTIVIDAD")) {
                             chocaConActividad = true;
                             view.getModelLog().addRow(new String[]{fechaStr, franja, "ERROR: OTRA ACTIVIDAD YA RESERVADA (ID: " + ocu[1] + ") - Se omite."});
                             conflictosIgnorados++;
                             break; 
-                        } else if (ocu[0].equals("SOCIO")) {
-                            int idReservaSocio = Integer.parseInt(ocu[1]);
-                            String resultadoAnulacion = model.anularReservaSocio(idReservaSocio);
-                            
-                            if (resultadoAnulacion != null) {
-                                view.getModelLog().addRow(new String[]{
-                                    fechaStr, franja, 
-                                    "INFO: SOCIO ANULADO (ID: " + idReservaSocio + "). " + resultadoAnulacion
-                                });
-                                sociosAnulados++;
-                            }
                         }
                     }
 
-                    // Si no choca con otra actividad, procedemos a insertar nuestra reserva
+                    // SEGUNDA PASADA: Si NO choca con actividad, procedemos a anular socios e insertar
                     if (!chocaConActividad) {
+                        for (String[] ocu : ocupantes) {
+                            if (ocu[0].equals("SOCIO")) {
+                                int idReservaSocio = Integer.parseInt(ocu[1]);
+                                String resultadoAnulacion = model.anularReservaSocio(idReservaSocio);
+                                
+                                if (resultadoAnulacion != null) {
+                                    view.getModelLog().addRow(new String[]{
+                                        fechaStr, franja, 
+                                        "INFO: SOCIO ANULADO (ID: " + idReservaSocio + "). " + resultadoAnulacion
+                                    });
+                                    sociosAnulados++;
+                                }
+                            }
+                        }
+
+                        // Insertar reserva de actividad
                         if (model.insertarReserva(idInst, fechaStr, hIni, hFin, idActividad)) {
                             view.getModelLog().addRow(new String[]{fechaStr, franja, "OK: Reserva generada con éxito."});
                             reservasCreadas++;
@@ -102,7 +105,6 @@ public class Generacion_Automatica_Controller {
             }
         }
 
-        // Resumen final
         JOptionPane.showMessageDialog(view, 
                 "Proceso finalizado.\n\n" +
                 "- Reservas creadas: " + reservasCreadas + "\n" +
@@ -122,7 +124,9 @@ public class Generacion_Automatica_Controller {
             case "VIERNES": return DayOfWeek.FRIDAY;
             case "SABADO": return DayOfWeek.SATURDAY;
             case "DOMINGO": return DayOfWeek.SUNDAY;
-            default: return DayOfWeek.MONDAY;
+            default: 
+                // SUGERENCIA APLICADA: Lanzar excepción si el día no es válido en BD
+                throw new IllegalArgumentException("Día de la semana desconocido en la BD: " + dia);
         }
     }
 
@@ -138,6 +142,5 @@ public class Generacion_Automatica_Controller {
         new Generacion_Automatica_Controller(view, model);
 
         view.setVisible(true);
-        //EventQueue.invokeLater(() -> new DatabaseViewer().setVisible(true));
     }
 }
