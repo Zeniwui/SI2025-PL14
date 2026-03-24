@@ -5,11 +5,16 @@ import si.pl14.util.Database;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Modelo del caso de uso "Visualizar Estado de Pagos del Socio".
+ * Encapsula todas las consultas SQL necesarias para obtener los cargos
+ * del socio (reservas propias y actividades) en un rango de fechas.
+ */
 public class EstadoPagosSocioModel {
 
     private final Database db = new Database();
 
-    // ID del socio autenticado. Valor 1 = "Carlos Gomez" (datos de prueba).
+    /** ID del socio autenticado. Valor 1 = "Carlos Gomez" (datos de prueba). */
     public static final int ID_SOCIO_ACTUAL = 1;
 
     public EstadoPagosSocioModel() {
@@ -19,27 +24,43 @@ public class EstadoPagosSocioModel {
     /**
      * Devuelve todos los cargos del socio en el rango [fechaDesde, fechaHasta],
      * tanto de reservas propias como de actividades, ordenados por fecha.
-     * Indices del Object[]: [0] tipo, [1] estado_pago, [2] fecha, [3] metodo_pago, [4] coste_reserva
+     * <p>
+     * Índices del Object[]:
+     * [0] tipo ("Reserva" | "Actividad"),
+     * [1] estado_pago,
+     * [2] fecha,
+     * [3] metodo_pago,
+     * [4] coste (coste_reserva para reservas propias; precio_socio para actividades)
+     * </p>
+     *
+     * @param fechaDesde  fecha de inicio en formato ISO (yyyy-MM-dd)
+     * @param fechaHasta  fecha de fin   en formato ISO (yyyy-MM-dd)
+     * @return lista de filas ordenadas por fecha ascendente
      */
     public List<Object[]> getCargos(String fechaDesde, String fechaHasta) {
+        // Reservas directas del socio (instalación reservada por él mismo)
         String sqlReservas =
-            "SELECT 'Reserva'           AS tipo, " +
+            "SELECT 'Reserva'                       AS tipo, " +
             "       estado_pago, " +
             "       fecha, " +
-            "       COALESCE(metodo_pago, '-') AS metodo_pago, " +
+            "       COALESCE(metodo_pago, '-')       AS metodo_pago, " +
             "       coste_reserva " +
             "FROM Reservas " +
             "WHERE id_socio = ? " +
             "  AND fecha >= ? AND fecha <= ?";
 
+        // Actividades en las que el socio está inscrito:
+        // el coste que paga el socio es precio_socio de la tabla Actividades,
+        // no el coste_reserva de la instalación.
         String sqlActividades =
-            "SELECT 'Actividad'         AS tipo, " +
+            "SELECT 'Actividad'                     AS tipo, " +
             "       r.estado_pago, " +
             "       r.fecha, " +
-            "       COALESCE(r.metodo_pago, '-') AS metodo_pago, " +
-            "       r.coste_reserva " +
+            "       COALESCE(r.metodo_pago, '-')     AS metodo_pago, " +
+            "       a.precio_socio " +
             "FROM Reservas r " +
             "JOIN Inscripciones i ON r.id_actividad = i.id_actividad " +
+            "JOIN Actividades    a ON r.id_actividad = a.id_actividad " +
             "WHERE i.id_socio = ? " +
             "  AND r.fecha >= ? AND r.fecha <= ?";
 
@@ -56,7 +77,20 @@ public class EstadoPagosSocioModel {
         return resultado;
     }
 
+    /**
+     * Calcula el importe total de cargos con estado "Pendiente" del socio
+     * en el rango [fechaDesde, fechaHasta].
+     * <p>
+     * Para reservas directas se usa {@code coste_reserva}; para actividades
+     * se usa {@code precio_socio} de la tabla Actividades.
+     * </p>
+     *
+     * @param fechaDesde  fecha de inicio en formato ISO (yyyy-MM-dd)
+     * @param fechaHasta  fecha de fin   en formato ISO (yyyy-MM-dd)
+     * @return suma de importes pendientes (0.0 si no hay ninguno)
+     */
     public double getTotalPendiente(String fechaDesde, String fechaHasta) {
+        // Importe pendiente de reservas directas del socio
         String sqlReservas =
             "SELECT COALESCE(SUM(coste_reserva), 0) " +
             "FROM Reservas " +
@@ -64,10 +98,12 @@ public class EstadoPagosSocioModel {
             "  AND estado_pago = 'Pendiente' " +
             "  AND fecha >= ? AND fecha <= ?";
 
+        // Importe pendiente de actividades: se suma precio_socio, no coste_reserva
         String sqlActividades =
-            "SELECT COALESCE(SUM(r.coste_reserva), 0) " +
+            "SELECT COALESCE(SUM(a.precio_socio), 0) " +
             "FROM Reservas r " +
             "JOIN Inscripciones i ON r.id_actividad = i.id_actividad " +
+            "JOIN Actividades    a ON r.id_actividad = a.id_actividad " +
             "WHERE i.id_socio = ? " +
             "  AND r.estado_pago = 'Pendiente' " +
             "  AND r.fecha >= ? AND r.fecha <= ?";
