@@ -130,8 +130,26 @@ public class Reserva_Instalacion_Admin_Controller {
                 if (date.getDayOfWeek() == dow) reservas.add(new String[]{date.toString(), h[1], h[2]});
             }
         }
-        if (model.insertarReservasGeneradas(Integer.parseInt(d[1]), idAct, reservas))
-            JOptionPane.showMessageDialog(view, "Reservas creadas: " + reservas.size());
+        
+        // --- SUGERENCIA APLICADA: Diálogo de confirmación ---
+        if (reservas.isEmpty()) {
+            JOptionPane.showMessageDialog(view, "No hay reservas que generar en este rango de fechas con los horarios actuales.");
+            return;
+        }
+
+        int confirmacion = JOptionPane.showConfirmDialog(view, 
+                "¿Estás seguro de que deseas generar " + reservas.size() + " reservas para esta actividad?", 
+                "Confirmar Generación", 
+                JOptionPane.YES_NO_OPTION, 
+                JOptionPane.WARNING_MESSAGE);
+
+        if (confirmacion == JOptionPane.YES_OPTION) {
+            if (model.insertarReservasGeneradas(Integer.parseInt(d[1]), idAct, reservas)) {
+                JOptionPane.showMessageDialog(view, "Se han creado correctamente " + reservas.size() + " reservas.");
+            } else {
+                JOptionPane.showMessageDialog(view, "Ocurrió un error al intentar guardar las reservas en la base de datos.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
 
     private String traducir(String d) {
