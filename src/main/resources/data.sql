@@ -72,39 +72,39 @@ VALUES ('Entrenamiento Funcional', 'Deporte', 'Circuitos de alta intensidad', 4,
 
 -- 6. HORARIOS
 INSERT INTO Horarios (id_actividad, dia_semana, hora_inicio, hora_fin) 
-SELECT id_actividad, 'Lunes', '10:00', '11:30' FROM Actividades WHERE nombre = 'Cursillo Natación Verano';
+SELECT id_actividad, 'LUNES', '10:00', '11:30' FROM Actividades WHERE nombre = 'Cursillo Natación Verano';
 INSERT INTO Horarios (id_actividad, dia_semana, hora_inicio, hora_fin) 
-SELECT id_actividad, 'Miércoles', '10:00', '11:30' FROM Actividades WHERE nombre = 'Cursillo Natación Verano';
+SELECT id_actividad, 'MIERCOLES', '10:00', '11:30' FROM Actividades WHERE nombre = 'Cursillo Natación Verano';
 INSERT INTO Horarios (id_actividad, dia_semana, hora_inicio, hora_fin) 
-SELECT id_actividad, 'Viernes', '10:00', '11:30' FROM Actividades WHERE nombre = 'Cursillo Natación Verano';
+SELECT id_actividad, 'VIERNES', '10:00', '11:30' FROM Actividades WHERE nombre = 'Cursillo Natación Verano';
 
 INSERT INTO Horarios (id_actividad, dia_semana, hora_inicio, hora_fin) 
-SELECT id_actividad, 'Sábado', '09:00', '20:00' FROM Actividades WHERE nombre = 'Torneo Tenis Juvenil';
+SELECT id_actividad, 'SABADO', '09:00', '20:00' FROM Actividades WHERE nombre = 'Torneo Tenis Juvenil';
 
 INSERT INTO Horarios (id_actividad, dia_semana, hora_inicio, hora_fin) 
-SELECT id_actividad, 'Martes', '18:00', '19:30' FROM Actividades WHERE nombre = 'Yoga Relax';
+SELECT id_actividad, 'MARTES', '18:00', '19:30' FROM Actividades WHERE nombre = 'Yoga Relax';
 INSERT INTO Horarios (id_actividad, dia_semana, hora_inicio, hora_fin) 
-SELECT id_actividad, 'Jueves', '18:00', '19:30' FROM Actividades WHERE nombre = 'Yoga Relax';
+SELECT id_actividad, 'JUEVES', '18:00', '19:30' FROM Actividades WHERE nombre = 'Yoga Relax';
 
 INSERT INTO Horarios (id_actividad, dia_semana, hora_inicio, hora_fin) 
-SELECT id_actividad, 'Domingo', '10:00', '14:00' FROM Actividades WHERE nombre = 'Liga Baloncesto Senior';
+SELECT id_actividad, 'DOMINGO', '10:00', '14:00' FROM Actividades WHERE nombre = 'Liga Baloncesto Senior';
 
 INSERT INTO Horarios (id_actividad, dia_semana, hora_inicio, hora_fin) 
-SELECT id_actividad, 'Lunes', '17:00', '18:30' FROM Actividades WHERE nombre = 'Escuela de Pádel';
+SELECT id_actividad, 'LUNES', '17:00', '18:30' FROM Actividades WHERE nombre = 'Escuela de Pádel';
 INSERT INTO Horarios (id_actividad, dia_semana, hora_inicio, hora_fin) 
-SELECT id_actividad, 'Miércoles', '17:00', '18:30' FROM Actividades WHERE nombre = 'Escuela de Pádel';
+SELECT id_actividad, 'MIERCOLES', '17:00', '18:30' FROM Actividades WHERE nombre = 'Escuela de Pádel';
 
 INSERT INTO Horarios (id_actividad, dia_semana, hora_inicio, hora_fin) 
-SELECT id_actividad, 'Martes', '09:30', '10:30' FROM Actividades WHERE nombre = 'Pilates Avanzado';
+SELECT id_actividad, 'MARTES', '09:30', '10:30' FROM Actividades WHERE nombre = 'Pilates Avanzado';
 INSERT INTO Horarios (id_actividad, dia_semana, hora_inicio, hora_fin) 
-SELECT id_actividad, 'Jueves', '09:30', '10:30' FROM Actividades WHERE nombre = 'Pilates Avanzado';
+SELECT id_actividad, 'JUEVES', '09:30', '10:30' FROM Actividades WHERE nombre = 'Pilates Avanzado';
 
 INSERT INTO Horarios (id_actividad, dia_semana, hora_inicio, hora_fin) 
-SELECT id_actividad, 'Viernes', '11:00', '11:45' FROM Actividades WHERE nombre = 'Aquagym Senior';
+SELECT id_actividad, 'VIERNES', '11:00', '11:45' FROM Actividades WHERE nombre = 'Aquagym Senior';
 
 INSERT INTO Horarios (id_actividad, dia_semana, hora_inicio, hora_fin) 
-SELECT id_actividad, 'Lunes', '19:00', '20:00' FROM Actividades WHERE nombre = 'Entrenamiento Funcional';
+SELECT id_actividad, 'LUNES', '19:00', '20:00' FROM Actividades WHERE nombre = 'Entrenamiento Funcional';
 INSERT INTO Horarios (id_actividad, dia_semana, hora_inicio, hora_fin) 
-SELECT id_actividad, 'Miércoles', '19:00', '20:00' FROM Actividades WHERE nombre = 'Entrenamiento Funcional';
+SELECT id_actividad, 'MIERCOLES', '19:00', '20:00' FROM Actividades WHERE nombre = 'Entrenamiento Funcional';
 INSERT INTO Horarios (id_actividad, dia_semana, hora_inicio, hora_fin) 
-SELECT id_actividad, 'Viernes', '19:00', '20:00' FROM Actividades WHERE nombre = 'Entrenamiento Funcional';
+SELECT id_actividad, 'VIERNES', '19:00', '20:00' FROM Actividades WHERE nombre = 'Entrenamiento Funcional';

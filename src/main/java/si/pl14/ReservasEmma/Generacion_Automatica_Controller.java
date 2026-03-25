@@ -5,6 +5,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 import si.pl14.util.Database;
+import si.pl14.util.DatabaseViewer;
 
 public class Generacion_Automatica_Controller {
 
@@ -132,6 +133,7 @@ public class Generacion_Automatica_Controller {
 
     public static void main(String[] args) {
         Database db = new Database();
+        DatabaseViewer dbv = new DatabaseViewer();
         db.createDatabase(false);
         db.loadDatabase();
 
@@ -142,5 +144,6 @@ public class Generacion_Automatica_Controller {
         new Generacion_Automatica_Controller(view, model);
 
         view.setVisible(true);
+        dbv.setVisible(true);
     }
 }
