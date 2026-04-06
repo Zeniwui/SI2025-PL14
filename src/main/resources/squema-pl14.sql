@@ -1,4 +1,3 @@
-
 DROP TABLE IF EXISTS Instalaciones;
 DROP TABLE IF EXISTS PeriodosInscripcion;
 DROP TABLE IF EXISTS Actividades;
