@@ -12,9 +12,18 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import si.pl14.actividadesEmma.Lista_Actividades_Periodo_Admin_Vista;
+import si.pl14.actividadesEmma.Lista_Actividades_Periodo_Controller;
+import si.pl14.actividadesEmma.Lista_Actividades_Periodo_Model;
+import si.pl14.actividadesEmma.Planificar_Actividad_Admin_View;
+import si.pl14.actividadesEmma.Planificar_Actividad_Controller;
+import si.pl14.actividadesEmma.Planificar_Actividad_Model;
 import si.pl14.periodosinscripcion.PeriodosInscripcionController;
 import si.pl14.periodosinscripcion.PeriodosInscripcionModel;
 import si.pl14.periodosinscripcion.PeriodosInscripcionView;
+import si.pl14.reservasEmma.Reserva_Instalacion_Admin_Controller;
+import si.pl14.reservasEmma.Reserva_Instalacion_Admin_Model;
+import si.pl14.reservasEmma.Reserva_Instalacion_Admin_View;
 import si.pl14.visualizarInstalaciones.VisualizarReservasAdminController;
 import si.pl14.visualizarInstalaciones.VisualizarReservasAdminModel;
 import si.pl14.visualizarInstalaciones.VisualizarReservasAdminView;
@@ -48,7 +57,7 @@ public class AdminView {
         // =====================================================================
         cbHistorias.addItem("Seleccionar historia de usuario");
         cbHistorias.addItem("HU1: Reservar una instalacion para un socio");
-        cbHistorias.addItem("HU2: Reservar una instalacion para una actividad");
+        cbHistorias.addItem("HU2: Reservar una instalacion para una actividad en un periodo determinado"); // HU 33741
         cbHistorias.addItem("HU3: Visualizar reservas de instalaciones");
         cbHistorias.addItem("HU4: Planificar una actividad");
         cbHistorias.addItem("HU5: Crear un periodo de inscripcion");
@@ -69,18 +78,33 @@ public class AdminView {
                 case 1:
                 	break;
                 case 2:
+                	Reserva_Instalacion_Admin_View viewRI = new Reserva_Instalacion_Admin_View();
+                    Reserva_Instalacion_Admin_Model modelRI = new Reserva_Instalacion_Admin_Model();
+                    new Reserva_Instalacion_Admin_Controller(viewRI, modelRI);
+                    viewRI.setVisible(true);
+                    viewRI.setLocationRelativeTo(null);
                 	break;
                 case 3:
     				VisualizarReservasAdminController controllerVisualizarReservas = new VisualizarReservasAdminController(new VisualizarReservasAdminModel(), new VisualizarReservasAdminView());
     				controllerVisualizarReservas.initController();
                 	break;
                 case 4:
+                	Planificar_Actividad_Admin_View vistaplanificar = new Planificar_Actividad_Admin_View();
+            		Planificar_Actividad_Model modeloplanificar = new Planificar_Actividad_Model();
+            		Planificar_Actividad_Controller controladorplanificar = new Planificar_Actividad_Controller(modeloplanificar, vistaplanificar);
+            		controladorplanificar.initController();
+            		//vistaplanificar.setVisible(true);
                 	break;
                 case 5:
                 	PeriodosInscripcionController controllerPeriodosInscripcion = new PeriodosInscripcionController(new PeriodosInscripcionModel(), new PeriodosInscripcionView());
                 	controllerPeriodosInscripcion.initController();
                 	break;
                 case 6:
+                	Lista_Actividades_Periodo_Admin_Vista vistalista = new Lista_Actividades_Periodo_Admin_Vista();
+    				Lista_Actividades_Periodo_Model modelolista = new Lista_Actividades_Periodo_Model();
+    				Lista_Actividades_Periodo_Controller controladorlista = new Lista_Actividades_Periodo_Controller(modelolista,
+    						vistalista);
+    				controladorlista.initController();
                 	break;
                 }
             }
