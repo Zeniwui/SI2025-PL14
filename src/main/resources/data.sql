@@ -64,9 +64,16 @@ VALUES ('Temporada Verano', '2026-06-01', '2026-06-15', '2026-08-30');
 INSERT INTO PeriodosInscripcion (nombre, inicio_socios, fin_socios, fin_no_socios) 
 VALUES ('Temporada Invierno', '2026-10-01', '2026-10-15', '2026-12-20');
 
+<<<<<<< HEAD
 INSERT INTO PeriodosInscripcion (nombre, inicio_socios, fin_socios, fin_no_socios) 
 VALUES ('Temporada Otoño', '2026-09-01', '2026-09-15', '2026-11-30');
+=======
+-- Datos para Usuarios y Socios
+INSERT INTO Usuarios (dni, nombre, apellidos, telefono, email) 
+VALUES ('12345678A', 'Juan', 'Pérez García', 600123456, 'juan.perez@email.com');
+>>>>>>> refs/remotes/origin/HU33741-Reserva_ins_actividadad
 
+<<<<<<< HEAD
 INSERT INTO PeriodosInscripcion (nombre, inicio_socios, fin_socios, fin_no_socios) 
 VALUES ('Temporada Primavera', '2026-03-01', '2026-03-15', '2026-05-30');
 
@@ -148,7 +155,6 @@ INSERT INTO Horarios (id_actividad, dia_semana, hora_inicio, hora_fin)
 SELECT id_actividad, 'Miércoles', '19:00', '20:00' FROM Actividades WHERE nombre = 'Entrenamiento Funcional';
 INSERT INTO Horarios (id_actividad, dia_semana, hora_inicio, hora_fin) 
 SELECT id_actividad, 'Viernes', '19:00', '20:00' FROM Actividades WHERE nombre = 'Entrenamiento Funcional';
-=======
 INSERT INTO Usuarios (dni, nombre, apellidos, telefono, email) VALUES 
 ('12345678A', 'Carlos', 'Gomez', 600111222, 'carlos@email.com'),
 ('87654321B', 'Maria', 'Lopez', 600333444, 'maria@email.com');
