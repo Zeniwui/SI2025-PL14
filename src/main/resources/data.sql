@@ -159,7 +159,17 @@ INSERT INTO PeriodosInscripcion (nombre, inicio_socios, fin_socios, fin_no_socio
 INSERT INTO Actividades (nombre, descripcion, id_instalacion, aforo, fecha_inicio, fecha_fin, precio_socio, precio_no_socio, id_periodo) VALUES 
 ('Ciclo Indoor', 'Clases de spinning', 4, 20, '2026-03-01', '2026-03-31', 20.00, 30.00, 1),
 ('Aquagym', 'Gimnasia en el agua', 3, 15, '2026-03-01', '2026-03-31', 15.00, 25.00, 1),
-('Clases de Tenis', 'Clases grupales de tenis', 1, 4, '2026-03-01', '2026-03-31', 20.00, 30.00, 1);;
+('Clases de Tenis', 'Clases grupales de tenis', 1, 4, '2026-03-01', '2026-03-31', 20.00, 30.00, 1),
+('Yoga', 'Sesiones de yoga y relajacion', 4, 15, '2026-03-01', '2026-04-30', 12.00, 18.00, 1),
+('Pilates', 'Ejercicios de pilates suelo', 4, 10, '2026-03-01', '2026-04-30', 14.00, 20.00, 1);;
+
+INSERT INTO Inscripciones (id_socio, id_actividad) VALUES
+(1, 4),
+(1, 5);
+
+INSERT INTO Reservas (id_instalacion, fecha, hora_inicio, hora_fin, id_socio, id_actividad, coste_reserva, estado_pago, metodo_pago) VALUES
+(4, '2026-03-04', '10:00:00', '11:00:00', NULL, 4, 12.00, 'Pagado', 'Efectivo'),
+(4, '2026-03-05', '11:00:00', '12:00:00', NULL, 5, 14.00, 'Pagado', 'Tarjeta');
 
 INSERT INTO Reservas (id_instalacion, fecha, hora_inicio, hora_fin, id_socio, id_actividad, coste_reserva, estado_pago, metodo_pago) VALUES
 (1, '2026-02-27', '09:00:00', '10:00:00', 1, NULL, 12.00, 'Pagado', 'Tarjeta'),
