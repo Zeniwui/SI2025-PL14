@@ -18,6 +18,9 @@ import si.pl14.actividadesEmma.Lista_Actividades_Periodo_Model;
 import si.pl14.actividadesEmma.Planificar_Actividad_Admin_View;
 import si.pl14.actividadesEmma.Planificar_Actividad_Controller;
 import si.pl14.actividadesEmma.Planificar_Actividad_Model;
+import si.pl14.inscripcionesNoSocio.InscripcionNoSocioController;
+import si.pl14.inscripcionesNoSocio.InscripcionNoSocioModel;
+import si.pl14.inscripcionesNoSocio.InscripcionNoSocioView;
 import si.pl14.periodosinscripcion.PeriodosInscripcionController;
 import si.pl14.periodosinscripcion.PeriodosInscripcionModel;
 import si.pl14.periodosinscripcion.PeriodosInscripcionView;
@@ -62,6 +65,7 @@ public class AdminView {
         cbHistorias.addItem("HU4: Planificar una actividad");
         cbHistorias.addItem("HU5: Crear un periodo de inscripcion");
         cbHistorias.addItem("HU6: Obtener lsita de actividades ofertadas en un periodo");
+        cbHistorias.addItem("HU7: Inscribir a un no socio a una actividad");
         
         panel.add(cbHistorias, BorderLayout.CENTER);
 
@@ -106,6 +110,9 @@ public class AdminView {
     						vistalista);
     				controladorlista.initController();
                 	break;
+                case 7:
+                	InscripcionNoSocioController controllerInscripcionNoSocio = new InscripcionNoSocioController(new InscripcionNoSocioModel(), new InscripcionNoSocioView());
+                	controllerInscripcionNoSocio.initController();
                 }
             }
         });
