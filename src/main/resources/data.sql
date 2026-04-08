@@ -19,12 +19,12 @@ VALUES (3, '22222222A', 'pass125', 'Al Corriente');
 
 -- Insertar Reserva vinculada al Socio 1
 INSERT INTO Reservas (id_instalacion, fecha, hora_inicio, hora_fin, id_socio, coste_reserva, estado_pago)
-VALUES (1, '2026-04-10', '10:00', '11:00', 1, 12.00, 'Pendiente');
+VALUES (1, '2026-05-10', '10:00', '11:00', 1, 12.00, 'Pendiente');
 INSERT INTO Reservas (id_instalacion, fecha, hora_inicio, hora_fin, id_socio, coste_reserva, estado_pago)
-VALUES (1, '2026-04-10', '11:00', '12:00', 1, 12.00, 'Pendiente');
+VALUES (1, '2026-05-10', '11:00', '12:00', 1, 12.00, 'Pendiente');
 INSERT INTO Reservas (id_instalacion, fecha, hora_inicio, hora_fin, id_socio, coste_reserva, estado_pago)
-VALUES (2, '2026-04-10', '13:00', '14:00', 2, 12.00, 'Pendiente');
+VALUES (2, '2026-05-10', '13:00', '14:00', 2, 12.00, 'Pendiente');
 INSERT INTO Reservas (id_instalacion, fecha, hora_inicio, hora_fin, id_socio, coste_reserva, estado_pago)
-VALUES (3, '2026-04-10', '14:00', '15:00', 3, 12.00, 'Pendiente');
+VALUES (3, '2026-05-10', '14:00', '15:00', 3, 12.00, 'Pendiente');
 
 PRAGMA foreign_keys = ON;
