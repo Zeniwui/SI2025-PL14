@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import si.pl14.reservas.ReservaModel;
 import si.pl14.reservas.ReservaController;
 import si.pl14.reservas.ReservaView;
+import si.pl14.visualizareservas.*;
 import si.pl14.estadoPagosSocio.EstadoPagosSocioController;
 import si.pl14.estadoPagosSocio.EstadoPagosSocioModel;
 
@@ -64,8 +65,11 @@ public class SociosView {
                 	controllerReserva.initController();
                 	break;
                 case 2:
+                	
                 	break;
                 case 3:
+                	VisualizarReservasSocioController controllerReservaS =new VisualizarReservasSocioController(new VisualizarReservasSocioModel(),new VisualizarReservasSocioView());
+                	controllerReservaS.initController();
                 	break;
                 case 4:
                 	EstadoPagosSocioController controllerEstadoPagos =
