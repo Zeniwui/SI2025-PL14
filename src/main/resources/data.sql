@@ -85,27 +85,27 @@ insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_socio, cos
 	(1, date('now'), '12:00', '13:00', 2, 10.0, 'Pendiente', 'Efectivo'),
 	(1, date('now'), '15:00', '16:00', 3, 10.0, 'Pagado',    'Tarjeta'),
 	(1, date('now'), '18:00', '19:00', 4, 10.0, 'Pendiente', 'Tarjeta'),
-	(1, date('now'), '14:00', '15:00', 0, 10.0, 'Pagado',    'Tarjeta'),   -- socio 0
-	(1, date('now'), '17:00', '18:00', 0, 10.0, 'Pendiente', 'Efectivo'),  -- socio 0
+	(1, date('now'), '14:00', '15:00', 0, 10.0, 'Pagado',    'Tarjeta'),
+	(1, date('now'), '17:00', '18:00', 0, 10.0, 'Pendiente', 'Efectivo'),
 	-- Pista de Padel
 	(5, date('now'), '11:00', '12:00', 5, 12.0, 'Pendiente', 'Efectivo'),
 	(5, date('now'), '16:00', '17:00', 6, 12.0, 'Pagado',    'Tarjeta'),
-	(5, date('now'), '13:00', '14:00', 0, 12.0, 'Pagado',    'Tarjeta'),   -- socio 0
+	(5, date('now'), '13:00', '14:00', 0, 12.0, 'Pagado',    'Tarjeta'),
 	-- Piscina Cubierta
 	(3, date('now'), '11:00', '12:00', 2,  5.0, 'Pendiente', 'Efectivo'),
-	(3, date('now'), '10:00', '11:00', 0,  5.0, 'Pagado',    'Tarjeta'),   -- socio 0
+	(3, date('now'), '10:00', '11:00', 0,  5.0, 'Pagado',    'Tarjeta'),
 	-- Gimnasio
 	(4, date('now'), '08:00', '09:00', 4,  3.0, 'Pagado',    'Tarjeta'),
 	(4, date('now'), '10:00', '11:00', 5,  3.0, 'Pagado',    'Tarjeta'),
 	(4, date('now'), '12:00', '13:00', 6,  3.0, 'Pendiente', 'Efectivo'),
-	(4, date('now'), '16:00', '17:00', 0,  3.0, 'Pagado',    'Tarjeta');   -- socio 0
+	(4, date('now'), '16:00', '17:00', 0,  3.0, 'Pagado',    'Tarjeta');
 
 -- ── HOY +1 ────────────────────────────────────────────────────────────────────
 insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_socio, coste_reserva, estado_pago, metodo_pago) values
 	(1, date('now','+1 day'), '08:00', '10:00', 1, 20.0, 'Pendiente', 'Tarjeta'),
 	(1, date('now','+1 day'), '12:00', '13:00', 3, 10.0, 'Pendiente', 'Efectivo'),
-	(1, date('now','+1 day'), '11:00', '12:00', 0, 10.0, 'Pendiente', 'Tarjeta'),  -- socio 0
-	(3, date('now','+1 day'), '09:00', '10:00', 0,  5.0, 'Pendiente', 'Tarjeta'),  -- socio 0
+	(1, date('now','+1 day'), '11:00', '12:00', 0, 10.0, 'Pendiente', 'Tarjeta'),
+	(3, date('now','+1 day'), '09:00', '10:00', 0,  5.0, 'Pendiente', 'Tarjeta'),
 	(5, date('now','+1 day'), '20:00', '21:00', 4, 12.0, 'Pendiente', 'Tarjeta'),
 	(5, date('now','+1 day'), '16:00', '17:00', 5, 12.0, 'Pagado',    'Tarjeta');
 
@@ -114,64 +114,64 @@ insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_socio, cos
 	(1, date('now','+2 day'), '09:00', '10:00', 2, 10.0, 'Pendiente', 'Tarjeta'),
 	(1, date('now','+2 day'), '13:00', '14:00', 6, 10.0, 'Pendiente', 'Efectivo'),
 	(5, date('now','+2 day'), '18:00', '19:00', 3, 12.0, 'Pendiente', 'Efectivo'),
-	(5, date('now','+2 day'), '09:00', '10:00', 0, 12.0, 'Pendiente', 'Efectivo'), -- socio 0
-	(4, date('now','+2 day'), '11:00', '12:00', 0,  3.0, 'Pendiente', 'Tarjeta');  -- socio 0
+	(5, date('now','+2 day'), '09:00', '10:00', 0, 12.0, 'Pendiente', 'Efectivo'),
+	(4, date('now','+2 day'), '11:00', '12:00', 0,  3.0, 'Pendiente', 'Tarjeta');
 
 -- ── HOY +3 ────────────────────────────────────────────────────────────────────
 insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_socio, coste_reserva, estado_pago, metodo_pago) values
 	(1, date('now','+3 day'), '10:00', '11:00', 1, 10.0, 'Pendiente', 'Tarjeta'),
-	(1, date('now','+3 day'), '14:00', '15:00', 0, 10.0, 'Pendiente', 'Tarjeta'),  -- socio 0
-	(3, date('now','+3 day'), '15:00', '16:00', 0,  5.0, 'Pendiente', 'Tarjeta');  -- socio 0
+	(1, date('now','+3 day'), '14:00', '15:00', 0, 10.0, 'Pendiente', 'Tarjeta'),
+	(3, date('now','+3 day'), '15:00', '16:00', 0,  5.0, 'Pendiente', 'Tarjeta');
 
 -- ── HOY +5 ────────────────────────────────────────────────────────────────────
 insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_socio, coste_reserva, estado_pago, metodo_pago) values
 	(4, date('now','+5 day'), '09:00', '10:00', 3,  3.0, 'Pendiente', 'Efectivo'),
 	(4, date('now','+5 day'), '11:00', '12:00', 1,  3.0, 'Pendiente', 'Tarjeta'),
-	(4, date('now','+5 day'), '10:00', '11:00', 0,  3.0, 'Pendiente', 'Tarjeta'),  -- socio 0
-	(1, date('now','+5 day'), '16:00', '17:00', 0, 10.0, 'Pagado',    'Tarjeta'),  -- socio 0
-	(5, date('now','+5 day'), '10:00', '11:00', 0, 12.0, 'Pendiente', 'Efectivo'); -- socio 0
+	(4, date('now','+5 day'), '10:00', '11:00', 0,  3.0, 'Pendiente', 'Tarjeta'),
+	(1, date('now','+5 day'), '16:00', '17:00', 0, 10.0, 'Pagado',    'Tarjeta'),
+	(5, date('now','+5 day'), '10:00', '11:00', 0, 12.0, 'Pendiente', 'Efectivo');
 
 -- ── HOY +7 ────────────────────────────────────────────────────────────────────
 insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_socio, coste_reserva, estado_pago, metodo_pago) values
 	(1, date('now','+7 day'), '09:00', '10:00', 2, 10.0, 'Pendiente', 'Tarjeta'),
-	(1, date('now','+7 day'), '12:00', '13:00', 0, 10.0, 'Pendiente', 'Tarjeta'),  -- socio 0
-	(3, date('now','+7 day'), '10:00', '11:00', 0,  5.0, 'Pagado',    'Tarjeta'),  -- socio 0
-	(4, date('now','+7 day'), '18:00', '19:00', 0,  3.0, 'Pendiente', 'Efectivo'); -- socio 0
+	(1, date('now','+7 day'), '12:00', '13:00', 0, 10.0, 'Pendiente', 'Tarjeta'),
+	(3, date('now','+7 day'), '10:00', '11:00', 0,  5.0, 'Pagado',    'Tarjeta'),
+	(4, date('now','+7 day'), '18:00', '19:00', 0,  3.0, 'Pendiente', 'Efectivo');
 
 -- ── HOY +10 ───────────────────────────────────────────────────────────────────
 insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_socio, coste_reserva, estado_pago, metodo_pago) values
 	(5, date('now','+10 day'), '11:00', '12:00', 1, 12.0, 'Pendiente', 'Tarjeta'),
-	(5, date('now','+10 day'), '14:00', '15:00', 0, 12.0, 'Pendiente', 'Tarjeta'),  -- socio 0
-	(1, date('now','+10 day'), '09:00', '10:00', 0, 10.0, 'Pendiente', 'Efectivo'), -- socio 0
-	(3, date('now','+10 day'), '16:00', '17:00', 0,  5.0, 'Pendiente', 'Tarjeta');  -- socio 0
+	(5, date('now','+10 day'), '14:00', '15:00', 0, 12.0, 'Pendiente', 'Tarjeta'),
+	(1, date('now','+10 day'), '09:00', '10:00', 0, 10.0, 'Pendiente', 'Efectivo'),
+	(3, date('now','+10 day'), '16:00', '17:00', 0,  5.0, 'Pendiente', 'Tarjeta');
 
 -- ── HOY +14 ───────────────────────────────────────────────────────────────────
 insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_socio, coste_reserva, estado_pago, metodo_pago) values
-	(4, date('now','+14 day'), '09:00', '10:00', 3,  3.0, 'Pendiente', 'Efectivo'); -- socio 3
+	(4, date('now','+14 day'), '09:00', '10:00', 3,  3.0, 'Pendiente', 'Efectivo');
 
 -- ── HOY +18 ───────────────────────────────────────────────────────────────────
 insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_socio, coste_reserva, estado_pago, metodo_pago) values
-	(1, date('now','+18 day'), '10:00', '11:00', 0, 10.0, 'Pendiente', 'Tarjeta'),  -- socio 0
-	(3, date('now','+18 day'), '12:00', '13:00', 0,  5.0, 'Pendiente', 'Efectivo'), -- socio 0
+	(1, date('now','+18 day'), '10:00', '11:00', 0, 10.0, 'Pendiente', 'Tarjeta'),
+	(3, date('now','+18 day'), '12:00', '13:00', 0,  5.0, 'Pendiente', 'Efectivo'),
 	(5, date('now','+18 day'), '17:00', '18:00', 4, 12.0, 'Pendiente', 'Tarjeta');
 
 -- ── HOY +21 ───────────────────────────────────────────────────────────────────
 insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_socio, coste_reserva, estado_pago, metodo_pago) values
-	(5, date('now','+21 day'), '09:00', '10:00', 0, 12.0, 'Pendiente', 'Tarjeta'),  -- socio 0
-	(4, date('now','+21 day'), '11:00', '12:00', 0,  3.0, 'Pendiente', 'Tarjeta'),  -- socio 0
+	(5, date('now','+21 day'), '09:00', '10:00', 0, 12.0, 'Pendiente', 'Tarjeta'),
+	(4, date('now','+21 day'), '11:00', '12:00', 0,  3.0, 'Pendiente', 'Tarjeta'),
 	(1, date('now','+21 day'), '14:00', '15:00', 2, 10.0, 'Pendiente', 'Efectivo');
 
 -- ── HOY +25 ───────────────────────────────────────────────────────────────────
 insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_socio, coste_reserva, estado_pago, metodo_pago) values
-	(1, date('now','+25 day'), '11:00', '12:00', 0, 10.0, 'Pendiente', 'Tarjeta'),  -- socio 0
-	(3, date('now','+25 day'), '10:00', '11:00', 0,  5.0, 'Pendiente', 'Efectivo'), -- socio 0
-	(5, date('now','+25 day'), '15:00', '16:00', 0, 12.0, 'Pendiente', 'Tarjeta'),  -- socio 0
+	(1, date('now','+25 day'), '11:00', '12:00', 0, 10.0, 'Pendiente', 'Tarjeta'),
+	(3, date('now','+25 day'), '10:00', '11:00', 0,  5.0, 'Pendiente', 'Efectivo'),
+	(5, date('now','+25 day'), '15:00', '16:00', 0, 12.0, 'Pendiente', 'Tarjeta'),
 	(4, date('now','+25 day'), '08:00', '09:00', 1,  3.0, 'Pagado',    'Tarjeta');
 
 -- ── HOY +29 ───────────────────────────────────────────────────────────────────
 insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_socio, coste_reserva, estado_pago, metodo_pago) values
-	(1, date('now','+29 day'), '09:00', '10:00', 0, 10.0, 'Pendiente', 'Tarjeta'),  -- socio 0
-	(4, date('now','+29 day'), '16:00', '17:00', 0,  3.0, 'Pendiente', 'Efectivo'), -- socio 0
+	(1, date('now','+29 day'), '09:00', '10:00', 0, 10.0, 'Pendiente', 'Tarjeta'),
+	(4, date('now','+29 day'), '16:00', '17:00', 0,  3.0, 'Pendiente', 'Efectivo'),
 	(5, date('now','+29 day'), '13:00', '14:00', 3, 12.0, 'Pendiente', 'Efectivo');
 
 -- ─── RESERVAS DE ACTIVIDADES REGULARES ───────────────────────────────────────
@@ -218,7 +218,7 @@ insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_actividad,
 	(3, date('now'),         '18:00', '19:00', 8, 0.0, 'Cuota'),
 	(3, date('now','+1 day'),'18:00', '19:00', 8, 0.0, 'Cuota');
 
--- ─── RESERVAS DE EVENTOS SOCIALES(Actividades tmb) ────────────────────────────────────────────
+-- ─── RESERVAS DE EVENTOS SOCIALES ────────────────────────────────────────────
 
 -- Torneo de Voley Playa (id=9) en Polideportivo (id=6): 4h 09:00-13:00
 insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_actividad, coste_reserva, estado_pago) values
@@ -251,13 +251,12 @@ insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_actividad,
 insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_actividad, coste_reserva, estado_pago) values
 	(6, date('now','+6 day'), '09:00', '14:00', 14, 0.0, 'Cuota'),
 	(6, date('now','+25 day'),'09:00', '14:00', 14, 0.0, 'Cuota');
+
 -- ═══════════════════════════════════════════════════════════════════════════════
--- BLOQUE +14 DÍAS: 20 NUEVAS ACTIVIDADES + 15 RESERVAS DE SOCIOS
+-- BLOQUE +14 DÍAS: 20 NUEVAS ACTIVIDADES + RESERVAS DE SOCIOS
 -- ═══════════════════════════════════════════════════════════════════════════════
 
 -- ─── 20 NUEVAS ACTIVIDADES (ids 15-34) ───────────────────────────────────────
--- Regulares (es_evento_social=0): ids 15-26
--- Eventos sociales (es_evento_social=1): ids 27-34
 insert into Actividades(nombre, descripcion, id_instalacion, aforo, fecha_inicio, fecha_fin, precio_socio, precio_no_socio, id_periodo, es_evento_social) values
 	('Tenis Iniciacion',          'Clase grupal de tenis para principiantes (1h)',     1,  8, '2026-02-01', '2026-06-30',  6.0, 12.0, 1, 0),
 	('Tenis Avanzado',            'Entrenamiento de tenis alto nivel (2h)',             2,  6, '2026-02-01', '2026-06-30', 10.0, 18.0, 1, 0),
@@ -281,37 +280,28 @@ insert into Actividades(nombre, descripcion, id_instalacion, aforo, fecha_inicio
 	('Gran Gala Deportiva',       'Evento de clausura de temporada (4h)',               6, 120,'2026-02-01', '2026-06-30',  5.0, 12.0, 1, 1);
 
 -- ─── RESERVAS DE SOCIOS EN +14 DÍAS ──────────────────────────────────────────
--- Socio 0: 6 reservas (ya tiene 3 de bloques anteriores: gym 10h, tenis 15h, padel 11h)
--- Socios 1-6: el resto repartido
 insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_socio, coste_reserva, estado_pago, metodo_pago) values
-	-- Socio 0 (6 reservas)
 	(1, date('now','+14 day'), '08:00', '09:00', 0, 10.0, 'Pendiente', 'Tarjeta'),
 	(2, date('now','+14 day'), '09:00', '10:00', 0, 10.0, 'Pendiente', 'Efectivo'),
 	(3, date('now','+14 day'), '08:00', '09:00', 0,  5.0, 'Pagado',    'Tarjeta'),
 	(4, date('now','+14 day'), '20:00', '21:00', 0,  3.0, 'Pendiente', 'Tarjeta'),
 	(5, date('now','+14 day'), '19:00', '20:00', 0, 12.0, 'Pendiente', 'Efectivo'),
 	(6, date('now','+14 day'), '08:00', '09:00', 0,  8.0, 'Pagado',    'Tarjeta'),
-	(5, date('now','+9 day'), '19:00', '20:00', 0, 12.0, 'Pendiente', 'Efectivo'),
+	(5, date('now','+9 day'),  '19:00', '20:00', 0, 12.0, 'Pendiente', 'Efectivo'),
 	(4, date('now','+24 day'), '11:00', '13:00', 0,  9.0, 'Pagado',    'Tarjeta'),
-	-- Socio 1 — Carlos
 	(1, date('now','+14 day'), '10:00', '11:00', 1, 10.0, 'Pagado',    'Tarjeta'),
 	(4, date('now','+14 day'), '09:00', '10:00', 1,  3.0, 'Pagado',    'Tarjeta'),
 	(5, date('now','+14 day'), '16:00', '17:00', 1, 12.0, 'Pendiente', 'Tarjeta'),
-	-- Socio 2 — Maria
 	(2, date('now','+14 day'), '10:00', '11:00', 2, 10.0, 'Pagado',    'Tarjeta'),
 	(3, date('now','+14 day'), '14:00', '15:00', 2,  5.0, 'Pendiente', 'Efectivo'),
 	(6, date('now','+14 day'), '10:00', '11:00', 2,  8.0, 'Pagado',    'Tarjeta'),
-	-- Socio 3 — Pedro
 	(1, date('now','+14 day'), '12:00', '13:00', 3, 10.0, 'Pendiente', 'Efectivo'),
 	(5, date('now','+14 day'), '09:00', '10:00', 3, 12.0, 'Pendiente', 'Efectivo'),
-	-- Socio 4 — Ana
 	(2, date('now','+14 day'), '14:00', '15:00', 4, 10.0, 'Pagado',    'Tarjeta'),
 	(3, date('now','+14 day'), '11:00', '12:00', 4,  5.0, 'Pagado',    'Tarjeta'),
 	(4, date('now','+14 day'), '13:00', '14:00', 4,  3.0, 'Pendiente', 'Tarjeta'),
-	-- Socio 5 — Luis
 	(1, date('now','+14 day'), '16:00', '17:00', 5, 10.0, 'Pendiente', 'Efectivo'),
 	(6, date('now','+14 day'), '15:00', '16:00', 5,  8.0, 'Pagado',    'Tarjeta'),
-	-- Socio 6 — Sofia
 	(2, date('now','+14 day'), '16:00', '17:00', 6, 10.0, 'Pendiente', 'Tarjeta'),
 	(5, date('now','+14 day'), '20:00', '21:00', 6, 12.0, 'Pendiente', 'Efectivo'),
 	(3, date('now','+14 day'), '20:00', '21:00', 6,  5.0, 'Pendiente', 'Tarjeta');
@@ -334,8 +324,7 @@ insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_actividad,
 	(4, date('now','+15 day'), '07:00', '08:00', 17, 0.0, 'Cuota'),
 	(4, date('now','+16 day'), '07:00', '08:00', 17, 0.0, 'Cuota');
 
--- Pilates Vespertino (id=18) Gimnasio: 21:00-22:00 (fuera del horario standard, muestra "cerrado" -> OK para test)
--- Usamos 20:00-21:00 para que quede visible en horario
+-- Pilates Vespertino (id=18) Gimnasio: 20:30-21:30
 insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_actividad, coste_reserva, estado_pago) values
 	(4, date('now','+14 day'), '20:30', '21:30', 18, 0.0, 'Cuota'),
 	(4, date('now','+15 day'), '20:30', '21:30', 18, 0.0, 'Cuota');
@@ -363,8 +352,7 @@ insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_actividad,
 	(4, date('now','+15 day'), '18:00', '19:00', 22, 0.0, 'Cuota'),
 	(4, date('now','+17 day'), '18:00', '19:00', 22, 0.0, 'Cuota');
 
--- Padel Iniciacion (id=23) Padel: 21:00 fuera horario, usamos dentro apertura
--- Padel abre L-V hasta 21:00, ponemos 13:00-14:00 el dia +15 que no choca
+-- Padel Iniciacion (id=23) Padel: 13:00-14:00
 insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_actividad, coste_reserva, estado_pago) values
 	(5, date('now','+15 day'), '13:00', '14:00', 23, 0.0, 'Cuota'),
 	(5, date('now','+17 day'), '13:00', '14:00', 23, 0.0, 'Cuota');
@@ -385,42 +373,42 @@ insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_actividad,
 	(6, date('now','+14 day'), '16:00', '18:00', 26, 0.0, 'Cuota'),
 	(6, date('now','+16 day'), '16:00', '18:00', 26, 0.0, 'Cuota');
 
--- Torneo Tenis Dobles (id=27) Tenis 2: 3h 08:00-11:00 — EVENTO SOCIAL
+-- Torneo Tenis Dobles (id=27) Tenis 2: 3h 08:00-11:00
 insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_actividad, coste_reserva, estado_pago) values
 	(2, date('now','+14 day'), '08:00', '11:00', 27, 0.0, 'Cuota'),
 	(2, date('now','+21 day'), '08:00', '11:00', 27, 0.0, 'Cuota');
 
--- Noche de Natacion (id=28) Piscina: 3h 17:00-20:00 — EVENTO SOCIAL
+-- Noche de Natacion (id=28) Piscina: 3h 17:00-20:00
 insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_actividad, coste_reserva, estado_pago) values
 	(3, date('now','+14 day'), '17:00', '20:00', 28, 0.0, 'Cuota'),
 	(3, date('now','+22 day'), '17:00', '20:00', 28, 0.0, 'Cuota');
 
--- Copa Club de Padel (id=29) Padel: 4h 08:00-12:00 — EVENTO SOCIAL
+-- Copa Club de Padel (id=29) Padel: 4h 08:00-12:00
 insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_actividad, coste_reserva, estado_pago) values
 	(5, date('now','+15 day'), '08:00', '12:00', 29, 0.0, 'Cuota'),
 	(5, date('now','+23 day'), '08:00', '12:00', 29, 0.0, 'Cuota');
 
--- Festival Multideporte (id=30) Polideportivo: 5h 09:00-14:00 — EVENTO SOCIAL
+-- Festival Multideporte (id=30) Polideportivo: 5h 09:00-14:00
 insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_actividad, coste_reserva, estado_pago) values
 	(6, date('now','+14 day'), '09:00', '14:00', 30, 0.0, 'Cuota'),
 	(6, date('now','+24 day'), '09:00', '14:00', 30, 0.0, 'Cuota');
 
--- Maraton de Spinning (id=31) Gimnasio: 3h 10:00-13:00 — EVENTO SOCIAL
+-- Maraton de Spinning (id=31) Gimnasio: 3h 10:00-13:00
 insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_actividad, coste_reserva, estado_pago) values
 	(4, date('now','+14 day'), '10:00', '13:00', 31, 0.0, 'Cuota'),
 	(4, date('now','+20 day'), '10:00', '13:00', 31, 0.0, 'Cuota');
 
--- Torneo Familiar Tenis (id=32) Tenis 1: 3h 14:00-17:00 — EVENTO SOCIAL
+-- Torneo Familiar Tenis (id=32) Tenis 1: 3h 14:00-17:00
 insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_actividad, coste_reserva, estado_pago) values
 	(1, date('now','+14 day'), '14:00', '17:00', 32, 0.0, 'Cuota'),
 	(1, date('now','+22 day'), '14:00', '17:00', 32, 0.0, 'Cuota');
 
--- Exhibicion de Boxeo (id=33) Polideportivo: 3h 17:00-20:00 — EVENTO SOCIAL
+-- Exhibicion de Boxeo (id=33) Polideportivo: 3h 17:00-20:00
 insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_actividad, coste_reserva, estado_pago) values
 	(6, date('now','+15 day'), '17:00', '20:00', 33, 0.0, 'Cuota'),
 	(6, date('now','+23 day'), '17:00', '20:00', 33, 0.0, 'Cuota');
 
--- Gran Gala Deportiva (id=34) Polideportivo: 4h 16:00-20:00 — EVENTO SOCIAL
+-- Gran Gala Deportiva (id=34) Polideportivo: 4h 16:00-20:00
 insert into Reservas(id_instalacion, fecha, hora_inicio, hora_fin, id_actividad, coste_reserva, estado_pago) values
 	(6, date('now','+16 day'), '16:00', '20:00', 34, 0.0, 'Cuota'),
 	(6, date('now','+28 day'), '16:00', '20:00', 34, 0.0, 'Cuota');
