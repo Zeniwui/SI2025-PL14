@@ -1,7 +1,5 @@
 package si.pl14.model;
 
-// clase para getters y setters de los elementos de la tabla "actividad" de la base de datos
-
 public class ActividadEntity {
 	private int idActividad;
     private String nombre;
@@ -55,14 +53,15 @@ public class ActividadEntity {
 	public String getFechaFin() {
 		return fechaFin;
 	}
-	
-	public String getFechaFinNS() {
-		return fechaFinNS;
-	}
-	
 	public void setFechaFin(String fechaFin) {
 		this.fechaFin = fechaFin;
 	}
+	public String getFechaFinNS() {
+		return fechaFinNS;
+	}
+	public void setFechaFinNS(String fechaFinNS) {
+        this.fechaFinNS = fechaFinNS;
+    }
 	public double getPrecioSocio() {
 		return precioSocio;
 	}
@@ -81,7 +80,5 @@ public class ActividadEntity {
 	public void setIdPeriodo(int idPeriodo) {
 		this.idPeriodo = idPeriodo;
 	}
-	public void setFechaFinNS(String fechaFinNS) {
-        this.fechaFinNS = fechaFinNS;
-    }
+
 }

@@ -100,10 +100,6 @@ public class SwingMain {
             }
         });
         frame.getContentPane().add(btnDebugBD);
-        
-        // ----------------------------------
 	}
-
-	public JFrame getFrame() { return this.frame; }
 	
 }

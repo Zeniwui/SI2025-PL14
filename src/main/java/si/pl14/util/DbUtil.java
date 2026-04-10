@@ -134,10 +134,16 @@ public abstract class DbUtil {
 			line = line.trim();
 			if (line.length() == 0 || line.startsWith("--")) // ignora lineas vacias comentarios de linea
 				continue;
+			// elimina comentarios de linea al final de la sentencia
+			int commentIdx = line.indexOf("--");
+			if (commentIdx >= 0)
+				line = line.substring(0, commentIdx).trim();
+			if (line.length() == 0)
+				continue;
 			if (line.endsWith(";")) {
 				String sql = previousLines.toString() + line;
 				// separa drop del resto
-				if (line.toLowerCase().startsWith("drop"))
+				if (sql.trim().toLowerCase().startsWith("drop"))
 					batchDrop.add(sql);
 				else
 					batchUpdate.add(sql);
