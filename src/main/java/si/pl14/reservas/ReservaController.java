@@ -22,6 +22,7 @@ public class ReservaController {
 	private ReservaView view;
 	
 	private final int ID_SOCIO_ACTUAL = 1;
+	private String nombreSocioActual;
 	private final int HORAS_MAXIMAS_SEGUIDAS = 2;
 	private final int HORAS_MAXIMAS_DIA = 3;
 	private final int HORAS_MAXIMAS_MES = 8;
@@ -35,6 +36,8 @@ public class ReservaController {
 	}
 	
 	public void initView() {
+		this.nombreSocioActual = model.getNombreSocioById(ID_SOCIO_ACTUAL);
+		
 		this.getInstalaciones();
 		
 		Date hoy = new Date();
@@ -150,7 +153,36 @@ public class ReservaController {
 		return maxConsecutivas > HORAS_MAXIMAS_SEGUIDAS;
 	}
 	
+	private boolean sonDatosInterfazValidos() {
+		InstalacionEntity instalacionSeleccionada = (InstalacionEntity) view.getCbInstalaciones().getSelectedItem();
+		
+		if (instalacionSeleccionada == null || instalacionSeleccionada.getIdInstalacion() <= 0) {
+			view.setTextoInformacion("SELECCIONA UNA INSTALACIÓN");
+			return false;
+		}
+		
+		int horaInicioSeleccionada = view.getHoraInicio();
+		int horaFinSeleccionada = view.getHoraFin();
+		
+		if (horaInicioSeleccionada == -1 || horaFinSeleccionada == -1) {
+		    view.setTextoInformacion("Por favor, selecciona una hora de inicio y de fin.");
+		    return false;
+		}
+		
+		if (horaFinSeleccionada <= horaInicioSeleccionada)  {
+			view.setTextoInformacion("LA HORA DE INICIO DEBE SER ANTERIOR A LA HORA DE FIN");
+			return false;
+		}
+
+		return true;
+	}
+	
 	private void realizarReserva() {
+		
+		if (!sonDatosInterfazValidos()) {
+			return; 
+		}
+		
 		Date fechaDate = view.getCalendarFecha().getDate();
 		
 		LocalDate fechaSeleccionadaLocal = fechaDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
@@ -203,29 +235,21 @@ public class ReservaController {
 			horasYaReservadasMes += (r.getHoraFin() - r.getHoraInicio());
 		}
 		
-		if (idInstalacionSeleccionada <= 0) {									//Comprobamos que este seleccionada una instalacion
-			view.setTextoInformacion("SELECCIONA UNA INSTALACIÓN");
-		} else if (horaInicioSeleccionada == -1 || horaFinSeleccionada == -1) {	//Comprobamos que haya seleccionada una hora de inicio y una hora de fin
-		    view.setTextoInformacion("Por favor, selecciona una hora de inicio y de fin.");
-		} else if(!model.estaAlCorriente(ID_SOCIO_ACTUAL)) {					//Comprobamos que el socio esté al corriente con los pagos
+		if(!model.estaAlCorriente(ID_SOCIO_ACTUAL)) {					
 			view.setTextoInformacion("SOCIO CON PAGOS PENDIENTES. NO PUEDE RESERVAR");
-		} else if (diasAntelacion < 0) {										//Comprobamos que la fecha no sea un día anterior a hoy
+		} else if (diasAntelacion < 0) {										
 			view.setTextoInformacion("NO SE PUEDE RESERVAR EN FECHAS PASADAS");
-		} else if (diasAntelacion == 0 && horaInicioSeleccionada <= horaActual) {  //Comprobamos que la hora que quiere reservar para hoy no haya pasado ya
-			view.setTextoInformacion("NO PUEDES RESERVAR EN UNA HORA QUE YA HA PASADO");
-		} else if (diasAntelacion > DIAS_MAXIMOS_ANTELACION) {					//Comprobamos que los dias de antelación no superen el numero descrito como parametro
+		} else if (diasAntelacion > DIAS_MAXIMOS_ANTELACION) {					
 			view.setTextoInformacion("SÓLO SE PUEDE RESERVAR CON " + DIAS_MAXIMOS_ANTELACION + " DÍAS DE ANTELACIÓN");
-		} else if (horaFinSeleccionada <= horaInicioSeleccionada)  {			//Comprobamos que la hora de inicio sea menor a la hora de fin
-			view.setTextoInformacion("LA HORA DE INICIO DEBE SER ANTERIOR A LA HORA DE FIN");
-		} else if ((horaFinSeleccionada - horaInicioSeleccionada) > HORAS_MAXIMAS_SEGUIDAS) {	//Comprobamos que la reserva no dure mas de unas horas determinadas
+		} else if (horasAReservar > HORAS_MAXIMAS_SEGUIDAS) {	
 			view.setTextoInformacion("NO SE PERMITE RESERVAR MAS DE " + HORAS_MAXIMAS_SEGUIDAS + " HORAS SEGUIDAS");
-		} else if (superaHorasSeguidas(reservasSocioDia, horaInicioSeleccionada, horaFinSeleccionada)) {	//Comprobamos que no se pueda reservar mas de unas horas seguidas aunque sean diferentes reservas
+		} else if (superaHorasSeguidas(reservasSocioDia, horaInicioSeleccionada, horaFinSeleccionada)) {	
 			view.setTextoInformacion("NO SE PERMITE RESERVAR MÁS DE " + HORAS_MAXIMAS_SEGUIDAS + " HORAS SEGUIDAS");
-		} else if ((horasYaReservadasDia + horasAReservar) > HORAS_MAXIMAS_DIA) {							//Comprobamos que no se puedan reservar mas de un numero de horas diarias
+		} else if ((horasYaReservadasDia + horasAReservar) > HORAS_MAXIMAS_DIA) {							
 			view.setTextoInformacion("LÍMITE DIARIO: NO SE PUEDEN RESERVAR MÁS DE " + HORAS_MAXIMAS_DIA + " HORAS AL DÍA");
-		} else if ((horasYaReservadasMes + horasAReservar) > HORAS_MAXIMAS_MES) {							//Comprobamos que no se puedan reservar mas de un numero de horas al mes
+		} else if ((horasYaReservadasMes + horasAReservar) > HORAS_MAXIMAS_MES) {							
 			view.setTextoInformacion("LÍMITE MENSUAL: NO SE PUEDEN RESERVAR MÁS DE " + HORAS_MAXIMAS_MES + " HORAS AL MES");
-		} else if (!model.estaLibreAEsasHoras(fechaSeleccionada, horaInicioSeleccionada, horaFinSeleccionada, idInstalacionSeleccionada)) {		// Comprobamos que la instalacion este libre a esas horas ese dia
+		} else if (!model.estaLibreAEsasHoras(fechaSeleccionada, horaInicioSeleccionada, horaFinSeleccionada, idInstalacionSeleccionada)) {		
 			view.setTextoInformacion("LA INSTALACIÓN NO ESTÁ DISPONIBLE EN ESE HORARIO");
 		} else {
 			
@@ -249,9 +273,9 @@ public class ReservaController {
 			    reserva.setEstadoPago("Pendiente");
 			}
 			
-			model.realizarReserva(reserva);
+			model.realizarReserva(reserva, instalacionSeleccionada.getNombre());
 			
-			String textoResguardo = model.generarResguardo(reserva, instalacionSeleccionada.getNombre());
+			String textoResguardo = model.generarResguardo(reserva, instalacionSeleccionada.getNombre(), nombreSocioActual);
 			view.setTextoResumen(textoResguardo);
 			
 			SwingUtil.showMessage("Reserva realizada con éxito.\n\n" + textoResguardo, 
