@@ -1,4 +1,4 @@
-package si.pl14.reservas;
+package si.pl14.reservasSocio;
 
 import java.util.List;
 

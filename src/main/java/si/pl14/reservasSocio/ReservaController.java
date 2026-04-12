@@ -1,4 +1,4 @@
-package si.pl14.reservas;
+package si.pl14.reservasSocio;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -239,6 +239,8 @@ public class ReservaController {
 			view.setTextoInformacion("SOCIO CON PAGOS PENDIENTES. NO PUEDE RESERVAR");
 		} else if (diasAntelacion < 0) {										
 			view.setTextoInformacion("NO SE PUEDE RESERVAR EN FECHAS PASADAS");
+		} else if (diasAntelacion == 0 && horaInicioSeleccionada <= horaActual) {   
+		    view.setTextoInformacion("NO SE PUEDE RESERVAR EN UNA HORA QUE YA HA PASADO");
 		} else if (diasAntelacion > DIAS_MAXIMOS_ANTELACION) {					
 			view.setTextoInformacion("SÓLO SE PUEDE RESERVAR CON " + DIAS_MAXIMOS_ANTELACION + " DÍAS DE ANTELACIÓN");
 		} else if (horasAReservar > HORAS_MAXIMAS_SEGUIDAS) {	
