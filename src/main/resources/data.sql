@@ -9,6 +9,11 @@ DELETE FROM Usuarios;
 -- Insertar Usuario y Socio con ID EXPLÍCITO
 INSERT INTO Usuarios (dni, nombre, apellidos, telefono, email) 
 VALUES ('12345678A', 'Carlos', 'Gomez', 600111222, 'carlos@email.com');
+INSERT INTO Usuarios (dni, nombre, apellidos, telefono, email) 
+VALUES ('11111111A', 'Marcos', 'Suarez', 600333222, 'ma@email.com');
+INSERT INTO Usuarios (dni, nombre, apellidos, telefono, email) 
+VALUES ('22222222A', 'Lucia', 'Perez', 600444222, 'luci@email.com');
+
 
 INSERT INTO Socios (id_socio, dni, contrasena, estado_pagos) 
 VALUES (1, '12345678A', 'pass123', 'Al Corriente');

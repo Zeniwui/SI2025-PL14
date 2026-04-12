@@ -7,7 +7,7 @@ import java.awt.*;
 
 public class AnulacionView extends JFrame {
     private JTextField txtNombre, txtDni, txtId;
-    private JButton btnBuscarNombre, btnBuscarDni, btnBuscarId, btnAnular;
+    private JButton btnBuscarNombre, btnBuscarDni, btnBuscarId, btnAnular, btnLimpiar;
     private JTable tablaReservas;
     private DefaultTableModel modeloTabla;
     private JLabel lblReservaSeleccionada;
@@ -39,6 +39,10 @@ public class AnulacionView extends JFrame {
         getContentPane().add(txtId, "cell 1 2, growx");
         btnBuscarId = new JButton("Buscar por ID");
         getContentPane().add(btnBuscarId, "cell 2 2, growx");
+        
+        // A la derecha: botón de limpiar
+        btnLimpiar = new JButton("LIMPIAR RESULTADOS");
+        getContentPane().add(btnLimpiar, "cell 3 2, growx");
 
         // Fila 3: Tabla de Reservas
         String[] columnas = {"ID Reserva", "Instalación", "Fecha", "H. Inicio", "H. Fin", "Coste", "ID Socio", "DNI Socio", "Nombre Socio"};
@@ -79,6 +83,7 @@ public class AnulacionView extends JFrame {
     public JButton getBtnBuscarDni() { return btnBuscarDni; }
     public JButton getBtnBuscarId() { return btnBuscarId; }
     public JButton getBtnAnular() { return btnAnular; }
+    public JButton getBtnLimpiar() { return btnLimpiar; }
     public JTable getTablaReservas() { return tablaReservas; }
     public DefaultTableModel getModeloTabla() { return modeloTabla; }
     public JLabel getLblReservaSeleccionada() { return lblReservaSeleccionada; }

@@ -17,7 +17,6 @@ public class AnulacionModel {
         private String dniSocio;
         private String nombreSocio;
 
-        // Getters y Setters
         public int getIdReserva() { return idReserva; }
         public void setIdReserva(int id) { this.idReserva = id; }
         public String getInstalacion() { return instalacion; }
@@ -48,15 +47,17 @@ public class AnulacionModel {
                "LEFT JOIN Usuarios u ON s.dni = u.dni ";
     }
 
-    // Compara la FECHA primero. Si la fecha es igual a hoy, mira la HORA.
+ 
     private String getTimeFilter() {
-        return " WHERE (date(r.fecha) > date('now')) " +
-               " OR (date(r.fecha) = date('now') AND time(r.hora_inicio) > time('now', 'localtime')) ";
+        return " WHERE ((date(r.fecha) > date('now')) " +
+               " OR (date(r.fecha) = date('now') AND time(r.hora_inicio) > time('now', 'localtime'))) ";
     }
 
     public List<ReservaDetalleDTO> getReservasPorNombre(String nombre) {
-        String sql = getBaseQuery() + getTimeFilter() + " AND nombreSocio LIKE ? ORDER BY r.fecha ASC";
-        return db.executeQueryPojo(ReservaDetalleDTO.class, sql, "%" + nombre + "%");
+        // Filtramos por las columnas reales de la tabla Usuarios (u)
+        String sql = getBaseQuery() + getTimeFilter() + 
+                     " AND (u.nombre LIKE ? OR u.apellidos LIKE ?) ORDER BY r.fecha ASC";
+        return db.executeQueryPojo(ReservaDetalleDTO.class, sql, "%" + nombre + "%", "%" + nombre + "%");
     }
 
     public List<ReservaDetalleDTO> getReservasPorDni(String dni) {

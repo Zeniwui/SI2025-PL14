@@ -20,6 +20,7 @@ public class AnulacionController {
 		view.getBtnBuscarDni().addActionListener(e -> buscar(2));
 		view.getBtnBuscarId().addActionListener(e -> buscar(3));
 		view.getBtnAnular().addActionListener(e -> ejecutarAnulacion());
+		view.getBtnLimpiar().addActionListener(e -> limpiarTabla());
 
 		view.getTablaReservas().getSelectionModel().addListSelectionListener(e -> {
 			if (!e.getValueIsAdjusting()) {
@@ -30,6 +31,17 @@ public class AnulacionController {
 				}
 			}
 		});
+	}
+	
+	private void limpiarTabla() {
+	    DefaultTableModel modelo = view.getModeloTabla();
+	    modelo.setRowCount(0);
+	    view.getLblReservaSeleccionada().setText("Reserva seleccionada: Ninguna");
+	    view.getTxtMotivo().setText("");
+	    if (reservasActuales != null) {
+	        reservasActuales.clear();
+	    }
+	    System.out.println("Tabla y datos temporales limpiados.");
 	}
 
 	private void buscar(int tipo) {
