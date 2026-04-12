@@ -9,7 +9,7 @@ import si.pl14.model.SocioEntity;
 import si.pl14.util.ApplicationException;
 import si.pl14.util.Database;
 
-public class ReservaModel {
+public class ReservaModelAdmin {
 	
 	private final int HORA_APERTURA = 9;
 	private final int HORA_CIERRE = 21;
@@ -185,13 +185,13 @@ public class ReservaModel {
 	public String generarResguardo(ReservaEntity reserva, String nombreInstalacion, String nombreSocio) {
 		
 		String resguardo = "--- RESGUARDO DE RESERVA ---" +
-				"\n Instalación: " + nombreInstalacion +
-				"\n Para socio: " + nombreSocio +
-				"\n Para la fecha: " + reserva.getFecha() +
-				"\n Hora inicio: " + reserva.getHoraInicio() +
-				"\n Hora fin: " + reserva.getHoraFin() + 
-				"\n Precio reserva: " + reserva.getCosteReserva() + "€" + 
-				"\n Método pago: " + reserva.getMetodoPago();
+		        "\n Instalación: " + nombreInstalacion +
+		        "\n Para socio: " + nombreSocio +
+		        "\n Para la fecha: " + reserva.getFecha() +
+		        "\n Hora inicio: " + reserva.getHoraInicio() +
+		        "\n Hora fin: " + reserva.getHoraFin() + 
+		        "\n Precio reserva: " + String.format("%.2f €", reserva.getCosteReserva()) + 
+		        "\n Método pago: " + reserva.getMetodoPago();
 		
 		return resguardo;
 	}

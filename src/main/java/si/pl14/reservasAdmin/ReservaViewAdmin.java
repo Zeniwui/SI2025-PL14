@@ -11,7 +11,7 @@ import java.text.SimpleDateFormat; // NUEVO: Para formatear la fecha
 import java.util.Date; // NUEVO
 import com.toedter.calendar.JCalendar;
 
-public class ReservaView {
+public class ReservaViewAdmin {
 
     private JFrame frame;
 
@@ -40,7 +40,7 @@ public class ReservaView {
     private final Color COLOR_EXITO = new Color(46, 204, 113); 
     private final Color COLOR_TEXTO = new Color(51, 51, 51);
 
-    public ReservaView() {
+    public ReservaViewAdmin() {
         initialize();
     }
 

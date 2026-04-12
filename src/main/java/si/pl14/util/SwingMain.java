@@ -8,9 +8,9 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
-import si.pl14.reservasAdmin.ReservaController;
-import si.pl14.reservasAdmin.ReservaModel;
-import si.pl14.reservasAdmin.ReservaView;
+import si.pl14.reservasAdmin.ReservaControllerAdmin;
+import si.pl14.reservasAdmin.ReservaModelAdmin;
+import si.pl14.reservasAdmin.ReservaViewAdmin;
 
 /**
  * Punto de entrada principal que incluye botones para la ejecucion de las pantallas 
@@ -63,7 +63,7 @@ public class SwingMain {
 				controller.initController();
 				*/
 				
-				ReservaController controllerReservas = new ReservaController(new ReservaModel(), new ReservaView());
+				ReservaControllerAdmin controllerReservas = new ReservaControllerAdmin(new ReservaModelAdmin(), new ReservaViewAdmin());
 				controllerReservas.initController();
 			}
 		});

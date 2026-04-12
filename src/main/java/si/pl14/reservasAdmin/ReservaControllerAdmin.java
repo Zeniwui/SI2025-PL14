@@ -18,9 +18,9 @@ import si.pl14.model.SocioDTO;
 import si.pl14.util.SwingUtil;
 import si.pl14.util.Util;
 
-public class ReservaController {
-	private ReservaModel model;
-	private ReservaView view;
+public class ReservaControllerAdmin {
+	private ReservaModelAdmin model;
+	private ReservaViewAdmin view;
 	
 	private Integer idSocioActual = null;
 	private String nombreSocioActual = null;
@@ -29,7 +29,7 @@ public class ReservaController {
 	private final int HORAS_MAXIMAS_MES = 8;
 	private final int DIAS_MAXIMOS_ANTELACION = 30;
 	
-	public ReservaController(ReservaModel m, ReservaView v) {
+	public ReservaControllerAdmin(ReservaModelAdmin m, ReservaViewAdmin v) {
 		model = m;
 		view = v;
 		
@@ -98,8 +98,7 @@ public class ReservaController {
 	                if (instalacion.getIdInstalacion() == -1) {
 	                    setText(instalacion.getNombre());
 	                } else {
-	                    setText(instalacion.getNombre() + " (" + instalacion.getCosteHora() + " €/h)");
-	                }
+	                	setText(String.format("%s (%.2f €/h)", instalacion.getNombre(), instalacion.getCosteHora()));	                }
 	            }
 	            return this;
 	        }
@@ -307,14 +306,30 @@ public class ReservaController {
 			    reserva.setEstadoPago("Pendiente");
 			}
 			
-			model.realizarReserva(reserva, instalacionSeleccionada.getNombre());
+			// Creamos dialogo de confirmacion
+			String mensajeConfirmacion = String.format(
+		            "¿Estás seguro de que deseas reservar la instalación %s para el socio %s?\nEl coste de %.2f € se gestionará como: %s.",
+		            instalacionSeleccionada.getNombre(), nombreSocioActual, costeReserva, metodoPago
+		    );
 			
-			String textoResguardo = model.generarResguardo(reserva, instalacionSeleccionada.getNombre(), nombreSocioActual);
-			view.setTextoResumen(textoResguardo);
+			int confirmacion = JOptionPane.showConfirmDialog(
+		            view.getFrame(),
+		            mensajeConfirmacion,
+		            "Confirmar Reserva",
+		            JOptionPane.YES_NO_OPTION,
+		            JOptionPane.QUESTION_MESSAGE
+		    );
 			
-			SwingUtil.showMessage("Reserva realizada con éxito.\n\n" + textoResguardo, 
-	                "Reserva Confirmada", JOptionPane.INFORMATION_MESSAGE);
+			// Solo si el administrador pulsa "Sí", ejecutamos el guardado
+		    if (confirmacion == JOptionPane.YES_OPTION) {
+		        model.realizarReserva(reserva, instalacionSeleccionada.getNombre());
+		        
+		        String textoResguardo = model.generarResguardo(reserva, instalacionSeleccionada.getNombre(), nombreSocioActual);
+		        view.setTextoResumen(textoResguardo);
+		        
+		        SwingUtil.showMessage("Reserva realizada con éxito.\n\n" + textoResguardo, 
+		                "Reserva Confirmada", JOptionPane.INFORMATION_MESSAGE);
+		    }
 		}
-
 	}
 }
