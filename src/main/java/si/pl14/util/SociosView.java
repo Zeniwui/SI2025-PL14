@@ -7,9 +7,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 // Importa aquí tus clases del MVC
-import si.pl14.reservas.ReservaModel;
-import si.pl14.reservas.ReservaController;
-import si.pl14.reservas.ReservaView;
+import si.pl14.reservasSocio.ReservaModel;
+import si.pl14.reservasSocio.ReservaController;
+import si.pl14.reservasSocio.ReservaView;
 import si.pl14.visualizareservas.*;
 import si.pl14.estadoPagosSocio.EstadoPagosSocioController;
 import si.pl14.estadoPagosSocio.EstadoPagosSocioModel;
