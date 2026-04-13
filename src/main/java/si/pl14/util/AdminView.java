@@ -21,6 +21,9 @@ import si.pl14.actividadesEmma.Planificar_Actividad_Model;
 import si.pl14.periodosinscripcion.PeriodosInscripcionController;
 import si.pl14.periodosinscripcion.PeriodosInscripcionModel;
 import si.pl14.periodosinscripcion.PeriodosInscripcionView;
+import si.pl14.reservasAdmin.ReservaControllerAdmin;
+import si.pl14.reservasAdmin.ReservaModelAdmin;
+import si.pl14.reservasAdmin.ReservaViewAdmin;
 import si.pl14.reservasEmma.Reserva_Instalacion_Admin_Controller;
 import si.pl14.reservasEmma.Reserva_Instalacion_Admin_Model;
 import si.pl14.reservasEmma.Reserva_Instalacion_Admin_View;
@@ -76,6 +79,8 @@ public class AdminView {
                 // =====================================================================
                 switch (seleccion) {
                 case 1:
+                	ReservaControllerAdmin controllerReservaAdmin = new ReservaControllerAdmin(new ReservaModelAdmin(), new ReservaViewAdmin());
+                	controllerReservaAdmin.initController();
                 	break;
                 case 2:
                 	Reserva_Instalacion_Admin_View viewRI = new Reserva_Instalacion_Admin_View();
