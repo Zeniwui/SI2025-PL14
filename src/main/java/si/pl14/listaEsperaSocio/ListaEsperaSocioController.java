@@ -1,6 +1,5 @@
 package si.pl14.listaEsperaSocio;
 
-
 import java.util.List;
 
 import javax.swing.JOptionPane;
