@@ -1,5 +1,10 @@
 package ReservasEmma;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -32,16 +37,16 @@ public class AnulacionController {
 			}
 		});
 	}
-	
+
 	private void limpiarTabla() {
-	    DefaultTableModel modelo = view.getModeloTabla();
-	    modelo.setRowCount(0);
-	    view.getLblReservaSeleccionada().setText("Reserva seleccionada: Ninguna");
-	    view.getTxtMotivo().setText("");
-	    if (reservasActuales != null) {
-	        reservasActuales.clear();
-	    }
-	    System.out.println("Tabla y datos temporales limpiados.");
+		DefaultTableModel modelo = view.getModeloTabla();
+		modelo.setRowCount(0);
+		view.getLblReservaSeleccionada().setText("Reserva seleccionada: Ninguna");
+		view.getTxtMotivo().setText("");
+		if (reservasActuales != null) {
+			reservasActuales.clear();
+		}
+		System.out.println("Tabla y datos temporales limpiados.");
 	}
 
 	private void buscar(int tipo) {
@@ -99,16 +104,26 @@ public class AnulacionController {
 		if (confirm == JOptionPane.YES_OPTION) {
 			model.anularReserva(idReserva);
 
-			// Como no tenemos whatsapp de los socios porque son datos inventados se imprime
-			// en consola el mensaje, pero sino se enviaria por correo electronico o
-			// whatsapp
-			System.out.println("NOTIFICACIÓN: Enviado mensaje a " + nombreSocio + ". Motivo: " + motivo);
+			guardarNotificacionTxt(nombreSocio, motivo);
 
-			JOptionPane.showMessageDialog(view, "Reserva anulada. Se ha liberado el hueco y eliminado el cargo.");
-
-			// Limpiar interfaz
+			JOptionPane.showMessageDialog(view,
+					"Reserva anulada.\nSe ha devuelto el dinero, eliminado el cargo en pagos y liberado la instalación.");
 			view.getTxtMotivo().setText("");
 			buscarReciente();
+		}
+	}
+
+	private void guardarNotificacionTxt(String nombreSocio, String motivo) {
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter("notificaciones_cancelaciones.txt", true))) {
+			String fechaHora = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+			String mensaje = "[" + fechaHora + "] SOCIO: " + nombreSocio + " | MOTIVO: " + motivo;
+
+			writer.write(mensaje);
+			writer.newLine();
+
+			System.out.println("Se ha guardado la notificación en 'notificaciones_cancelaciones.txt'");
+		} catch (IOException e) {
+			System.err.println("Error al escribir el archivo txt: " + e.getMessage());
 		}
 	}
 

@@ -47,15 +47,13 @@ public class AnulacionModel {
                "LEFT JOIN Usuarios u ON s.dni = u.dni ";
     }
 
- 
     private String getTimeFilter() {
         return " WHERE ((date(r.fecha) > date('now')) " +
                " OR (date(r.fecha) = date('now') AND time(r.hora_inicio) > time('now', 'localtime'))) ";
     }
 
     public List<ReservaDetalleDTO> getReservasPorNombre(String nombre) {
-        // Filtramos por las columnas reales de la tabla Usuarios (u)
-        String sql = getBaseQuery() + getTimeFilter() + 
+        String sql = getBaseQuery() + getTimeFilter() +  
                      " AND (u.nombre LIKE ? OR u.apellidos LIKE ?) ORDER BY r.fecha ASC";
         return db.executeQueryPojo(ReservaDetalleDTO.class, sql, "%" + nombre + "%", "%" + nombre + "%");
     }
@@ -71,6 +69,7 @@ public class AnulacionModel {
     }
 
     public void anularReserva(int idReserva) {
+        db.executeUpdate("DELETE FROM Pagos WHERE id_reserva = ?", idReserva);
         db.executeUpdate("DELETE FROM Reservas WHERE id_reserva = ?", idReserva);
     }
 }
