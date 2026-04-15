@@ -1,5 +1,10 @@
 package si.pl14.actividadesEmma;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import javax.swing.JOptionPane;
 
@@ -62,17 +67,32 @@ public class CancelacionActividadController {
 
         if (confirm == JOptionPane.YES_OPTION) {
             List<String> emails = model.getEmailsInscritos(idAct);
+            
             model.cancelarActividadCompleta(idAct);
 
-            // simulado porque no podemos mandar emails de verdad
             System.out.println("--- NOTIFICACIONES ENVIADAS ---");
+            String motivo = "Actividad '" + nombreAct + "' cancelada por falta de aforo.";
+            
             for (String email : emails) {
-                System.out.println("Aviso enviado a: " + email + " -> Motivo: Actividad " + nombreAct + " cancelada por falta de aforo.");
+                System.out.println("Aviso enviado a: " + email + " -> Motivo: " + motivo);
+                guardarNotificacionTxt(email, motivo);
             }
 
-            JOptionPane.showMessageDialog(view, "Actividad cancelada con éxito.");
-            cargarActividades(); // Refrescar
+            JOptionPane.showMessageDialog(view, "Actividad cancelada con éxito.\nSe ha devuelto el dinero a los inscritos y liberado la instalación.");
+            cargarActividades(); 
             view.getLblSeleccionada().setText("Actividad seleccionada: Ninguna");
+        }
+    }
+
+    private void guardarNotificacionTxt(String email, String motivo) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("notificaciones_actividades.txt", true))) {
+            String fechaHora = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+            String mensaje = "[" + fechaHora + "] AVISO A: " + email + " | MOTIVO: " + motivo;
+            
+            writer.write(mensaje);
+            writer.newLine();
+        } catch (IOException e) {
+            System.err.println("Error al escribir el archivo txt: " + e.getMessage());
         }
     }
 }

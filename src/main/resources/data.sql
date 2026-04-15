@@ -71,3 +71,29 @@ INSERT INTO Pagos (id_socio, monto, metodo_pago, estado_pago, concepto, id_inscr
 VALUES (1, 20.00, 'Tarjeta', 'Pagado', 'Inscripción Padel Carlos', 1);
 INSERT INTO Pagos (id_socio, monto, metodo_pago, estado_pago, concepto, id_inscripcion)
 VALUES (1, 25.00, 'Cuota', 'Pendiente', 'Inscripción Natación Carlos', 4);
+INSERT INTO Pagos (id_socio, monto, metodo_pago, estado_pago, concepto, id_inscripcion)
+VALUES (2, 20.00, 'Transferencia', 'Pagado', 'Inscripción Padel Marcos', 2);
+
+INSERT INTO Pagos (id_socio, monto, metodo_pago, estado_pago, concepto, id_inscripcion)
+VALUES (3, 20.00, 'Tarjeta', 'Pagado', 'Inscripción Padel Lucia', 3);
+
+-- 1. Insertar Reservas de Alquiler (Socios)
+INSERT INTO Reservas (id_reserva, id_instalacion, fecha, hora_inicio, hora_fin, id_socio, coste_reserva, estado_pago)
+VALUES (17, 1, '2026-05-10', '10:00', '11:00', 1, 12.00, 'Pagado');
+INSERT INTO Reservas (id_reserva, id_instalacion, fecha, hora_inicio, hora_fin, id_socio, coste_reserva, estado_pago)
+VALUES (19, 2, '2026-05-10', '13:00', '14:00', 2, 12.00, 'Pagado');
+
+-- 2. Insertar Inscripciones (Actividades)
+INSERT INTO Inscripciones (id_inscripcion, id_socio, id_actividad, fecha_inscripcion) VALUES (1, 1, 1, '2026-04-10');
+INSERT INTO Inscripciones (id_inscripcion, id_socio, id_actividad, fecha_inscripcion) VALUES (2, 2, 1, '2026-04-11');
+
+-- 3. INSERTAR PAGOS CRUCIALES
+-- Pago vinculado a RESERVA (Para la HU de Anulación de Reservas)
+INSERT INTO Pagos (id_socio, monto, metodo_pago, estado_pago, concepto, id_reserva)
+VALUES (1, 12.00, 'Tarjeta', 'Pagado', 'Pago Alquiler Pista Reserva #17', 17);
+
+-- Pagos vinculados a INSCRIPCIÓN (Para la HU de Cancelación Actividades)
+INSERT INTO Pagos (id_socio, monto, metodo_pago, estado_pago, concepto, id_inscripcion)
+VALUES (1, 20.00, 'Tarjeta', 'Pagado', 'Inscripción Padel Carlos', 1);
+INSERT INTO Pagos (id_socio, monto, metodo_pago, estado_pago, concepto, id_inscripcion)
+VALUES (2, 20.00, 'Transferencia', 'Pagado', 'Inscripción Padel Marcos', 2);

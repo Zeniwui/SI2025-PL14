@@ -18,11 +18,12 @@ public class CancelacionActividadModel {
     }
 
     public void cancelarActividadCompleta(int idActividad) {
- 
+        String sqlPagos = "DELETE FROM Pagos WHERE id_inscripcion IN (" +
+                          "SELECT id_inscripcion FROM Inscripciones WHERE id_actividad = ?)";
+        db.executeUpdate(sqlPagos, idActividad);
+
+
         db.executeUpdate("DELETE FROM Reservas WHERE id_actividad = ?", idActividad);
-        
-        db.executeUpdate("UPDATE Pagos SET estado_pago = 'Devuelto', concepto = '[CANCELADA] ' || concepto " +
-                         "WHERE id_inscripcion IN (SELECT id_inscripcion FROM Inscripciones WHERE id_actividad = ?)", idActividad);
 
         db.executeUpdate("DELETE FROM Actividades WHERE id_actividad = ?", idActividad);
     }
