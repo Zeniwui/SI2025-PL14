@@ -38,12 +38,19 @@ public class InformeDetalladoSociosModel {
             "JOIN Usuarios u ON s.dni = u.dni " +
             "LEFT JOIN Reservas r ON r.id_socio = s.id_socio " +
             "                     AND r.fecha BETWEEN ? AND ? " +
-            "GROUP BY s.id_socio, u.nombre, u.apellidos";
+            "GROUP BY s.id_socio, u.nombre, u.apellidos " +
+            // Solo se incluyen socios que tuvieron reservas o actividades en el periodo
+            "HAVING COUNT(DISTINCT r.id_reserva) > 0 " +
+            "    OR (SELECT COUNT(*) FROM Inscripciones i2 " +
+            "        JOIN Actividades a2 ON i2.id_actividad = a2.id_actividad " +
+            "        WHERE i2.id_socio = s.id_socio " +
+            "          AND a2.fecha_inicio BETWEEN ? AND ?) > 0";
 
         List<Object[]> filas = db.executeQueryArray(sql,
-            fechaDesde, fechaHasta,
-            fechaDesde, fechaHasta,
-            fechaDesde, fechaHasta);
+            fechaDesde, fechaHasta,   // num_actividades (subquery SELECT)
+            fechaDesde, fechaHasta,   // instalacion_favorita (subquery SELECT)
+            fechaDesde, fechaHasta,   // LEFT JOIN Reservas (fecha del periodo)
+            fechaDesde, fechaHasta);  // HAVING actividades (subquery)
 
         List<InformeDetalladoSocioDTO> resultado = new ArrayList<>();
         for (Object[] f : filas) {
