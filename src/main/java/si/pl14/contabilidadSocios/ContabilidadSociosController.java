@@ -1,65 +1,43 @@
 package si.pl14.contabilidadSocios;
 
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import javax.swing.JFileChooser;
 import java.util.List;
 
 /**
  * Controlador MVC para la HU "Calcular contabilidad de socios en un mes".
  *
- * Coordina la Vista y el Modelo:
- *  1. Al pulsar "Calcular"  → pide al Model los datos y los envía a la Vista.
- *  2. Al pulsar "Guardar"   → pide al Model que escriba el fichero y notifica a la Vista.
- *
- * El directorio de salida por defecto es el directorio de trabajo del proceso (raíz del proyecto).
+ * Flujo:
+ *  1. initController() registra los listeners y hace visible la ventana.
+ *  2. Botón "Calcular"  → llama al Model y pasa resultados a la Vista.
+ *  3. Botón "Guardar"   → abre JFileChooser de directorio y delega en el Model.
  */
 public class ContabilidadSociosController {
 
     private final ContabilidadSociosModel model;
     private final ContabilidadSociosView  view;
 
-    /** Lista resultado del último cálculo; se reutiliza al guardar. */
     private List<ContabilidadSocioDTO> ultimaLista = null;
     private int ultimoMes  = 0;
     private int ultimoAnio = 0;
-
-    // ─────────────────────────────────────────────────────────────────────────
 
     public ContabilidadSociosController(ContabilidadSociosModel model,
                                         ContabilidadSociosView  view) {
         this.model = model;
         this.view  = view;
-        initController();
     }
 
-    /** Registra los listeners y hace visible la ventana. */
+    /** Registra listeners y muestra la ventana. */
     public void initController() {
-        view.getBtnCalcular().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                onCalcular();
-            }
-        });
-
-        view.getBtnGuardar().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                onGuardar();
-            }
-        });
-
+        view.getBtnCalcular().addActionListener(e -> onCalcular());
+        view.getBtnGuardar() .addActionListener(e -> onGuardar());
         view.setVisible(true);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Acciones
     // ─────────────────────────────────────────────────────────────────────────
 
     private void onCalcular() {
         int mes  = view.getMesSeleccionado();
         int anio = view.getAnioSeleccionado();
-
         try {
             ultimaLista = model.calcularContabilidad(mes, anio);
             ultimoMes   = mes;
@@ -76,19 +54,16 @@ public class ContabilidadSociosController {
             return;
         }
 
-        // Elegir directorio mediante JFileChooser
         JFileChooser chooser = new JFileChooser();
         chooser.setDialogTitle("Seleccionar carpeta de destino");
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         chooser.setAcceptAllFileFilterUsed(false);
 
-        int resultado = chooser.showSaveDialog(view);
-        if (resultado != JFileChooser.APPROVE_OPTION) return;
+        if (chooser.showSaveDialog(view) != JFileChooser.APPROVE_OPTION) return;
 
-        String directorio = chooser.getSelectedFile().getAbsolutePath();
-
+        String dir = chooser.getSelectedFile().getAbsolutePath();
         try {
-            String ruta = model.guardarFichero(ultimaLista, ultimoMes, ultimoAnio, directorio);
+            String ruta = model.guardarFichero(ultimaLista, ultimoMes, ultimoAnio, dir);
             view.mostrarMensajeFichero(ruta);
         } catch (Exception ex) {
             view.mostrarError("Error al guardar el fichero:\n" + ex.getMessage());

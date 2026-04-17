@@ -1,20 +1,27 @@
 package si.pl14.contabilidadSocios;
 
+import si.pl14.util.ApplicationException;
 import si.pl14.util.Database;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Capa de modelo (acceso a datos y lógica de negocio) para la HU
- * "Calcular contabilidad de socios en un mes".
+ * Modelo MVC para la HU "Calcular contabilidad de socios en un mes".
  *
- * Consulta las reservas directas de instalaciones (id_socio NOT NULL)
- * y las reservas derivadas de inscripciones a actividades (id_actividad NOT NULL)
- * filtrando por el mes/año indicados, las agrupa por socio y genera el fichero.
+ * Calcula:
+ *  - Total de coste de reservas directas de instalaciones (id_socio NOT NULL, id_actividad NULL)
+ *    agrupadas por socio para el mes/año seleccionado.
+ *  - Total de coste de actividades inscritas (precio_socio) por socio
+ *    cuyas inscripciones pertenezcan al mes/año seleccionado.
+ *
+ * Genera un fichero .txt con los datos de cada socio y los totales finales.
+ * Si no hay datos, NO genera fichero.
  */
 public class ContabilidadSociosModel {
 
@@ -29,56 +36,40 @@ public class ContabilidadSociosModel {
     // ─────────────────────────────────────────────────────────────────────────
 
     /**
-     * Calcula la contabilidad de todos los socios para el mes y año indicados.
-     *
-     * @param mes  Número de mes (1-12)
-     * @param anio Año con cuatro dígitos
-     * @return Lista de DTOs, uno por socio que tenga al menos una reserva ese mes.
-     *         Lista vacía si no hay datos.
+     * Devuelve la lista de DTOs de contabilidad para el mes/año indicados.
+     * Lista vacía si no hay reservas de socios ese mes.
      */
     public List<ContabilidadSocioDTO> calcularContabilidad(int mes, int anio) {
-
-        // Prefijo del mes en formato SQLite: "YYYY-MM"
         String prefijo = String.format("%04d-%02d", anio, mes);
 
-        // ── 1. Total reservas directas de instalaciones por socio ─────────────
-        String sqlReservas =
-            "SELECT s.id_socio, " +
-            "       u.nombre, " +
-            "       u.apellidos, " +
-            "       u.dni, " +
-            "       COALESCE(SUM(r.coste_reserva), 0.0) AS total_reservas " +
-            "FROM Socios s " +
+        // 1) Reservas directas de instalaciones por socio ese mes
+        String sqlRes =
+            "SELECT s.id_socio, u.nombre, u.apellidos, u.dni, " +
+            "       COALESCE(SUM(r.coste_reserva), 0.0) AS total " +
+            "FROM Reservas r " +
+            "JOIN Socios s   ON r.id_socio = s.id_socio " +
             "JOIN Usuarios u ON s.dni = u.dni " +
-            "JOIN Reservas r ON r.id_socio = s.id_socio " +
             "WHERE r.id_socio IS NOT NULL " +
             "  AND r.id_actividad IS NULL " +
             "  AND strftime('%Y-%m', r.fecha) = ? " +
             "GROUP BY s.id_socio, u.nombre, u.apellidos, u.dni";
 
-        List<Object[]> filasReservas = db.executeQueryArray(sqlReservas, prefijo);
+        List<Object[]> filasRes = db.executeQueryArray(sqlRes, prefijo);
 
-        // ── 2. Total actividades (inscripciones) por socio ────────────────────
-        //
-        // Buscamos reservas cuyo origen sea una actividad (id_actividad NOT NULL)
-        // e identificamos al socio que la inscribió a través de la tabla Inscripciones.
-        String sqlActividades =
-            "SELECT s.id_socio, " +
-            "       u.nombre, " +
-            "       u.apellidos, " +
-            "       u.dni, " +
-            "       COALESCE(SUM(a.precio_socio), 0.0) AS total_actividades " +
+        // 2) Inscripciones a actividades ese mes → precio_socio como coste
+        String sqlAct =
+            "SELECT s.id_socio, u.nombre, u.apellidos, u.dni, " +
+            "       COALESCE(SUM(a.precio_socio), 0.0) AS total " +
             "FROM Inscripciones i " +
-            "JOIN Socios  s ON i.id_socio    = s.id_socio " +
-            "JOIN Usuarios u ON s.dni         = u.dni " +
+            "JOIN Socios     s ON i.id_socio     = s.id_socio " +
+            "JOIN Usuarios   u ON s.dni           = u.dni " +
             "JOIN Actividades a ON i.id_actividad = a.id_actividad " +
             "WHERE strftime('%Y-%m', i.fecha_inscripcion) = ? " +
             "GROUP BY s.id_socio, u.nombre, u.apellidos, u.dni";
 
-        List<Object[]> filasActividades = db.executeQueryArray(sqlActividades, prefijo);
+        List<Object[]> filasAct = db.executeQueryArray(sqlAct, prefijo);
 
-        // ── 3. Combinar ambos resultados en DTOs ──────────────────────────────
-        return combinar(filasReservas, filasActividades);
+        return combinar(filasRes, filasAct);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -86,49 +77,62 @@ public class ContabilidadSociosModel {
     // ─────────────────────────────────────────────────────────────────────────
 
     /**
-     * Guarda la contabilidad en un fichero de texto plano.
-     * Si la lista está vacía no crea el fichero.
+     * Guarda los datos en un fichero de texto plano.
+     * Incluye una sección de TOTALES al final con la suma de todos los socios.
+     * Si la lista está vacía, no crea fichero y devuelve null.
      *
-     * @param lista    Lista de DTOs calculada previamente.
-     * @param mes      Mes del cálculo (1-12).
-     * @param anio     Año del cálculo.
-     * @param rutaDir  Directorio donde se guarda el fichero.
-     * @return Ruta completa del fichero generado, o null si no se creó.
+     * @param lista   Lista de DTOs calculada.
+     * @param mes     Mes del cálculo (1-12).
+     * @param anio    Año del cálculo.
+     * @param rutaDir Directorio destino.
+     * @return Ruta completa del fichero, o null si no se creó.
      */
     public String guardarFichero(List<ContabilidadSocioDTO> lista, int mes, int anio, String rutaDir) {
         if (lista == null || lista.isEmpty()) {
-            return null; // HU: no generar fichero vacío
+            return null;
         }
+
+        String[] nombresMes = {
+            "Enero","Febrero","Marzo","Abril","Mayo","Junio",
+            "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"
+        };
 
         String nombreFichero = String.format("contabilidad_%04d_%02d.txt", anio, mes);
         String ruta = rutaDir + "/" + nombreFichero;
 
         try (PrintWriter pw = new PrintWriter(new FileWriter(ruta))) {
-            pw.printf("=== Contabilidad de socios – %02d/%04d ===%n%n", mes, anio);
+            pw.printf("==========================================================%n");
+            pw.printf("  CONTABILIDAD DE SOCIOS – %s de %04d%n", nombresMes[mes - 1], anio);
+            pw.printf("==========================================================%n%n");
 
             double sumReservas    = 0;
             double sumActividades = 0;
             double sumTotal       = 0;
 
             for (ContabilidadSocioDTO dto : lista) {
-                pw.printf("Socio: %s %s (DNI: %s)%n", dto.getNombre(), dto.getApellidos(), dto.getDni());
-                pw.printf("  Total reservas     : %.2f EUR%n", dto.getTotalReservas());
-                pw.printf("  Total actividades  : %.2f EUR%n", dto.getTotalActividades());
-                pw.printf("  DEUDA TOTAL        : %.2f EUR%n%n", dto.getTotalDeuda());
+                pw.printf("Socio  : %s %s%n", dto.getNombre(), dto.getApellidos());
+                pw.printf("DNI    : %s%n", dto.getDni());
+                pw.printf("  Coste reservas     : %8.2f EUR%n", dto.getTotalReservas());
+                pw.printf("  Coste actividades  : %8.2f EUR%n", dto.getTotalActividades());
+                pw.printf("  DEUDA TOTAL        : %8.2f EUR%n", dto.getTotalDeuda());
+                pw.printf("----------------------------------------------------------%n");
 
                 sumReservas    += dto.getTotalReservas();
                 sumActividades += dto.getTotalActividades();
                 sumTotal       += dto.getTotalDeuda();
             }
 
-            pw.printf("─────────────────────────────────────────%n");
-            pw.printf("Total socios       : %d%n",   lista.size());
-            pw.printf("Total reservas     : %.2f EUR%n", sumReservas);
-            pw.printf("Total actividades  : %.2f EUR%n", sumActividades);
-            pw.printf("TOTAL DEUDA        : %.2f EUR%n", sumTotal);
+            pw.printf("%n==========================================================%n");
+            pw.printf("  TOTALES GLOBALES%n");
+            pw.printf("==========================================================%n");
+            pw.printf("  Nº de socios con cargos : %d%n",        lista.size());
+            pw.printf("  Total coste reservas    : %8.2f EUR%n", sumReservas);
+            pw.printf("  Total coste actividades : %8.2f EUR%n", sumActividades);
+            pw.printf("  TOTAL DEUDA             : %8.2f EUR%n", sumTotal);
+            pw.printf("==========================================================%n");
 
         } catch (IOException e) {
-            throw new si.pl14.util.ApplicationException("Error al guardar el fichero: " + e.getMessage());
+            throw new ApplicationException("Error al guardar el fichero: " + e.getMessage());
         }
 
         return ruta;
@@ -139,36 +143,32 @@ public class ContabilidadSociosModel {
     // ─────────────────────────────────────────────────────────────────────────
 
     private List<ContabilidadSocioDTO> combinar(List<Object[]> filasRes, List<Object[]> filasAct) {
-
-        // Indexar reservas por idSocio
-        java.util.Map<Integer, ContabilidadSocioDTO> mapa = new java.util.LinkedHashMap<>();
+        Map<Integer, ContabilidadSocioDTO> mapa = new LinkedHashMap<>();
 
         for (Object[] f : filasRes) {
             ContabilidadSocioDTO dto = new ContabilidadSocioDTO();
-            dto.setIdSocio(   toInt(f[0])     );
-            dto.setNombre(    str(f[1])        );
-            dto.setApellidos( str(f[2])        );
-            dto.setDni(       str(f[3])        );
+            dto.setIdSocio(   toInt(f[0])    );
+            dto.setNombre(    str(f[1])       );
+            dto.setApellidos( str(f[2])       );
+            dto.setDni(       str(f[3])       );
             dto.setTotalReservas( toDouble(f[4]) );
             mapa.put(dto.getIdSocio(), dto);
         }
 
-        // Añadir/acumular actividades
         for (Object[] f : filasAct) {
             int id = toInt(f[0]);
             ContabilidadSocioDTO dto = mapa.get(id);
             if (dto == null) {
                 dto = new ContabilidadSocioDTO();
                 dto.setIdSocio(   toInt(f[0]) );
-                dto.setNombre(    str(f[1])   );
-                dto.setApellidos( str(f[2])   );
-                dto.setDni(       str(f[3])   );
+                dto.setNombre(    str(f[1])    );
+                dto.setApellidos( str(f[2])    );
+                dto.setDni(       str(f[3])    );
                 mapa.put(id, dto);
             }
             dto.setTotalActividades( toDouble(f[4]) );
         }
 
-        // Calcular deuda total
         List<ContabilidadSocioDTO> resultado = new ArrayList<>(mapa.values());
         for (ContabilidadSocioDTO dto : resultado) {
             dto.setTotalDeuda( dto.getTotalReservas() + dto.getTotalActividades() );
@@ -176,7 +176,7 @@ public class ContabilidadSociosModel {
         return resultado;
     }
 
-    private int    toInt   (Object o) { return o instanceof Number ? ((Number) o).intValue()    : 0;   }
-    private double toDouble(Object o) { return o instanceof Number ? ((Number) o).doubleValue()  : 0.0; }
-    private String str     (Object o) { return o != null ? o.toString() : "";                          }
+    private int    toInt   (Object o) { return o instanceof Number ? ((Number) o).intValue()   : 0;   }
+    private double toDouble(Object o) { return o instanceof Number ? ((Number) o).doubleValue() : 0.0; }
+    private String str     (Object o) { return o != null ? o.toString() : "";                         }
 }

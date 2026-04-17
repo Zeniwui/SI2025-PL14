@@ -2,219 +2,196 @@ package si.pl14.contabilidadSocios;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.MatteBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
 
 /**
  * Vista Swing para la HU "Calcular contabilidad de socios en un mes".
- * Muestra:
- *   - Selectores de mes y año
- *   - Botón "Calcular"
- *   - Tabla con resultados (nombre, DNI, total reservas, total actividades, deuda)
- *   - Fila de totales al pie
- *   - Botón "Guardar fichero"
- *   - Etiqueta de estado con la ruta del fichero generado
+ *
+ * Contiene:
+ *  - Selectores de mes y año + botón Calcular
+ *  - Tabla con resultados (nombre+DNI, coste reservas, coste actividades, deuda)
+ *  - Fila de TOTALES al pie de la tabla
+ *  - Botón "Guardar fichero" + etiqueta de estado
  */
 public class ContabilidadSociosView extends JFrame {
 
     private static final long serialVersionUID = 1L;
 
-    // ── Controles superiores ─────────────────────────────────────────────────
-    private JComboBox<String> cmbMes;
+    // Controles de selección
+    private JComboBox<String>  cmbMes;
     private JComboBox<Integer> cmbAnio;
-    private JButton btnCalcular;
+    private JButton            btnCalcular;
+    private JLabel             lblResultado;
 
-    // ── Tabla de resultados ──────────────────────────────────────────────────
-    private JTable tabla;
-    private DefaultTableModel modeloTabla;
+    // Tabla de resultados
+    private JTable             tabla;
+    private DefaultTableModel  modeloTabla;
 
-    // ── Panel de totales ─────────────────────────────────────────────────────
+    // Fila de totales
     private JLabel lblTotalSocios;
     private JLabel lblTotalReservas;
     private JLabel lblTotalActividades;
     private JLabel lblTotalDeuda;
 
-    // ── Controles inferiores ─────────────────────────────────────────────────
+    // Controles inferiores
     private JButton btnGuardar;
     private JLabel  lblEstado;
 
-    // ── Etiqueta de resultado actual ─────────────────────────────────────────
-    private JLabel lblResultado;
-
     // ─────────────────────────────────────────────────────────────────────────
+
     public ContabilidadSociosView() {
         super("Contabilidad de socios para un mes");
         construirUI();
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // Construcción de la interfaz
+    // Construcción de la UI
     // ─────────────────────────────────────────────────────────────────────────
 
     private void construirUI() {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(820, 540);
+        setSize(860, 500);
         setLocationRelativeTo(null);
         setResizable(true);
 
-        JPanel panelPrincipal = new JPanel(new BorderLayout(8, 8));
-        panelPrincipal.setBorder(new EmptyBorder(12, 12, 12, 12));
-        setContentPane(panelPrincipal);
+        JPanel root = new JPanel(new BorderLayout(8, 8));
+        root.setBorder(new EmptyBorder(10, 10, 10, 10));
+        setContentPane(root);
 
-        panelPrincipal.add(crearPanelSuperior(), BorderLayout.NORTH);
-        panelPrincipal.add(crearPanelCentral(),  BorderLayout.CENTER);
-        panelPrincipal.add(crearPanelInferior(), BorderLayout.SOUTH);
+        root.add(crearPanelSuperior(), BorderLayout.NORTH);
+        root.add(crearPanelCentral(),  BorderLayout.CENTER);
+        root.add(crearPanelInferior(), BorderLayout.SOUTH);
     }
 
-    /** Panel con los selectores de mes/año y el botón calcular */
     private JPanel crearPanelSuperior() {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 6));
-        panel.setBorder(BorderFactory.createEtchedBorder());
+        JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 6));
+        p.setBorder(BorderFactory.createEtchedBorder());
 
-        panel.add(new JLabel("Selecciona:"));
+        p.add(new JLabel("Selecciona:"));
 
-        // Meses
         String[] meses = {
             "Enero","Febrero","Marzo","Abril","Mayo","Junio",
             "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"
         };
         cmbMes = new JComboBox<>(meses);
         cmbMes.setPreferredSize(new Dimension(130, 26));
-        panel.add(cmbMes);
+        p.add(cmbMes);
 
-        // Años: últimos 5 y próximo
         cmbAnio = new JComboBox<>();
-        int anioActual = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR);
-        for (int a = anioActual - 4; a <= anioActual + 1; a++) {
-            cmbAnio.addItem(a);
-        }
-        cmbAnio.setSelectedItem(anioActual);
+        int hoy = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR);
+        for (int a = hoy - 4; a <= hoy + 1; a++) cmbAnio.addItem(a);
+        cmbAnio.setSelectedItem(hoy);
         cmbAnio.setPreferredSize(new Dimension(80, 26));
-        panel.add(cmbAnio);
+        p.add(cmbAnio);
 
         btnCalcular = new JButton("Calcular");
         btnCalcular.setFont(btnCalcular.getFont().deriveFont(Font.BOLD));
-        panel.add(btnCalcular);
+        p.add(btnCalcular);
 
-        // Etiqueta de resultado seleccionado
-        lblResultado = new JLabel("");
+        p.add(Box.createHorizontalStrut(16));
+        p.add(new JLabel("Resultado:"));
+        lblResultado = new JLabel("–");
         lblResultado.setFont(lblResultado.getFont().deriveFont(Font.BOLD, 12f));
-        lblResultado.setForeground(new Color(0, 90, 160));
-        panel.add(Box.createHorizontalStrut(20));
-        panel.add(new JLabel("Resultado:"));
-        panel.add(lblResultado);
+        lblResultado.setForeground(new Color(0, 80, 160));
+        p.add(lblResultado);
 
-        return panel;
+        return p;
     }
 
-    /** Panel central con la tabla de resultados y los totales */
     private JPanel crearPanelCentral() {
-        JPanel panel = new JPanel(new BorderLayout(0, 4));
+        JPanel p = new JPanel(new BorderLayout(0, 4));
 
-        // ── Tabla ────────────────────────────────────────────────────────────
-        String[] columnas = {
-            "Socio (nombre, DNI)",
-            "Total Coste Reservas",
-            "Total Coste Actividades",
-            "Deuda (Total)"
-        };
-        modeloTabla = new DefaultTableModel(columnas, 0) {
-            @Override
-            public boolean isCellEditable(int row, int col) { return false; }
+        // Tabla
+        String[] cols = { "Socio (nombre · DNI)", "Coste Reservas (€)", "Coste Actividades (€)", "Deuda Total (€)" };
+        modeloTabla = new DefaultTableModel(cols, 0) {
+            @Override public boolean isCellEditable(int r, int c) { return false; }
         };
         tabla = new JTable(modeloTabla);
         tabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tabla.setRowHeight(22);
         tabla.getTableHeader().setFont(tabla.getTableHeader().getFont().deriveFont(Font.BOLD));
 
-        // Alineación numérica en columnas 1, 2, 3
-        javax.swing.table.DefaultTableCellRenderer renderDerecha =
-            new javax.swing.table.DefaultTableCellRenderer();
-        renderDerecha.setHorizontalAlignment(SwingConstants.RIGHT);
-        for (int i = 1; i <= 3; i++) {
-            tabla.getColumnModel().getColumn(i).setCellRenderer(renderDerecha);
-        }
+        DefaultTableCellRenderer right = new DefaultTableCellRenderer();
+        right.setHorizontalAlignment(SwingConstants.RIGHT);
+        for (int i = 1; i <= 3; i++) tabla.getColumnModel().getColumn(i).setCellRenderer(right);
 
         JScrollPane scroll = new JScrollPane(tabla);
         scroll.setBorder(new TitledBorder("Contabilidad del mes"));
-        panel.add(scroll, BorderLayout.CENTER);
+        p.add(scroll, BorderLayout.CENTER);
 
-        // ── Fila de totales ──────────────────────────────────────────────────
-        JPanel panelTotales = new JPanel(new GridLayout(1, 4, 4, 0));
-        panelTotales.setBorder(BorderFactory.createMatteBorder(2, 0, 0, 0, Color.DARK_GRAY));
+        // Fila de totales
+        JPanel fila = new JPanel(new GridLayout(1, 4, 2, 0));
+        fila.setBorder(new MatteBorder(2, 0, 0, 0, Color.DARK_GRAY));
+        fila.setBackground(new Color(230, 230, 230));
 
-        lblTotalSocios      = crearLblTotal("Total socios: -");
-        lblTotalReservas    = crearLblTotal("Total: -");
-        lblTotalActividades = crearLblTotal("Total: -");
-        lblTotalDeuda       = crearLblTotal("Total: -");
+        lblTotalSocios      = lblTotal("Total socios: –");
+        lblTotalReservas    = lblTotal("Total: –");
+        lblTotalActividades = lblTotal("Total: –");
+        lblTotalDeuda       = lblTotal("Total: –");
 
-        panelTotales.add(lblTotalSocios);
-        panelTotales.add(lblTotalReservas);
-        panelTotales.add(lblTotalActividades);
-        panelTotales.add(lblTotalDeuda);
+        fila.add(lblTotalSocios);
+        fila.add(lblTotalReservas);
+        fila.add(lblTotalActividades);
+        fila.add(lblTotalDeuda);
 
-        panel.add(panelTotales, BorderLayout.SOUTH);
-        return panel;
+        p.add(fila, BorderLayout.SOUTH);
+        return p;
     }
 
-    private JLabel crearLblTotal(String texto) {
-        JLabel lbl = new JLabel(texto, SwingConstants.CENTER);
-        lbl.setFont(lbl.getFont().deriveFont(Font.BOLD, 11f));
-        lbl.setBorder(new EmptyBorder(4, 6, 4, 6));
-        return lbl;
+    private JLabel lblTotal(String texto) {
+        JLabel l = new JLabel(texto, SwingConstants.CENTER);
+        l.setFont(l.getFont().deriveFont(Font.BOLD, 11f));
+        l.setBorder(new EmptyBorder(4, 4, 4, 4));
+        return l;
     }
 
-    /** Panel inferior con el botón de guardar y la etiqueta de estado */
     private JPanel crearPanelInferior() {
-        JPanel panel = new JPanel(new BorderLayout(8, 0));
-        panel.setBorder(new EmptyBorder(6, 0, 0, 0));
+        JPanel p = new JPanel(new BorderLayout(8, 0));
+        p.setBorder(new EmptyBorder(6, 0, 0, 0));
 
         btnGuardar = new JButton("Guardar fichero");
         btnGuardar.setEnabled(false);
-        panel.add(btnGuardar, BorderLayout.WEST);
+        p.add(btnGuardar, BorderLayout.WEST);
 
         lblEstado = new JLabel(" ");
         lblEstado.setFont(lblEstado.getFont().deriveFont(Font.ITALIC));
-        lblEstado.setForeground(new Color(40, 120, 40));
-        panel.add(lblEstado, BorderLayout.CENTER);
+        p.add(lblEstado, BorderLayout.CENTER);
 
-        return panel;
+        return p;
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // Métodos de actualización de la UI (llamados desde el Controller)
+    // Métodos de actualización llamados desde el Controller
     // ─────────────────────────────────────────────────────────────────────────
 
-    /** Rellena la tabla con la lista de DTOs y actualiza los totales */
     public void mostrarResultados(List<ContabilidadSocioDTO> lista, int mes, int anio) {
-        // Limpiar tabla
         modeloTabla.setRowCount(0);
 
-        // Nombre del mes en español
-        String[] nombresMes = {
+        String[] nombres = {
             "Enero","Febrero","Marzo","Abril","Mayo","Junio",
             "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"
         };
-        lblResultado.setText(nombresMes[mes - 1] + " de " + anio);
+        lblResultado.setText(nombres[mes - 1] + " de " + anio);
 
         if (lista == null || lista.isEmpty()) {
             actualizarTotales(0, 0, 0, 0);
-            lblEstado.setText("No hay reservas de socios en el mes seleccionado. No se generará fichero.");
-            lblEstado.setForeground(new Color(160, 80, 0));
+            setEstado("No hay reservas de socios en el mes seleccionado. No se generará fichero.", new Color(160, 80, 0));
             btnGuardar.setEnabled(false);
             return;
         }
 
         double sumRes = 0, sumAct = 0, sumTot = 0;
         for (ContabilidadSocioDTO dto : lista) {
-            String socio = dto.getNombre() + " " + dto.getApellidos() + " · " + dto.getDni();
-            modeloTabla.addRow(new Object[] {
-                socio,
-                String.format("%.2f €", dto.getTotalReservas()),
-                String.format("%.2f €", dto.getTotalActividades()),
-                String.format("%.2f €", dto.getTotalDeuda())
+            modeloTabla.addRow(new Object[]{
+                dto.getNombre() + " " + dto.getApellidos() + " · " + dto.getDni(),
+                String.format("%.2f", dto.getTotalReservas()),
+                String.format("%.2f", dto.getTotalActividades()),
+                String.format("%.2f", dto.getTotalDeuda())
             });
             sumRes += dto.getTotalReservas();
             sumAct += dto.getTotalActividades();
@@ -222,13 +199,12 @@ public class ContabilidadSociosView extends JFrame {
         }
 
         actualizarTotales(lista.size(), sumRes, sumAct, sumTot);
-        lblEstado.setText("Cálculo completado. Pulse 'Guardar fichero' para exportar.");
-        lblEstado.setForeground(new Color(40, 120, 40));
+        setEstado("Cálculo completado. Pulse 'Guardar fichero' para exportar.", new Color(30, 110, 30));
         btnGuardar.setEnabled(true);
     }
 
-    private void actualizarTotales(int nSocios, double res, double act, double tot) {
-        lblTotalSocios     .setText("Total socios: " + nSocios);
+    private void actualizarTotales(int n, double res, double act, double tot) {
+        lblTotalSocios     .setText("Total socios: " + n);
         lblTotalReservas   .setText(String.format("Total: %.2f €", res));
         lblTotalActividades.setText(String.format("Total: %.2f €", act));
         lblTotalDeuda      .setText(String.format("Total: %.2f €", tot));
@@ -236,28 +212,27 @@ public class ContabilidadSociosView extends JFrame {
 
     public void mostrarMensajeFichero(String ruta) {
         if (ruta != null) {
-            lblEstado.setText("Fichero guardado en: " + ruta);
-            lblEstado.setForeground(new Color(40, 120, 40));
+            setEstado("Fichero guardado: " + ruta, new Color(30, 110, 30));
         } else {
-            lblEstado.setText("No se generó fichero (sin datos).");
-            lblEstado.setForeground(new Color(160, 80, 0));
+            setEstado("No se generó fichero (sin datos).", new Color(160, 80, 0));
         }
     }
 
-    public void mostrarError(String mensaje) {
-        JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
+    public void mostrarError(String msg) {
+        JOptionPane.showMessageDialog(this, msg, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    private void setEstado(String msg, Color color) {
+        lblEstado.setText(msg);
+        lblEstado.setForeground(color);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
     // Getters para el Controller
     // ─────────────────────────────────────────────────────────────────────────
 
-    public int getMesSeleccionado()  { return cmbMes.getSelectedIndex() + 1; }
-
-    public int getAnioSeleccionado() {
-        return (Integer) cmbAnio.getSelectedItem();
-    }
-
-    public JButton getBtnCalcular() { return btnCalcular; }
-    public JButton getBtnGuardar()  { return btnGuardar;  }
+    public int     getMesSeleccionado()  { return cmbMes.getSelectedIndex() + 1;          }
+    public int     getAnioSeleccionado() { return (Integer) cmbAnio.getSelectedItem();     }
+    public JButton getBtnCalcular()      { return btnCalcular;                             }
+    public JButton getBtnGuardar()       { return btnGuardar;                              }
 }
