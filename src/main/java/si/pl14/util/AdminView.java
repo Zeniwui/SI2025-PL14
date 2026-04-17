@@ -12,6 +12,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import si.pl14.contabilidadSocios.ContabilidadSociosController;
+import si.pl14.contabilidadSocios.ContabilidadSociosModel;
+import si.pl14.contabilidadSocios.ContabilidadSociosView;
 import si.pl14.actividadesEmma.Lista_Actividades_Periodo_Admin_Vista;
 import si.pl14.actividadesEmma.Lista_Actividades_Periodo_Controller;
 import si.pl14.actividadesEmma.Lista_Actividades_Periodo_Model;
@@ -65,6 +68,7 @@ public class AdminView {
         cbHistorias.addItem("HU4: Planificar una actividad");
         cbHistorias.addItem("HU5: Crear un periodo de inscripcion");
         cbHistorias.addItem("HU6: Obtener lsita de actividades ofertadas en un periodo");
+        cbHistorias.addItem("HU8: Calcular contabilidad de socios en un mes");
         
         panel.add(cbHistorias, BorderLayout.CENTER);
 
@@ -110,6 +114,12 @@ public class AdminView {
     				Lista_Actividades_Periodo_Controller controladorlista = new Lista_Actividades_Periodo_Controller(modelolista,
     						vistalista);
     				controladorlista.initController();
+                	break;
+                case 7:
+                	ContabilidadSociosView viewContab = new ContabilidadSociosView();
+                	ContabilidadSociosModel modelContab = new ContabilidadSociosModel();
+                	ContabilidadSociosController controllerContab = new ContabilidadSociosController(modelContab, viewContab);
+                	controllerContab.initController();
                 	break;
                 }
             }
