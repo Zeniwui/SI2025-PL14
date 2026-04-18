@@ -5,6 +5,7 @@
 -- ─────────────────────────────────────────────────────────────────
 
 -- borrado en orden inverso para respetar las claves foraneas
+DROP TABLE IF EXISTS ListaEspera;
 DROP TABLE IF EXISTS Pagos;
 DROP TABLE IF EXISTS Inscripciones;
 DROP TABLE IF EXISTS Horarios;
@@ -130,25 +131,17 @@ CREATE TABLE IF NOT EXISTS Pagos (
     )
 );
 
-CREATE TABLE IF NOT EXISTS Pagos (
-    id_pago          INTEGER PRIMARY KEY AUTOINCREMENT,
-    id_socio         INTEGER       NOT NULL,
-    monto            DECIMAL(10,2) NOT NULL,
-    fecha_pago       DATETIME      DEFAULT CURRENT_TIMESTAMP,
-    metodo_pago      VARCHAR(20)   NOT NULL,
-    estado_pago      VARCHAR(20)   DEFAULT 'Pendiente',
-    concepto         VARCHAR(100),
-    
-    id_reserva       INTEGER       NULL,
-    id_inscripcion   INTEGER       NULL,
-    
-    FOREIGN KEY (id_socio)       REFERENCES Socios(id_socio),
-    FOREIGN KEY (id_reserva)     REFERENCES Reservas(id_reserva) ON DELETE SET NULL,
-    FOREIGN KEY (id_inscripcion) REFERENCES Inscripciones(id_inscripcion) ON DELETE SET NULL,
-    
-    CONSTRAINT chk_origen_pago CHECK (
-        (id_reserva IS NOT NULL AND id_inscripcion IS NULL) OR
-        (id_reserva IS NULL AND id_inscripcion IS NOT NULL) OR
-        (id_reserva IS NULL AND id_inscripcion IS NULL)
+CREATE TABLE IF NOT EXISTS ListaEspera (
+    id_espera       INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_actividad    INTEGER  NOT NULL,
+    id_socio        INTEGER  NULL,
+    id_no_socio     INTEGER  NULL,
+    fecha_solicitud DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_actividad) REFERENCES Actividades(id_actividad) ON DELETE CASCADE,
+    FOREIGN KEY (id_socio)     REFERENCES Socios(id_socio)          ON DELETE CASCADE,
+    FOREIGN KEY (id_no_socio)  REFERENCES NoSocios(id_no_socio)     ON DELETE CASCADE,
+    CONSTRAINT chk_solicitante_espera CHECK (
+        (id_socio IS NOT NULL AND id_no_socio IS NULL) OR
+        (id_socio IS NULL AND id_no_socio IS NOT NULL)
     )
 );
