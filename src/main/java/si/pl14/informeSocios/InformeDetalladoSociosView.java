@@ -45,18 +45,43 @@ public class InformeDetalladoSociosView {
     private void buildView() {
         frame = new JDialog((Frame) null, "Generar Informe Detallado de Socios", true);
         frame.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        frame.setSize(950, 620);
-        frame.setMinimumSize(new Dimension(800, 500));
+        frame.setSize(950, 660);
+        frame.setMinimumSize(new Dimension(800, 540));
         frame.setLocationRelativeTo(null);
 
         JPanel root = new JPanel(new BorderLayout(0, 8));
         root.setBorder(new EmptyBorder(14, 14, 14, 14));
         root.setBackground(Color.WHITE);
 
-        root.add(buildCabecera(),    BorderLayout.NORTH);
+        root.add(buildCabecera(),      BorderLayout.NORTH);
         root.add(buildPanelBusqueda(), BorderLayout.CENTER);
+        root.add(buildPanelInferior(), BorderLayout.SOUTH);  // <-- nuevo panel inferior
 
         frame.add(root);
+    }
+
+    // ── Panel inferior con el botón Guardar Fichero ────────────────────────
+    private JPanel buildPanelInferior() {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 8));
+        panel.setBackground(new Color(245, 248, 255));
+        panel.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(180, 210, 255)),
+            new EmptyBorder(2, 10, 2, 10)
+        ));
+
+        btnGuardar = new JButton("Guardar Fichero");
+        btnGuardar.setFont(FONT_BOLD);
+        btnGuardar.setFocusPainted(false);
+        btnGuardar.setOpaque(true);
+        btnGuardar.setBorderPainted(false);
+        btnGuardar.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        // Arranca deshabilitado y gris hasta que haya resultados válidos
+        btnGuardar.setEnabled(false);
+        btnGuardar.setBackground(new Color(180, 180, 180));
+        btnGuardar.setForeground(new Color(230, 230, 230));
+
+        panel.add(btnGuardar);
+        return panel;
     }
 
     private JPanel buildCabecera() {
@@ -115,15 +140,6 @@ public class InformeDetalladoSociosView {
         });
         cbFiltrar.setFont(FONT_NORMAL);
 
-        btnGuardar = new JButton("Guardar Informe");
-        btnGuardar.setFont(FONT_BOLD);
-        btnGuardar.setBackground(new Color(34, 139, 34));
-        btnGuardar.setForeground(Color.WHITE);
-        btnGuardar.setFocusPainted(false);
-        btnGuardar.setOpaque(true);
-        btnGuardar.setBorderPainted(false);
-        btnGuardar.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
         panelBusqueda.add(lblRango);
         panelBusqueda.add(new JLabel("Desde:"));
         panelBusqueda.add(txtFechaDesde);
@@ -133,8 +149,6 @@ public class InformeDetalladoSociosView {
         panelBusqueda.add(Box.createHorizontalStrut(20));
         panelBusqueda.add(new JLabel("Ordenar por:"));
         panelBusqueda.add(cbFiltrar);
-        panelBusqueda.add(Box.createHorizontalStrut(10));
-        panelBusqueda.add(btnGuardar);
 
         panelResultados = new JPanel(new BorderLayout());
         panelResultados.setBackground(Color.WHITE);
@@ -143,9 +157,21 @@ public class InformeDetalladoSociosView {
             "Seleccione el rango de fechas y pulse <b>Confirmar</b> para generar el informe."
         ), BorderLayout.CENTER);
 
-        contenedor.add(panelBusqueda,    BorderLayout.NORTH);
-        contenedor.add(panelResultados,  BorderLayout.CENTER);
+        contenedor.add(panelBusqueda,   BorderLayout.NORTH);
+        contenedor.add(panelResultados, BorderLayout.CENTER);
         return contenedor;
+    }
+
+    // ── Habilita/deshabilita el botón cambiando su color ──────────────────
+    public void setGuardarEnabled(boolean enabled) {
+        btnGuardar.setEnabled(enabled);
+        if (enabled) {
+            btnGuardar.setBackground(new Color(34, 139, 34));
+            btnGuardar.setForeground(Color.WHITE);
+        } else {
+            btnGuardar.setBackground(new Color(180, 180, 180));
+            btnGuardar.setForeground(new Color(230, 230, 230));
+        }
     }
 
     public void mostrarResultados(List<InformeDetalladoSocioDTO> datos,

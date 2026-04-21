@@ -9,20 +9,6 @@ import java.time.format.DateTimeParseException;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- * Controlador MVC para la HU "Generar Informe Detallado de Socios".
- *
- * Flujo:
- *  1. initController() registra listeners y hace visible la ventana.
- *  2. Botón "Confirmar" → valida fechas, consulta el Model y muestra resultados.
- *     Validaciones:
- *       · Ambos campos deben estar rellenos y con formato dd/MM/yyyy.
- *       · La fecha de inicio no puede ser posterior a hoy.
- *       · La fecha de fin no puede ser posterior a hoy.
- *       · La fecha de fin no puede ser anterior a la de inicio.
- *  3. ComboBox "Ordenar por" → reordena la lista en memoria y refresca la tabla.
- *  4. Botón "Guardar Informe" → exporta a CSV mediante la Vista.
- */
 public class InformeDetalladoSociosController {
 
     private static final DateTimeFormatter FMT_ENTRADA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -40,9 +26,9 @@ public class InformeDetalladoSociosController {
     }
 
     public void initController() {
-        view.getBtnConfirmar()  .addActionListener(e -> SwingUtil.exceptionWrapper(this::accionConfirmar));
-        view.getBtnGuardar()    .addActionListener(e -> SwingUtil.exceptionWrapper(this::accionGuardar));
-        view.getCbFiltrar()     .addActionListener(e -> SwingUtil.exceptionWrapper(this::accionFiltrar));
+        view.getBtnConfirmar().addActionListener(e -> SwingUtil.exceptionWrapper(this::accionConfirmar));
+        view.getBtnGuardar()  .addActionListener(e -> SwingUtil.exceptionWrapper(this::accionGuardar));
+        view.getCbFiltrar()   .addActionListener(e -> SwingUtil.exceptionWrapper(this::accionFiltrar));
         view.setVisible(true);
     }
 
@@ -68,7 +54,6 @@ public class InformeDetalladoSociosController {
             throw new ApplicationException("La fecha de fin no tiene el formato correcto (dd/MM/yyyy).");
         }
 
-        // ── Validación: fechas no pueden ser futuras ──────────────────────
         LocalDate hoy = LocalDate.now();
 
         if (fechaInicio.isAfter(hoy))
@@ -82,7 +67,6 @@ public class InformeDetalladoSociosController {
                 "La fecha de fin no puede ser posterior a hoy (" + hoy.format(FMT_ENTRADA) + ").\n" +
                 "No es posible informar de reservas o actividades que aún no han ocurrido."
             );
-        // ──────────────────────────────────────────────────────────────────
 
         if (fechaFin.isBefore(fechaInicio))
             throw new ApplicationException("La fecha de fin no puede ser anterior a la de inicio.");
@@ -90,6 +74,7 @@ public class InformeDetalladoSociosController {
         datosActuales = model.getInforme(fechaInicio.format(FMT_ISO), fechaFin.format(FMT_ISO));
         aplicarOrden(datosActuales);
         view.mostrarResultados(datosActuales, textoInicio, textoFin);
+        view.setGuardarEnabled(!datosActuales.isEmpty()); // <-- activa el botón si hay resultados
     }
 
     private void accionFiltrar() {
