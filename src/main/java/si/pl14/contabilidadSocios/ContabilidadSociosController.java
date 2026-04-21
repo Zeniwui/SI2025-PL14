@@ -1,5 +1,7 @@
 package si.pl14.contabilidadSocios;
 
+import si.pl14.util.ApplicationException;
+
 import javax.swing.JFileChooser;
 import java.util.List;
 
@@ -9,6 +11,8 @@ import java.util.List;
  * Flujo:
  *  1. initController() registra los listeners y hace visible la ventana.
  *  2. Botón "Calcular"  → llama al Model y pasa resultados a la Vista.
+ *     Si el Model lanza ApplicationException por fecha futura o demasiado antigua,
+ *     el Controller resalta los selectores en rojo y muestra un mensaje preventivo.
  *  3. Botón "Guardar"   → abre JFileChooser de directorio y delega en el Model.
  */
 public class ContabilidadSociosController {
@@ -38,12 +42,29 @@ public class ContabilidadSociosController {
     private void onCalcular() {
         int mes  = view.getMesSeleccionado();
         int anio = view.getAnioSeleccionado();
+
         try {
+            // Resetear posibles marcas de error anteriores antes de recalcular
+            view.resetearFecha();
+
             ultimaLista = model.calcularContabilidad(mes, anio);
             ultimoMes   = mes;
             ultimoAnio  = anio;
             view.mostrarResultados(ultimaLista, mes, anio);
+
+        } catch (ApplicationException ex) {
+            // Error de validación de rango de fechas: resaltar selectores en rojo
+            // y mostrar mensaje claro al usuario sin stacktrace técnico.
+            view.marcarFechaInvalida();
+            view.mostrarError(
+                "Fecha no válida\n\n" + ex.getMessage() +
+                "\n\nPor favor, seleccione un mes comprendido entre\n" +
+                "el mes actual y hace un año."
+            );
+
         } catch (Exception ex) {
+            // Error inesperado: resetear marcas y mostrar mensaje genérico.
+            view.resetearFecha();
             view.mostrarError("Error al calcular la contabilidad:\n" + ex.getMessage());
         }
     }

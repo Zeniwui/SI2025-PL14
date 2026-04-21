@@ -16,11 +16,20 @@ import java.util.List;
  *  - Selectores de mes y año + botón Calcular
  *  - Tabla con resultados (nombre+DNI, coste reservas, coste actividades, deuda)
  *  - Fila de TOTALES al pie de la tabla
- *  - Botón "Guardar fichero" + etiqueta de estado
+ *  - Botón "Guardar fichero" (verde) + etiqueta de estado
+ *
+ * Los selectores de fecha pueden marcarse en rojo (marcarFechaInvalida) cuando
+ * el Controller detecta un rango no permitido, y restaurarse (resetearFecha)
+ * en el siguiente cálculo correcto.
  */
 public class ContabilidadSociosView extends JFrame {
 
     private static final long serialVersionUID = 1L;
+
+    // Color del botón Guardar (verde)
+    private static final Color COLOR_BTN_GUARDAR   = new Color(34, 139, 34);
+    // Color de fondo para selectores con fecha inválida
+    private static final Color COLOR_FECHA_INVALIDA = new Color(255, 150, 150);
 
     // Controles de selección
     private JComboBox<String>  cmbMes;
@@ -156,6 +165,12 @@ public class ContabilidadSociosView extends JFrame {
 
         btnGuardar = new JButton("Guardar fichero");
         btnGuardar.setEnabled(false);
+        // ── Mejora: botón verde para que el usuario identifique su función ──
+        btnGuardar.setBackground(COLOR_BTN_GUARDAR);
+        btnGuardar.setForeground(Color.WHITE);
+        btnGuardar.setOpaque(true);
+        btnGuardar.setBorderPainted(false);
+        btnGuardar.setFont(btnGuardar.getFont().deriveFont(Font.BOLD));
         p.add(btnGuardar, BorderLayout.WEST);
 
         lblEstado = new JLabel(" ");
@@ -225,6 +240,29 @@ public class ContabilidadSociosView extends JFrame {
     private void setEstado(String msg, Color color) {
         lblEstado.setText(msg);
         lblEstado.setForeground(color);
+    }
+
+    /**
+     * Marca los selectores de mes y año en rojo para indicar visualmente
+     * que la fecha seleccionada no es válida (futura o demasiado antigua).
+     */
+    public void marcarFechaInvalida() {
+        cmbMes .setBackground(COLOR_FECHA_INVALIDA);
+        cmbAnio.setBackground(COLOR_FECHA_INVALIDA);
+        setEstado("Fecha no válida: seleccione un mes dentro del rango permitido.", new Color(180, 0, 0));
+        lblResultado.setText("–");
+        btnGuardar.setEnabled(false);
+    }
+
+    /**
+     * Restaura el aspecto normal de los selectores de fecha
+     * tras un cálculo correcto.
+     */
+    public void resetearFecha() {
+        Color fondoOriginal = UIManager.getColor("ComboBox.background");
+        if (fondoOriginal == null) fondoOriginal = Color.WHITE;
+        cmbMes .setBackground(fondoOriginal);
+        cmbAnio.setBackground(fondoOriginal);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
