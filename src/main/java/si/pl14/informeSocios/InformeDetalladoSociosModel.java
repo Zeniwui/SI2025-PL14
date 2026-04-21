@@ -27,11 +27,18 @@ public class InformeDetalladoSociosModel {
             "    COALESCE(SUM(CASE WHEN r.estado_pago = 'Pendiente' " +
             "                      THEN r.coste_reserva ELSE 0.0 END), 0.0) AS deuda, " +
             "    COALESCE(( " +
-            "        SELECT ins.nombre FROM Reservas r2 " +
-            "        JOIN Instalaciones ins ON r2.id_instalacion = ins.id_instalacion " +
-            "        WHERE r2.id_socio = s.id_socio " +
-            "          AND r2.fecha BETWEEN ? AND ? " +
-            "        GROUP BY r2.id_instalacion " +
+            "        SELECT ins.nombre FROM ( " +
+            "            SELECT r2.id_instalacion FROM Reservas r2 " +
+            "            WHERE r2.id_socio = s.id_socio " +
+            "              AND r2.fecha BETWEEN ? AND ? " +
+            "            UNION ALL " +
+            "            SELECT a2.id_instalacion FROM Inscripciones i2 " +
+            "            JOIN Actividades a2 ON i2.id_actividad = a2.id_actividad " +
+            "            WHERE i2.id_socio = s.id_socio " +
+            "              AND a2.fecha_inicio BETWEEN ? AND ? " +
+            "        ) usos " +
+            "        JOIN Instalaciones ins ON usos.id_instalacion = ins.id_instalacion " +
+            "        GROUP BY usos.id_instalacion " +
             "        ORDER BY COUNT(*) DESC LIMIT 1 " +
             "    ), '-') AS instalacion_favorita " +
             "FROM Socios s " +
@@ -48,7 +55,8 @@ public class InformeDetalladoSociosModel {
 
         List<Object[]> filas = db.executeQueryArray(sql,
             fechaDesde, fechaHasta,   // num_actividades (subquery SELECT)
-            fechaDesde, fechaHasta,   // instalacion_favorita (subquery SELECT)
+            fechaDesde, fechaHasta,   // instalacion_favorita – reservas  (UNION branch 1)
+            fechaDesde, fechaHasta,   // instalacion_favorita – actividades (UNION branch 2)
             fechaDesde, fechaHasta,   // LEFT JOIN Reservas (fecha del periodo)
             fechaDesde, fechaHasta);  // HAVING actividades (subquery)
 
