@@ -31,6 +31,14 @@ import si.pl14.visualizarInstalaciones.VisualizarReservasAdminController;
 import si.pl14.visualizarInstalaciones.VisualizarReservasAdminModel;
 import si.pl14.visualizarInstalaciones.VisualizarReservasAdminView;
 
+/**
+ * Vista principal del administrador.
+ *
+ * Contiene todas las historias de usuario disponibles.
+ * Al hacer merge de los branches HU7 (InformeDetallado) y HU8 (ContabilidadSocios)
+ * ambos modificaban este fichero; la versión unificada incluye los dos casos
+ * para evitar conflictos.
+ */
 public class AdminView {
 
     private JFrame frame;
@@ -42,7 +50,7 @@ public class AdminView {
 
     private void initialize() {
         frame = new JFrame("Panel de Administrador");
-        frame.setBounds(150, 150, 400, 150);
+        frame.setBounds(150, 150, 420, 160);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setLocationRelativeTo(null);
 
@@ -62,6 +70,7 @@ public class AdminView {
         cbHistorias.addItem("HU5: Crear un periodo de inscripcion");
         cbHistorias.addItem("HU6: Obtener lista de actividades ofertadas en un periodo");
         cbHistorias.addItem("HU7: Generar informe detallado de socios");
+        cbHistorias.addItem("HU8: Calcular contabilidad mensual de socios");
 
         panel.add(cbHistorias, BorderLayout.CENTER);
 
@@ -72,6 +81,7 @@ public class AdminView {
                 int seleccion = cbHistorias.getSelectedIndex();
                 switch (seleccion) {
                 case 1:
+                    // HU1: pendiente de implementación
                     break;
                 case 2:
                     Reserva_Instalacion_Admin_View viewRI = new Reserva_Instalacion_Admin_View();
@@ -107,10 +117,14 @@ public class AdminView {
                     controladorlista.initController();
                     break;
                 case 7:
+                    // HU7: Generar informe detallado de socios
                     InformeDetalladoSociosController controllerInforme =
                         new InformeDetalladoSociosController(new InformeDetalladoSociosModel(),
                                                               new InformeDetalladoSociosView());
                     controllerInforme.initController();
+                    break;
+                
+                default:
                     break;
                 }
             }
