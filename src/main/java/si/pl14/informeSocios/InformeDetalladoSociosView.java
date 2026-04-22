@@ -55,12 +55,11 @@ public class InformeDetalladoSociosView {
 
         root.add(buildCabecera(),      BorderLayout.NORTH);
         root.add(buildPanelBusqueda(), BorderLayout.CENTER);
-        root.add(buildPanelInferior(), BorderLayout.SOUTH);  // <-- nuevo panel inferior
+        root.add(buildPanelInferior(), BorderLayout.SOUTH);
 
         frame.add(root);
     }
 
-    // ── Panel inferior con el botón Guardar Fichero ────────────────────────
     private JPanel buildPanelInferior() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 8));
         panel.setBackground(new Color(245, 248, 255));
@@ -75,7 +74,6 @@ public class InformeDetalladoSociosView {
         btnGuardar.setOpaque(true);
         btnGuardar.setBorderPainted(false);
         btnGuardar.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        // Arranca deshabilitado y gris hasta que haya resultados válidos
         btnGuardar.setEnabled(false);
         btnGuardar.setBackground(new Color(180, 180, 180));
         btnGuardar.setForeground(new Color(230, 230, 230));
@@ -162,7 +160,6 @@ public class InformeDetalladoSociosView {
         return contenedor;
     }
 
-    // ── Habilita/deshabilita el botón cambiando su color ──────────────────
     public void setGuardarEnabled(boolean enabled) {
         btnGuardar.setEnabled(enabled);
         if (enabled) {
@@ -238,8 +235,7 @@ public class InformeDetalladoSociosView {
         } catch (IOException e) {
             throw new ApplicationException("No se pudo guardar el informe: " + e.getMessage());
         }
-    }  
-    
+    }
 
     private JScrollPane crearTabla(List<InformeDetalladoSocioDTO> datos) {
         String[] cabeceras = {"Socio", "Reservas realizadas", "Actividades", "Deuda (EUR)", "Instalación Favorita"};
@@ -265,11 +261,16 @@ public class InformeDetalladoSociosView {
 
         double totalDeuda    = 0;
         int    totalReservas = 0;
+        java.util.Map<String, Integer> freqInst = new java.util.LinkedHashMap<>();
 
         for (int i = 0; i < datos.size(); i++) {
             InformeDetalladoSocioDTO d = datos.get(i);
             totalDeuda    += d.getDeuda();
             totalReservas += d.getNumReservas();
+
+            String inst = d.getInstalacionFavorita();
+            if (inst != null && !inst.equals("-"))
+                freqInst.merge(inst, 1, Integer::sum);
 
             Color bgFila = calcularColorFila(d.getDeuda(), i);
 
@@ -299,6 +300,11 @@ public class InformeDetalladoSociosView {
             }
         }
 
+        String instMasRepetida = freqInst.entrySet().stream()
+            .max(java.util.Map.Entry.comparingByValue())
+            .map(e -> e.getKey() + " (" + e.getValue() + "×)")
+            .orElse("-");
+
         int   filaTot = datos.size() + 1;
         Color bgTotal = new Color(215, 230, 255);
         String[] totales = {
@@ -306,7 +312,7 @@ public class InformeDetalladoSociosView {
             String.valueOf(totalReservas),
             "",
             String.format("%.2f", totalDeuda),
-            ""
+            instMasRepetida
         };
         for (int col = 0; col < cabeceras.length; col++) {
             gc.gridx = col; gc.gridy = filaTot; gc.weightx = pesos[col];
