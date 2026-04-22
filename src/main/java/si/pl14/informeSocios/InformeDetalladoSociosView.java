@@ -228,17 +228,18 @@ public class InformeDetalladoSociosView {
         if (res != JFileChooser.APPROVE_OPTION) return;
 
         try (FileWriter fw = new FileWriter(fc.getSelectedFile())) {
-            fw.write("Socio;Reservas;Actividades;Deuda (EUR);Instalacion Favorita\n");
+            fw.write("Socio;Reservas;Actividades;Deuda (EUR);Top Instalaciones\n");
             for (InformeDetalladoSocioDTO d : datos) {
                 fw.write(String.format("%s;%d;%d;%.2f;%s\n",
                     d.getNombreSocio(), d.getNumReservas(),
                     d.getNumActividades(), d.getDeuda(),
-                    d.getInstalacionFavorita()));
+                    d.getTopInstalaciones()));
             }
         } catch (IOException e) {
             throw new ApplicationException("No se pudo guardar el informe: " + e.getMessage());
         }
-    }
+    }  
+    
 
     private JScrollPane crearTabla(List<InformeDetalladoSocioDTO> datos) {
         String[] cabeceras = {"Socio", "Reservas realizadas", "Actividades", "Deuda (EUR)", "Instalación Favorita"};
