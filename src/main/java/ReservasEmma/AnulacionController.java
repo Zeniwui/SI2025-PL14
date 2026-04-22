@@ -3,6 +3,7 @@ package ReservasEmma;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -12,7 +13,7 @@ import javax.swing.table.DefaultTableModel;
 public class AnulacionController {
 	private AnulacionModel model;
 	private AnulacionView view;
-	private List<AnulacionModel.ReservaDetalleDTO> reservasActuales;
+	private List<ReservaDetalleDTO> reservasActuales;
 
 	public AnulacionController(AnulacionModel m, AnulacionView v) {
 		this.model = m;
@@ -24,7 +25,14 @@ public class AnulacionController {
 		view.getBtnBuscarNombre().addActionListener(e -> buscar(1));
 		view.getBtnBuscarDni().addActionListener(e -> buscar(2));
 		view.getBtnBuscarId().addActionListener(e -> buscar(3));
-		view.getBtnAnular().addActionListener(e -> ejecutarAnulacion());
+		view.getBtnAnular().addActionListener(e -> {
+			try {
+				ejecutarAnulacion();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
 		view.getBtnLimpiar().addActionListener(e -> limpiarTabla());
 
 		view.getTablaReservas().getSelectionModel().addListSelectionListener(e -> {
@@ -76,13 +84,13 @@ public class AnulacionController {
 
 	private void llenarTabla() {
 		DefaultTableModel modelo = view.getModeloTabla();
-		for (AnulacionModel.ReservaDetalleDTO r : reservasActuales) {
+		for (ReservaDetalleDTO r : reservasActuales) {
 			modelo.addRow(new Object[] { r.getIdReserva(), r.getInstalacion(), r.getFecha(), r.getHoraInicio(),
 					r.getHoraFin(), r.getCosteReserva(), r.getIdSocio(), r.getDniSocio(), r.getNombreSocio() });
 		}
 	}
 
-	private void ejecutarAnulacion() {
+	private void ejecutarAnulacion() throws SQLException {
 		int fila = view.getTablaReservas().getSelectedRow();
 		if (fila == -1) {
 			JOptionPane.showMessageDialog(view, "Por favor, seleccione una reserva de la tabla.");
@@ -104,26 +112,12 @@ public class AnulacionController {
 		if (confirm == JOptionPane.YES_OPTION) {
 			model.anularReserva(idReserva);
 
-			guardarNotificacionTxt(nombreSocio, motivo);
+			model.guardarNotificacionTxt(nombreSocio, motivo);
 
 			JOptionPane.showMessageDialog(view,
 					"Reserva anulada.\nSe ha devuelto el dinero, eliminado el cargo en pagos y liberado la instalación.");
 			view.getTxtMotivo().setText("");
 			buscarReciente();
-		}
-	}
-
-	private void guardarNotificacionTxt(String nombreSocio, String motivo) {
-		try (BufferedWriter writer = new BufferedWriter(new FileWriter("notificaciones_cancelaciones.txt", true))) {
-			String fechaHora = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
-			String mensaje = "[" + fechaHora + "] SOCIO: " + nombreSocio + " | MOTIVO: " + motivo;
-
-			writer.write(mensaje);
-			writer.newLine();
-
-			System.out.println("Se ha guardado la notificación en 'notificaciones_cancelaciones.txt'");
-		} catch (IOException e) {
-			System.err.println("Error al escribir el archivo txt: " + e.getMessage());
 		}
 	}
 
