@@ -106,12 +106,14 @@ public class Generacion_Automatica_Controller {
             }
         }
 
-        JOptionPane.showMessageDialog(view, 
-                "Proceso finalizado.\n\n" +
-                "- Reservas creadas: " + reservasCreadas + "\n" +
-                "- Socios desplazados/anulados: " + sociosAnulados + "\n" +
-                "- Conflictos omitidos: " + conflictosIgnorados, 
-                "Resumen de Generación", JOptionPane.INFORMATION_MESSAGE);
+        String mensajeResumen = String.format(
+        	    "<html>Proceso finalizado: <font color='blue'>%d creadas</font> | " +
+        	    "<font color='orange'>%d socios anulados</font> | " +
+        	    "<font color='red'>%d conflictos</font></html>",
+        	    reservasCreadas, sociosAnulados, conflictosIgnorados
+        	);
+
+        	view.getLblResumen().setText(mensajeResumen);
         
         cargarActividadesPendientes();
     }

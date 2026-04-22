@@ -13,6 +13,7 @@ public class Generacion_Automatica_View extends JFrame {
     private JButton btnGenerarReservas;
     private JTable tableLog;
     private DefaultTableModel modelLog;
+    private JLabel lblResumen;
 
     public Generacion_Automatica_View() {
         setTitle("Generador Automático de Reservas (Ejecución)");
@@ -43,6 +44,11 @@ public class Generacion_Automatica_View extends JFrame {
         modelLog = new DefaultTableModel(null, columnas);
         tableLog = new JTable(modelLog);
         tableLog.setRowHeight(25);
+        
+        lblResumen = new JLabel("Seleccione una actividad y pulse Generar.");
+        lblResumen.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        // Añádelo al panel sur (SOUTH) o donde prefieras
+        panel.add(lblResumen, BorderLayout.SOUTH);
 
         // Colores según lo que haya pasado (Socio borrado, Actividad choca, Libre)
         tableLog.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
@@ -76,4 +82,5 @@ public class Generacion_Automatica_View extends JFrame {
     public JComboBox<String> getCbActividadesPendientes() { return cbActividadesPendientes; }
     public JButton getBtnGenerarReservas() { return btnGenerarReservas; }
     public DefaultTableModel getModelLog() { return modelLog; }
+    public JLabel getLblResumen() { return lblResumen; }
 }
