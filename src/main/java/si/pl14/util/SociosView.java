@@ -1,18 +1,29 @@
 package si.pl14.util;
 
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-// Importa aquí tus clases del MVC
-import si.pl14.reservas.ReservaModel;
-import si.pl14.reservas.ReservaController;
-import si.pl14.reservas.ReservaView;
-import si.pl14.visualizareservas.*;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+
 import si.pl14.estadoPagosSocio.EstadoPagosSocioController;
 import si.pl14.estadoPagosSocio.EstadoPagosSocioModel;
+import si.pl14.inscripcionesSocio.InscripcionSocioController;
+import si.pl14.inscripcionesSocio.InscripcionSocioModel;
+import si.pl14.inscripcionesSocio.InscripcionSocioView;
+import si.pl14.reservasSocio.ReservaController;
+// Importa aquí tus clases del MVC
+import si.pl14.reservasSocio.ReservaModel;
+import si.pl14.reservasSocio.ReservaView;
+import si.pl14.visualizareservas.VisualizarReservasSocioController;
+import si.pl14.visualizareservas.VisualizarReservasSocioModel;
+import si.pl14.visualizareservas.VisualizarReservasSocioView;
 
 public class SociosView {
 
@@ -47,6 +58,7 @@ public class SociosView {
         cbHistorias.addItem("HU2: Ver disponibilidad de las instalaciones");
         cbHistorias.addItem("HU3: Visualizar mis reservas en un periodo de tiempo");
         cbHistorias.addItem("HU4: Ver estado de mis pagos de reservas y actividades");
+        cbHistorias.addItem("HU5: Inscribirse a una actividad");
         
         panel.add(cbHistorias, BorderLayout.CENTER);
 
@@ -76,6 +88,9 @@ public class SociosView {
                 		new EstadoPagosSocioController(new EstadoPagosSocioModel());
                 	controllerEstadoPagos.initController();
                 	break;
+                case 5:
+                	InscripcionSocioController controllerInscripcion = new InscripcionSocioController(new InscripcionSocioModel(), new InscripcionSocioView());
+                	controllerInscripcion.initController();
                 }
             }
         });

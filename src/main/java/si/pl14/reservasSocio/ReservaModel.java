@@ -1,4 +1,4 @@
-package si.pl14.reservas;
+package si.pl14.reservasSocio;
 
 import java.util.List;
 
@@ -140,7 +140,7 @@ public class ReservaModel {
 	/*
 	 * Realiza la reserva y la guarda en la base de datos
 	 */
-	public void realizarReserva(ReservaEntity reserva) {
+	public void realizarReserva(ReservaEntity reserva, String nombreInstalacion) {
 		String sql = "INSERT INTO Reservas (id_instalacion, fecha, hora_inicio, hora_fin, id_socio, coste_reserva, estado_pago, metodo_pago) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 	    
@@ -157,16 +157,35 @@ public class ReservaModel {
 	        reserva.getEstadoPago(),
 	        reserva.getMetodoPago()
 	    );
+	    
+	    String sqlGetId = "SELECT MAX(id_reserva) FROM Reservas";
+		List<Object[]> res = db.executeQueryArray(sqlGetId);
+		int idReserva = ((Number) res.get(0)[0]).intValue();
+		
+		// 3. Insertar el registro en la tabla Pagos asociado a esta reserva
+		String concepto = "Reserva instalación: " + nombreInstalacion;
+		
+		String sqlPago = "INSERT INTO Pagos (id_socio, monto, metodo_pago, estado_pago, concepto, id_reserva) " +
+				"VALUES (?, ?, ?, ?, ?, ?)";
+		
+		db.executeUpdate(sqlPago, 
+				reserva.getIdSocio(),
+				reserva.getCosteReserva(),
+				reserva.getMetodoPago(),
+				reserva.getEstadoPago(), 
+				concepto,
+				idReserva
+		);
 	}
 	
 	/*
 	 * Generar resguardo de la reserva
 	 */
-	public String generarResguardo(ReservaEntity reserva, String nombreInstalacion) {
+	public String generarResguardo(ReservaEntity reserva, String nombreInstalacion, String nombreSocio) {
 		
 		String resguardo = "--- RESGUARDO DE RESERVA ---" +
 				"\n Instalación: " + nombreInstalacion +
-				"\n Para socio: " + reserva.getIdSocio() +
+				"\n Para socio: " + nombreSocio +
 				"\n Para la fecha: " + reserva.getFecha() +
 				"\n Hora inicio: " + String.format("%02d:00", reserva.getHoraInicio()) +
 				"\n Hora fin: " + String.format("%02d:00", reserva.getHoraFin()) +
@@ -174,6 +193,20 @@ public class ReservaModel {
 				"\n Método pago: " + reserva.getMetodoPago();
 		
 		return resguardo;
+	}
+	
+	public String getNombreSocioById(int idSocio) {
+		String sql = "SELECT u.nombre, u.apellidos " +
+                     "FROM Usuarios u " +
+                     "INNER JOIN Socios s ON u.dni = s.dni " +
+                     "WHERE s.id_socio = ?";
+		
+		List<Object[]> res = db.executeQueryArray(sql, idSocio);
+		
+		if (!res.isEmpty()) {
+			return res.get(0)[0] + " " + res.get(0)[1];
+		}
+		return "Socio Desconocido";
 	}
 	
 }

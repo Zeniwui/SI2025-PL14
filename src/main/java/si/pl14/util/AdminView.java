@@ -12,6 +12,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import si.pl14.contabilidadSocios.ContabilidadSociosController;
+import si.pl14.contabilidadSocios.ContabilidadSociosModel;
+import si.pl14.contabilidadSocios.ContabilidadSociosView;
 import si.pl14.actividadesEmma.Lista_Actividades_Periodo_Admin_Vista;
 import si.pl14.actividadesEmma.Lista_Actividades_Periodo_Controller;
 import si.pl14.actividadesEmma.Lista_Actividades_Periodo_Model;
@@ -129,30 +132,18 @@ public class AdminView {
                     controllerPeriodosInscripcion.initController();
                     break;
                 case 6:
-                    // HU6: Obtener lista de actividades ofertadas en un periodo
-                    Lista_Actividades_Periodo_Admin_Vista vistalista = new Lista_Actividades_Periodo_Admin_Vista();
-                    Lista_Actividades_Periodo_Model modelolista = new Lista_Actividades_Periodo_Model();
-                    Lista_Actividades_Periodo_Controller controladorlista =
-                        new Lista_Actividades_Periodo_Controller(modelolista, vistalista);
-                    controladorlista.initController();
-                    break;
+                	Lista_Actividades_Periodo_Admin_Vista vistalista = new Lista_Actividades_Periodo_Admin_Vista();
+    				Lista_Actividades_Periodo_Model modelolista = new Lista_Actividades_Periodo_Model();
+    				Lista_Actividades_Periodo_Controller controladorlista = new Lista_Actividades_Periodo_Controller(modelolista,
+    						vistalista);
+    				controladorlista.initController();
+                	break;
                 case 7:
-                    // HU7: Generar informe detallado de socios
-                    InformeDetalladoSociosController controllerInforme =
-                        new InformeDetalladoSociosController(new InformeDetalladoSociosModel(),
-                                                              new InformeDetalladoSociosView());
-                    controllerInforme.initController();
-                    break;
-                case 8:
-                    // HU8: Calcular contabilidad mensual de socios
-                    ContabilidadSociosView viewContab = new ContabilidadSociosView();
-                    ContabilidadSociosModel modelContab = new ContabilidadSociosModel();
-                    ContabilidadSociosController controllerContab =
-                        new ContabilidadSociosController(modelContab, viewContab);
-                    controllerContab.initController();
-                    break;
-                default:
-                    break;
+                	ContabilidadSociosView viewContab = new ContabilidadSociosView();
+                	ContabilidadSociosModel modelContab = new ContabilidadSociosModel();
+                	ContabilidadSociosController controllerContab = new ContabilidadSociosController(modelContab, viewContab);
+                	controllerContab.initController();
+                	break;
                 }
             }
         });

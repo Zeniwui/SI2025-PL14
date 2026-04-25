@@ -59,6 +59,7 @@ public class InscripcionSocioModel {
 	 * Realiza la inscripcion
 	 * */
 	public void realizarInscripcion(int idSocio, ActividadInscripcionDTO actividad) {
+				// Comprobaciones para que el socio se pueda inscribir
 				if (!estaAlCorriente(idSocio)) {
 					throw new ApplicationException("No puedes inscribirte: No estás al corriente de pago.");
 				}
@@ -71,23 +72,51 @@ public class InscripcionSocioModel {
 					throw new ApplicationException("El aforo máximo para esta actividad se ha completado.");
 				}
 				
-				String sql = "INSERT INTO Inscripciones (id_socio, id_actividad, fecha_inscripcion) VALUES (?, ?, CURRENT_DATE)";
-				db.executeUpdate(sql, idSocio, actividad.getIdActividad());
+				// Insertamos la inscripción
+				String sqlInscripcion = "INSERT INTO Inscripciones (id_socio, id_actividad, fecha_inscripcion, precio_inscripcion) VALUES (?, ?, CURRENT_DATE, ?)";
+				db.executeUpdate(sqlInscripcion, idSocio, actividad.getIdActividad(), actividad.getPrecioSocio());
 				
-				generaResguardoInscripcion(idSocio, actividad.getNombre(), actividad.getPrecioSocio());
+				String sqlGetId = "SELECT last_insert_rowid()";
+				List<Object[]> res = db.executeQueryArray(sqlGetId);
+				int idInscripcion = ((Number) res.get(0)[0]).intValue();
+				
+				// Generamos el pago y lo insertamos
+				String concepto = "Cuota actividad: " + actividad.getNombre();
+				String metodoPago = "Cuota Mensual";
+				
+				String sqlPago = "INSERT INTO Pagos (id_socio, monto, metodo_pago, estado_pago, concepto, id_inscripcion) VALUES (?, ?, ?, 'Pendiente', ?, ?)";
+				db.executeUpdate(sqlPago, idSocio, actividad.getPrecioSocio(), metodoPago, concepto, idInscripcion);
+				
 	}
 	
 	/*
 	 * Genera un resguardo con los datos de la inscripcion para el socio
 	 * */
-	public String generaResguardoInscripcion(int idSocio, String nombreActividad, double precio) {
+	public String generaResguardoInscripcion(String nombreSocio, String nombreActividad, double precio) {
 		String fecha = new SimpleDateFormat("dd-MM-yyyy HH:mm").format(new Date());
 		String resguardo = "=== RESGUARDO DE INSCRIPCIÓN ===\n" +
-                           "ID Socio: " + idSocio + "\n" +
+                           "Socio: " + nombreSocio + "\n" +
                            "Actividad: " + nombreActividad + "\n" +
                            "Cuota mensual añadida: " + precio + " €\n" +
                            "Fecha de operación: " + fecha + "\n" +
                            "===============================";
 		return resguardo;
+	}
+	
+	/*
+	 * Obtiene el nombre completo de un socio por su ID
+	 */
+	public String getNombreSocioById(int idSocio) {
+		String sql = "SELECT u.nombre, u.apellidos " +
+                     "FROM Usuarios u " +
+                     "INNER JOIN Socios s ON u.dni = s.dni " +
+                     "WHERE s.id_socio = ?";
+		
+		List<Object[]> res = db.executeQueryArray(sql, idSocio);
+		
+		if (!res.isEmpty()) {
+			return res.get(0)[0] + " " + res.get(0)[1];
+		}
+		return "Socio Desconocido";
 	}
 }
