@@ -18,12 +18,18 @@ import si.pl14.actividadesEmma.Lista_Actividades_Periodo_Model;
 import si.pl14.actividadesEmma.Planificar_Actividad_Admin_View;
 import si.pl14.actividadesEmma.Planificar_Actividad_Controller;
 import si.pl14.actividadesEmma.Planificar_Actividad_Model;
+import si.pl14.contabilidadSocios.ContabilidadSociosController;
+import si.pl14.contabilidadSocios.ContabilidadSociosModel;
+import si.pl14.contabilidadSocios.ContabilidadSociosView;
 import si.pl14.informeSocios.InformeDetalladoSociosController;
 import si.pl14.informeSocios.InformeDetalladoSociosModel;
 import si.pl14.informeSocios.InformeDetalladoSociosView;
 import si.pl14.periodosinscripcion.PeriodosInscripcionController;
 import si.pl14.periodosinscripcion.PeriodosInscripcionModel;
 import si.pl14.periodosinscripcion.PeriodosInscripcionView;
+import si.pl14.reservasAdmin.ReservaControllerAdmin;
+import si.pl14.reservasAdmin.ReservaModelAdmin;
+import si.pl14.reservasAdmin.ReservaViewAdmin;
 import si.pl14.reservasEmma.Reserva_Instalacion_Admin_Controller;
 import si.pl14.reservasEmma.Reserva_Instalacion_Admin_Model;
 import si.pl14.reservasEmma.Reserva_Instalacion_Admin_View;
@@ -35,9 +41,7 @@ import si.pl14.visualizarInstalaciones.VisualizarReservasAdminView;
  * Vista principal del administrador.
  *
  * Contiene todas las historias de usuario disponibles.
- * Al hacer merge de los branches HU7 (InformeDetallado) y HU8 (ContabilidadSocios)
- * ambos modificaban este fichero; la versión unificada incluye los dos casos
- * para evitar conflictos.
+ * Versión unificada: incluye HU7 (InformeDetalladoSocios) y HU8 (ContabilidadSocios).
  */
 public class AdminView {
 
@@ -62,6 +66,10 @@ public class AdminView {
         panel.add(lblTitulo, BorderLayout.NORTH);
 
         JComboBox<String> cbHistorias = new JComboBox<>();
+
+        // =====================================================================
+        // 1. HISTORIAS DE USUARIO DEL ADMINISTRADOR
+        // =====================================================================
         cbHistorias.addItem("Seleccionar historia de usuario");
         cbHistorias.addItem("HU1: Reservar una instalacion para un socio");
         cbHistorias.addItem("HU2: Reservar una instalacion para una actividad en un periodo determinado");
@@ -79,11 +87,19 @@ public class AdminView {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int seleccion = cbHistorias.getSelectedIndex();
+
+                // =====================================================================
+                // 2. INSTANCIAR EL MVC CORRESPONDIENTE A LA HISTORIA SELECCIONADA
+                // =====================================================================
                 switch (seleccion) {
                 case 1:
-                    // HU1: pendiente de implementación
+                    // HU1: Reservar una instalacion para un socio
+                    ReservaControllerAdmin controllerReservaAdmin =
+                        new ReservaControllerAdmin(new ReservaModelAdmin(), new ReservaViewAdmin());
+                    controllerReservaAdmin.initController();
                     break;
                 case 2:
+                    // HU2: Reservar instalacion para actividad
                     Reserva_Instalacion_Admin_View viewRI = new Reserva_Instalacion_Admin_View();
                     Reserva_Instalacion_Admin_Model modelRI = new Reserva_Instalacion_Admin_Model();
                     new Reserva_Instalacion_Admin_Controller(viewRI, modelRI);
@@ -91,12 +107,14 @@ public class AdminView {
                     viewRI.setLocationRelativeTo(null);
                     break;
                 case 3:
+                    // HU3: Visualizar reservas de instalaciones
                     VisualizarReservasAdminController controllerVisualizarReservas =
                         new VisualizarReservasAdminController(new VisualizarReservasAdminModel(),
                                                               new VisualizarReservasAdminView());
                     controllerVisualizarReservas.initController();
                     break;
                 case 4:
+                    // HU4: Planificar una actividad
                     Planificar_Actividad_Admin_View vistaplanificar = new Planificar_Actividad_Admin_View();
                     Planificar_Actividad_Model modeloplanificar = new Planificar_Actividad_Model();
                     Planificar_Actividad_Controller controladorplanificar =
@@ -104,12 +122,14 @@ public class AdminView {
                     controladorplanificar.initController();
                     break;
                 case 5:
+                    // HU5: Crear un periodo de inscripcion
                     PeriodosInscripcionController controllerPeriodosInscripcion =
                         new PeriodosInscripcionController(new PeriodosInscripcionModel(),
                                                           new PeriodosInscripcionView());
                     controllerPeriodosInscripcion.initController();
                     break;
                 case 6:
+                    // HU6: Obtener lista de actividades ofertadas en un periodo
                     Lista_Actividades_Periodo_Admin_Vista vistalista = new Lista_Actividades_Periodo_Admin_Vista();
                     Lista_Actividades_Periodo_Model modelolista = new Lista_Actividades_Periodo_Model();
                     Lista_Actividades_Periodo_Controller controladorlista =
@@ -123,7 +143,14 @@ public class AdminView {
                                                               new InformeDetalladoSociosView());
                     controllerInforme.initController();
                     break;
-                
+                case 8:
+                    // HU8: Calcular contabilidad mensual de socios
+                    ContabilidadSociosView viewContab = new ContabilidadSociosView();
+                    ContabilidadSociosModel modelContab = new ContabilidadSociosModel();
+                    ContabilidadSociosController controllerContab =
+                        new ContabilidadSociosController(modelContab, viewContab);
+                    controllerContab.initController();
+                    break;
                 default:
                     break;
                 }

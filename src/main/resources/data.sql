@@ -1,8 +1,16 @@
 -- ══════════════════════════════════════════════════════════════════════════
--- data.sql – Datos de prueba para la HU "Generar Informe Detallado de Socios"
+-- data.sql  –  Datos de prueba combinados
+--
+--   SECCIÓN A: HU7 – Generar Informe Detallado de Socios
+--   SECCIÓN B: HU8 – Calcular Contabilidad Mensual de Socios
 -- ══════════════════════════════════════════════════════════════════════════
 
--- ── 1. Usuarios ───────────────────────────────────────────────────────────
+
+-- ════════════════════════════════════════════════════════════════════════════
+-- SECCIÓN A: HU7 – Generar Informe Detallado de Socios
+-- ════════════════════════════════════════════════════════════════════════════
+
+-- ── A.1. Usuarios ─────────────────────────────────────────────────────────
 INSERT INTO Usuarios (dni, nombre, apellidos, telefono, email) VALUES
     ('12345678A', 'Juan',    'Pérez García',       600111222, 'juan.perez@email.com'),
     ('87654321B', 'María',   'López Martínez',     600333444, 'maria.lopez@email.com'),
@@ -16,7 +24,7 @@ INSERT INTO Usuarios (dni, nombre, apellidos, telefono, email) VALUES
     ('10111213J', 'Roberto', 'Herrera Blanco',     601555666, 'roberto.herrera@email.com'),
     ('20212223K', 'Lucía',   'Navarro Prieto',     601666777, 'lucia.navarro@email.com');
 
--- ── 2. Socios ─────────────────────────────────────────────────────────────
+-- ── A.2. Socios ───────────────────────────────────────────────────────────
 INSERT INTO Socios (id_socio, dni, contrasena, estado_pagos) VALUES
     (1,  '12345678A', 'pass123',    'Al Corriente'),
     (2,  '87654321B', 'securePass', 'Pendiente'),
@@ -30,20 +38,20 @@ INSERT INTO Socios (id_socio, dni, contrasena, estado_pagos) VALUES
     (10, '10111213J', 'pass010',    'Pendiente'),
     (11, '20212223K', 'pass011',    'Al Corriente');
 
--- ── 3. Instalaciones ──────────────────────────────────────────────────────
+-- ── A.3. Instalaciones ────────────────────────────────────────────────────
 INSERT INTO Instalaciones (id_instalacion, nombre, tipo, coste_hora) VALUES
     (1, 'Pista de Tenis 1', 'Exterior',  10.00),
     (2, 'Pista de Pádel 1', 'Cristal',   12.00),
     (3, 'Pista de Pádel 2', 'Muro',      10.00),
     (4, 'Sala Polivalente',  'Interior', 15.00);
 
--- ── 4. Periodo de inscripción ─────────────────────────────────────────────
+-- ── A.4. Periodo de inscripción ───────────────────────────────────────────
 INSERT INTO PeriodosInscripcion (id_periodo, nombre, descripcion,
                                   inicio_socios, fin_socios, fin_no_socios) VALUES
     (1, 'Temporada 2026', 'Temporada anual 2026',
         '2026-01-01', '2026-12-31', '2026-12-31');
 
--- ── 5. Actividades ────────────────────────────────────────────────────────
+-- ── A.5. Actividades ──────────────────────────────────────────────────────
 INSERT INTO Actividades (id_actividad, nombre, descripcion, id_instalacion, aforo,
                           fecha_inicio, fecha_fin, precio_socio, precio_no_socio, id_periodo) VALUES
     (1, 'Yoga Mañanas',     'Clase de Yoga suave',         4, 20, '2026-01-05', '2026-12-31', 20.00, 30.00, 1),
@@ -59,7 +67,7 @@ INSERT INTO Horarios (id_actividad, dia_semana, hora_inicio, hora_fin) VALUES
     (4, 'Martes',    '10:00', '11:00'),
     (5, 'Jueves',    '19:00', '20:00');
 
--- ── 6. Reservas automáticas de actividades (sin socio) ───────────────────
+-- ── A.6. Reservas automáticas de actividades (sin socio) ─────────────────
 INSERT INTO Reservas (id_instalacion, fecha, hora_inicio, hora_fin,
                       id_socio, id_actividad, coste_reserva, estado_pago, metodo_pago) VALUES
     (4, '2026-02-02', '09:00', '10:00', NULL, 1, NULL, NULL, NULL),
@@ -159,7 +167,7 @@ INSERT INTO Reservas (id_instalacion, fecha, hora_inicio, hora_fin,
     (1, '2026-03-10', '10:00', '11:00', 11, NULL, 10.00, 'Pagado', 'Tarjeta'),
     (4, '2026-03-24', '09:00', '10:00', 11, NULL, 15.00, 'Pagado', 'Efectivo');
 
--- ── 7. Inscripciones ──────────────────────────────────────────────────────
+-- ── A.7. Inscripciones ────────────────────────────────────────────────────
 INSERT INTO Inscripciones (id_socio, id_actividad, fecha_inscripcion) VALUES
     (1, 1, '2026-01-10'),   -- Juan:    Yoga
     (1, 2, '2026-02-03'),   -- Juan:    Pilates
@@ -186,10 +194,7 @@ INSERT INTO Inscripciones (id_socio, id_actividad, fecha_inscripcion) VALUES
     (11, 2, '2026-02-15'),  -- Lucía:   Pilates
     (11, 3, '2026-02-16');  -- Lucía:   Zumba Fitness
 
--- ════════════════════════════════════════════════════════════════════════════
--- Socios activos en ABRIL 2026 (hasta el día 21)
--- ════════════════════════════════════════════════════════════════════════════
-
+-- ── Socios activos en ABRIL 2026 ──────────────────────────────────────────
 INSERT INTO Usuarios (dni, nombre, apellidos, telefono, email) VALUES
     ('30313233L', 'Marta',   'Serrano Fuentes',  602111222, 'marta.serrano@email.com'),
     ('40414243M', 'Diego',   'Molina Crespo',    602333444, 'diego.molina@email.com'),
@@ -240,13 +245,7 @@ INSERT INTO Inscripciones (id_socio, id_actividad, fecha_inscripcion) VALUES
     (5, 5, '2026-04-03'),   -- Pedro: Pádel Avanzado
     (5, 2, '2026-04-04');   -- Pedro: Pilates Tarde
 
--- ════════════════════════════════════════════════════════════════════════════
--- Miguel Torres — activo en FEBRERO, MARZO y ABRIL
---   Feb: 1 reserva (Pádel 2) + 1 actividad (Zumba Fitness, inst 4)
---   Mar: 1 reserva (Sala Polivalente)
---   Abr: 1 reserva (Pádel 2) + 1 actividad (Pádel Avanzado, inst 2)
--- ════════════════════════════════════════════════════════════════════════════
-
+-- MIGUEL TORRES (socio 15) — activo en febrero, marzo y abril
 INSERT INTO Usuarios (dni, nombre, apellidos, telefono, email) VALUES
     ('60616263O', 'Miguel', 'Torres Aguilar', 603111222, 'miguel.torres@email.com');
 
@@ -260,5 +259,111 @@ INSERT INTO Reservas (id_instalacion, fecha, hora_inicio, hora_fin,
     (3, '2026-04-09', '16:00', '17:00', 15, NULL, 10.00, 'Pagado', 'Tarjeta');   -- Abr: Pádel 2
 
 INSERT INTO Inscripciones (id_socio, id_actividad, fecha_inscripcion) VALUES
-    (15, 3, '2026-02-11'),   -- Miguel: Zumba Fitness  (inst 4, inicio feb → cuenta desde feb)
-    (15, 5, '2026-04-08');   -- Miguel: Pádel Avanzado (inst 2, inicio mar → cuenta desde mar)
+    (15, 3, '2026-02-11'),   -- Miguel: Zumba Fitness
+    (15, 5, '2026-04-08');   -- Miguel: Pádel Avanzado
+
+
+-- ════════════════════════════════════════════════════════════════════════════
+-- SECCIÓN B: HU8 – Calcular Contabilidad Mensual de Socios
+--
+-- Casos cubiertos:
+--   · Febrero 2026   → socios con SOLO reservas, con SOLO actividades y con ambas
+--   · Marzo    2026  → mes con datos (reservas + actividades)
+--   · Abril    2026  → mes futuro restringido por validación del Model
+--   · Enero    2026  → mes sin ningún dato (lista vacía, no genera fichero)
+--   · Diciembre 2025 → mes pasado dentro del año permitido (solo reservas)
+--   · Socio con varias actividades inscritas en el mismo mes
+--   · Socio sin ninguna actividad ni reserva ese mes (no debe aparecer)
+-- ════════════════════════════════════════════════════════════════════════════
+
+-- ── B.1. Usuarios ─────────────────────────────────────────────────────────
+INSERT INTO Usuarios (dni, nombre, apellidos, telefono, email) VALUES
+    ('52664444B', 'Pablo',  'García López',    612345678, 'pablo@ejemplo.com'),
+    ('61014052S', 'Irene',  'Martínez Ruiz',   698765432, 'irene@ejemplo.com'),
+    ('33221100C', 'Carlos', 'Fernández Díaz',  666111222, 'carlos@ejemplo.com'),
+    ('77889900D', 'Ana',    'Sánchez Mora',    655444333, 'ana@ejemplo.com'),
+    ('11223344E', 'Luis',   'Torres Blanco',   611222333, 'luis@ejemplo.com'),
+    ('99887766F', 'Marta',  'Vega Ruiz',       677888999, 'marta@ejemplo.com');
+
+-- ── B.2. Socios ───────────────────────────────────────────────────────────
+INSERT INTO Socios (id_socio, dni, contrasena, estado_pagos) VALUES
+    (16, '52664444B', 'pass1', 'Al Corriente'),
+    (17, '61014052S', 'pass2', 'Al Corriente'),
+    (18, '33221100C', 'pass3', 'Deudor'),
+    (19, '77889900D', 'pass4', 'Al Corriente'),   -- solo actividades, sin reservas directas en Feb
+    (20, '11223344E', 'pass5', 'Al Corriente'),   -- sin actividad ni reserva en Febrero (no aparece)
+    (21, '99887766F', 'pass6', 'Al Corriente');   -- reserva+actividad en Marzo; solo actividad en Feb
+
+-- ── B.3. Instalaciones ────────────────────────────────────────────────────
+INSERT INTO Instalaciones (nombre, tipo, coste_hora) VALUES
+    ('Pista Padel 1', 'Padel',   20.0),
+    ('Pista Tenis 1', 'Tenis',   15.0),
+    ('Sala Fitness',  'Fitness', 10.0);
+
+-- ── B.4. Periodos de inscripcion ──────────────────────────────────────────
+INSERT INTO PeriodosInscripcion (nombre, descripcion, inicio_socios, fin_socios, fin_no_socios) VALUES
+    ('Invierno 2025',  'Periodo invernal 2025',   '2025-11-15', '2025-11-30', '2025-12-07'),
+    ('Invierno 2026',  'Periodo invernal 2026',   '2026-01-01', '2026-01-15', '2026-01-22'),
+    ('Primavera 2026', 'Periodo primaveral 2026', '2026-03-01', '2026-03-10', '2026-03-20');
+
+-- ── B.5. Actividades ──────────────────────────────────────────────────────
+-- Nota: se usan las instalaciones insertadas en B.3 (ids asignados por la BD)
+INSERT INTO Actividades (nombre, descripcion, id_instalacion, aforo, fecha_inicio, fecha_fin,
+                         precio_socio, precio_no_socio, es_evento_social, id_periodo) VALUES
+    -- Febrero 2026
+    ('Yoga matutino',       'Clases de yoga',         (SELECT id_instalacion FROM Instalaciones WHERE nombre='Sala Fitness' LIMIT 1),   15, '2026-02-02', '2026-02-28',  60.0,  90.0, 0, (SELECT id_periodo FROM PeriodosInscripcion WHERE nombre='Invierno 2026')),
+    ('Pilates',             'Clases de pilates',       (SELECT id_instalacion FROM Instalaciones WHERE nombre='Sala Fitness' LIMIT 1),   12, '2026-02-02', '2026-02-28',  50.0,  75.0, 0, (SELECT id_periodo FROM PeriodosInscripcion WHERE nombre='Invierno 2026')),
+    -- Marzo 2026
+    ('Spinning avanzado',   'Alta intensidad en bici', (SELECT id_instalacion FROM Instalaciones WHERE nombre='Sala Fitness' LIMIT 1),   10, '2026-03-05', '2026-03-31',  40.0,  65.0, 0, (SELECT id_periodo FROM PeriodosInscripcion WHERE nombre='Primavera 2026')),
+    ('Aquagym',             'Aerobic en piscina',      (SELECT id_instalacion FROM Instalaciones WHERE nombre='Sala Fitness' LIMIT 1),    8, '2026-03-08', '2026-03-31',  45.0,  70.0, 0, (SELECT id_periodo FROM PeriodosInscripcion WHERE nombre='Primavera 2026')),
+    -- Diciembre 2025
+    ('Zumba navideña',      'Baile festivo',           (SELECT id_instalacion FROM Instalaciones WHERE nombre='Sala Fitness' LIMIT 1),   20, '2025-12-01', '2025-12-31',  35.0,  55.0, 0, (SELECT id_periodo FROM PeriodosInscripcion WHERE nombre='Invierno 2025'));
+
+-- ── B.6. Reservas directas de instalaciones ───────────────────────────────
+INSERT INTO Reservas (id_instalacion, fecha, hora_inicio, hora_fin,
+                      id_socio, id_actividad, coste_reserva, estado_pago, metodo_pago) VALUES
+    -- Febrero 2026
+    ((SELECT id_instalacion FROM Instalaciones WHERE nombre='Pista Padel 1' LIMIT 1), '2026-02-05', '10:00', '11:00', 16, NULL, 20.0, 'Pagado',    'Tarjeta'),
+    ((SELECT id_instalacion FROM Instalaciones WHERE nombre='Pista Padel 1' LIMIT 1), '2026-02-12', '10:00', '11:00', 16, NULL, 20.0, 'Pagado',    'Efectivo'),
+    ((SELECT id_instalacion FROM Instalaciones WHERE nombre='Pista Tenis 1' LIMIT 1), '2026-02-10', '17:00', '18:30', 16, NULL, 22.5, 'Pendiente', NULL),
+    ((SELECT id_instalacion FROM Instalaciones WHERE nombre='Pista Padel 1' LIMIT 1), '2026-02-07', '12:00', '13:00', 17, NULL, 20.0, 'Pagado',    'Tarjeta'),
+    ((SELECT id_instalacion FROM Instalaciones WHERE nombre='Pista Tenis 1' LIMIT 1), '2026-02-14', '09:00', '10:30', 17, NULL, 22.5, 'Pagado',    'Tarjeta'),
+    ((SELECT id_instalacion FROM Instalaciones WHERE nombre='Pista Tenis 1' LIMIT 1), '2026-02-20', '16:00', '17:00', 18, NULL, 15.0, 'Pendiente', NULL),
+
+    -- Marzo 2026
+    ((SELECT id_instalacion FROM Instalaciones WHERE nombre='Pista Padel 1' LIMIT 1), '2026-03-03', '10:00', '11:00', 16, NULL, 20.0, 'Pagado',    'Tarjeta'),
+    ((SELECT id_instalacion FROM Instalaciones WHERE nombre='Pista Tenis 1' LIMIT 1), '2026-03-10', '17:00', '18:30', 17, NULL, 22.5, 'Pagado',    'Efectivo'),
+    ((SELECT id_instalacion FROM Instalaciones WHERE nombre='Pista Padel 1' LIMIT 1), '2026-03-15', '11:00', '12:00', 18, NULL, 20.0, 'Pendiente', NULL),
+    ((SELECT id_instalacion FROM Instalaciones WHERE nombre='Pista Tenis 1' LIMIT 1), '2026-03-22', '16:00', '17:30', 20, NULL, 22.5, 'Pagado',    'Tarjeta'),
+    -- Marta (21): una reserva directa en Marzo
+    ((SELECT id_instalacion FROM Instalaciones WHERE nombre='Pista Padel 1' LIMIT 1), '2026-03-18', '10:00', '11:00', 21, NULL, 20.0, 'Pagado',    'Tarjeta'),
+
+    -- Diciembre 2025
+    ((SELECT id_instalacion FROM Instalaciones WHERE nombre='Pista Padel 1' LIMIT 1), '2025-12-05', '09:00', '10:00', 16, NULL, 20.0, 'Pagado',    'Tarjeta'),
+    ((SELECT id_instalacion FROM Instalaciones WHERE nombre='Pista Tenis 1' LIMIT 1), '2025-12-18', '17:00', '18:00', 17, NULL, 15.0, 'Pagado',    'Efectivo'),
+
+    -- Luis (20) solo en Marzo → no aparece en Febrero
+    ((SELECT id_instalacion FROM Instalaciones WHERE nombre='Pista Padel 1' LIMIT 1), '2026-03-28', '10:00', '11:00', 20, NULL, 20.0, 'Pagado',    'Tarjeta');
+
+-- ── B.7. Inscripciones a actividades ──────────────────────────────────────
+INSERT INTO Inscripciones (id_socio, id_actividad, fecha_inscripcion) VALUES
+    -- Febrero 2026
+    (16, (SELECT id_actividad FROM Actividades WHERE nombre='Yoga matutino'),  '2026-02-01'),   -- Pablo:  Yoga
+    (17, (SELECT id_actividad FROM Actividades WHERE nombre='Yoga matutino'),  '2026-02-01'),   -- Irene:  Yoga
+    (17, (SELECT id_actividad FROM Actividades WHERE nombre='Pilates'),        '2026-02-03'),   -- Irene:  Pilates
+    (18, (SELECT id_actividad FROM Actividades WHERE nombre='Yoga matutino'),  '2026-02-02'),   -- Carlos: Yoga
+    (19, (SELECT id_actividad FROM Actividades WHERE nombre='Yoga matutino'),  '2026-02-04'),   -- Ana:    Yoga (sin reservas directas ese mes)
+    (19, (SELECT id_actividad FROM Actividades WHERE nombre='Pilates'),        '2026-02-05'),   -- Ana:    Pilates
+    (21, (SELECT id_actividad FROM Actividades WHERE nombre='Yoga matutino'),  '2026-02-10'),   -- Marta:  solo actividad en Febrero (sin reserva directa)
+
+    -- Marzo 2026
+    (16, (SELECT id_actividad FROM Actividades WHERE nombre='Spinning avanzado'), '2026-03-02'),   -- Pablo:  Spinning
+    (17, (SELECT id_actividad FROM Actividades WHERE nombre='Spinning avanzado'), '2026-03-02'),   -- Irene:  Spinning
+    (18, (SELECT id_actividad FROM Actividades WHERE nombre='Aquagym'),           '2026-03-05'),   -- Carlos: Aquagym
+    (19, (SELECT id_actividad FROM Actividades WHERE nombre='Spinning avanzado'), '2026-03-03'),   -- Ana:    Spinning
+    (19, (SELECT id_actividad FROM Actividades WHERE nombre='Aquagym'),           '2026-03-06'),   -- Ana:    Aquagym
+    (21, (SELECT id_actividad FROM Actividades WHERE nombre='Spinning avanzado'), '2026-03-04'),   -- Marta:  Spinning (+ reserva directa ese mes)
+
+    -- Diciembre 2025
+    (16, (SELECT id_actividad FROM Actividades WHERE nombre='Zumba navideña'), '2025-12-01'),
+    (18, (SELECT id_actividad FROM Actividades WHERE nombre='Zumba navideña'), '2025-12-03');
