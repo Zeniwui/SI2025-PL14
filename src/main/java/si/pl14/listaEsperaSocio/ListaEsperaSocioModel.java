@@ -148,4 +148,14 @@ public class ListaEsperaSocioModel {
 		String sql = "INSERT INTO ListaEspera (id_actividad, id_socio) VALUES (?, ?)";
 		db.executeUpdate(sql, actividad.getIdActividad(), idSocio);
 	}
+	
+	/*
+	 * Obtiene el puesto que ocuparia un nuevo socio en la lista de espera
+	 */
+	public int getPuestoFuturoListaEspera(int idActividad) {
+		String sql = "SELECT COUNT(*) FROM ListaEspera WHERE id_actividad = ?";
+		List<Object[]> res = db.executeQueryArray(sql, idActividad);
+		int inscritosActuales = ((Number) res.get(0)[0]).intValue();
+		return inscritosActuales + 1;
+	}
 }

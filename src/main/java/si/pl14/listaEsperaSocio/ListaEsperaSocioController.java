@@ -105,13 +105,31 @@ public class ListaEsperaSocioController {
 			);
 		} else {
             // Flujo lista de espera
-			model.apuntarListaEspera(ID_SOCIO_ACTUAL, actividadSeleccionada);
 			
-			SwingUtil.showMessage(
-					"El aforo para '" + actividadSeleccionada.getNombre() + "' está completo.\nHas sido añadido a la lista de espera con éxito.\nNo se te cobrará nada hasta que se te asigne una plaza definitiva.", 
-					"Añadido a Lista de Espera", 
-					JOptionPane.INFORMATION_MESSAGE
+			int puesto = model.getPuestoFuturoListaEspera(actividadSeleccionada.getIdActividad());
+			
+			int respuesta = JOptionPane.showConfirmDialog(
+					view.getFrame(),
+					"El aforo para '" + actividadSeleccionada.getNombre() + "' está completo.\n"
+					+ "Si te apuntas, ocuparás el puesto nº " + puesto + " en la lista de espera.\n"
+					+ "¿Estás conforme y deseas apuntarte?",
+					"Confirmación de Lista de Espera",
+					JOptionPane.YES_NO_OPTION,
+					JOptionPane.QUESTION_MESSAGE
 			);
+			
+			if (respuesta == JOptionPane.YES_OPTION) {
+				model.apuntarListaEspera(ID_SOCIO_ACTUAL, actividadSeleccionada);
+				
+				SwingUtil.showMessage(
+						"Has sido añadido a la lista de espera con éxito (Puesto: " + puesto + ").\n"
+						+ "No se te cobrará nada hasta que se te asigne una plaza definitiva.", 
+						"Añadido a Lista de Espera", 
+						JOptionPane.INFORMATION_MESSAGE
+				);
+			} else {
+				return; 
+			}
 		}
 		
 		cargarTablaActividades();
