@@ -183,7 +183,7 @@ public class ReservaModel {
 	/*
 	 * Valida que se cumplan todas las condiciones
 	 */
-	public String validarReglasNegocio(int idSocio, Date fechaDate, int horaInicio, int horaFin, int idInstalacion) {
+	public String validarReglas(int idSocio, Date fechaDate, int horaInicio, int horaFin, int idInstalacion) {
 		
 		// 1. Cálculos de tiempo
 		LocalDate fechaSeleccionadaLocal = fechaDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();

@@ -152,7 +152,7 @@ public class ReservaController {
 		int horaInicioSeleccionada = view.getHoraInicio();
 		int horaFinSeleccionada = view.getHoraFin();
 		
-		String errorNegocio = model.validarReglasNegocio(
+		String errorNegocio = model.validarReglas(
 		        ID_SOCIO_ACTUAL, fechaDate, horaInicioSeleccionada, horaFinSeleccionada, idInstalacionSeleccionada);
 		
 		if (errorNegocio != null) {
