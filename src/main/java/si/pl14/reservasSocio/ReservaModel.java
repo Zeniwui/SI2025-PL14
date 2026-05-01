@@ -1,5 +1,10 @@
 package si.pl14.reservasSocio;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.List;
 
 import si.pl14.model.InstalacionEntity;
@@ -12,6 +17,10 @@ public class ReservaModel {
 	
 	private final int HORA_APERTURA = 9;
 	private final int HORA_CIERRE = 21;
+	private final int HORAS_MAXIMAS_SEGUIDAS = 2;
+	private final int HORAS_MAXIMAS_DIA = 3;
+	private final int HORAS_MAXIMAS_MES = 8;
+	private final int DIAS_MAXIMOS_ANTELACION = 30;
 	
 	private Database db = new Database();
 	
@@ -21,6 +30,10 @@ public class ReservaModel {
 
 	public int getHoraCierre() {
 		return HORA_CIERRE;
+	}
+	
+	public int getDiasMaximosAntelacion() {
+		return DIAS_MAXIMOS_ANTELACION;
 	}
 
 	/*
@@ -135,6 +148,77 @@ public class ReservaModel {
 		int horasReservas = horaFin - horaInicio;
 		
 		return horasReservas * instalaciones.get(0).getCosteHora();
+	}
+	
+	/*
+	 * Comprueba que la reserva no supere las horas seguidas preestablecidas
+	 */
+	public boolean superaHorasSeguidas(List<ReservaEntity> reservasDia, int nuevaHoraInicio, int nuevaHoraFin) {
+		boolean[] horasActivas = new boolean[24];
+		
+		for (ReservaEntity r : reservasDia) {
+			for (int i = r.getHoraInicio(); i < r.getHoraFin(); i++) {
+				horasActivas[i] = true;
+			}
+		}
+		for (int i = nuevaHoraInicio; i < nuevaHoraFin; i++) {
+			horasActivas[i] = true;
+		}
+		
+		int maxConsecutivas = 0;
+		int actualesConsecutivas = 0;
+		for (int i = 0; i < 24; i++) {
+			if (horasActivas[i]) {
+				actualesConsecutivas++;
+				if (actualesConsecutivas > maxConsecutivas) {
+					maxConsecutivas = actualesConsecutivas;
+				}
+			} else {
+				actualesConsecutivas = 0;
+			}
+		}
+		return maxConsecutivas > HORAS_MAXIMAS_SEGUIDAS;
+	}
+	
+	/*
+	 * Valida que se cumplan todas las condiciones
+	 */
+	public String validarReglas(int idSocio, Date fechaDate, int horaInicio, int horaFin, int idInstalacion) {
+		
+		// 1. Cálculos de tiempo
+		LocalDate fechaSeleccionadaLocal = fechaDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+		LocalDate hoy = LocalDate.now();
+		long diasAntelacion = ChronoUnit.DAYS.between(hoy, fechaSeleccionadaLocal);
+		int horaActual = LocalTime.now().getHour();
+		
+		String fechaSeleccionada = si.pl14.util.Util.dateToIsoString(fechaDate);
+		String mesAnio = fechaSeleccionada.substring(0, 7); 
+		
+		// 2. Extraer datos de la BD
+		List<ReservaEntity> reservasSocioDia = getReservasSocioEnDia(idSocio, fechaSeleccionada);
+		List<ReservaEntity> reservasSocioMes = getReservasSocioEnMes(idSocio, mesAnio);
+		
+		int horasAReservar = horaFin - horaInicio;
+		
+		int horasYaReservadasDia = 0;
+		for (ReservaEntity r : reservasSocioDia) { horasYaReservadasDia += (r.getHoraFin() - r.getHoraInicio()); }
+
+		int horasYaReservadasMes = 0;
+		for (ReservaEntity r : reservasSocioMes) { horasYaReservadasMes += (r.getHoraFin() - r.getHoraInicio()); }
+
+		// 3. Aplicar las reglas de negocio en orden
+		if (!estaAlCorriente(idSocio)) return "SOCIO CON PAGOS PENDIENTES. NO PUEDE RESERVAR";
+		if (diasAntelacion < 0) return "NO SE PUEDE RESERVAR EN FECHAS PASADAS";
+		if (diasAntelacion == 0 && horaInicio <= horaActual) return "NO SE PUEDE RESERVAR EN UNA HORA QUE YA HA PASADO";
+		if (diasAntelacion > DIAS_MAXIMOS_ANTELACION) return "SÓLO SE PUEDE RESERVAR CON " + DIAS_MAXIMOS_ANTELACION + " DÍAS DE ANTELACIÓN";
+		if (horasAReservar > HORAS_MAXIMAS_SEGUIDAS) return "NO SE PERMITE RESERVAR MAS DE " + HORAS_MAXIMAS_SEGUIDAS + " HORAS SEGUIDAS";
+		if (superaHorasSeguidas(reservasSocioDia, horaInicio, horaFin)) return "NO SE PERMITE RESERVAR MÁS DE " + HORAS_MAXIMAS_SEGUIDAS + " HORAS SEGUIDAS";
+		if ((horasYaReservadasDia + horasAReservar) > HORAS_MAXIMAS_DIA) return "LÍMITE DIARIO: NO SE PUEDEN RESERVAR MÁS DE " + HORAS_MAXIMAS_DIA + " HORAS AL DÍA";
+		if ((horasYaReservadasMes + horasAReservar) > HORAS_MAXIMAS_MES) return "LÍMITE MENSUAL: NO SE PUEDEN RESERVAR MÁS DE " + HORAS_MAXIMAS_MES + " HORAS AL MES";
+		if (!estaLibreAEsasHoras(fechaSeleccionada, horaInicio, horaFin, idInstalacion)) return "LA INSTALACIÓN NO ESTÁ DISPONIBLE EN ESE HORARIO";
+
+		// Si pasa todos los IF, la reserva es válida
+		return null;
 	}
 	
 	/*

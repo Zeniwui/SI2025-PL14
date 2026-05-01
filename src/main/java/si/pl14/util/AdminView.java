@@ -27,6 +27,9 @@ import si.pl14.contabilidadSocios.ContabilidadSociosView;
 import si.pl14.informeSocios.InformeDetalladoSociosController;
 import si.pl14.informeSocios.InformeDetalladoSociosModel;
 import si.pl14.informeSocios.InformeDetalladoSociosView;
+import si.pl14.inscripcionesNoSocio.InscripcionNoSocioController;
+import si.pl14.inscripcionesNoSocio.InscripcionNoSocioModel;
+import si.pl14.inscripcionesNoSocio.InscripcionNoSocioView;
 import si.pl14.periodosinscripcion.PeriodosInscripcionController;
 import si.pl14.periodosinscripcion.PeriodosInscripcionModel;
 import si.pl14.periodosinscripcion.PeriodosInscripcionView;
@@ -82,7 +85,8 @@ public class AdminView {
         cbHistorias.addItem("HU6: Obtener lista de actividades ofertadas en un periodo");
         cbHistorias.addItem("HU7: Generar informe detallado de socios");
         cbHistorias.addItem("HU8: Calcular contabilidad mensual de socios");
-
+        cbHistorias.addItem("HU9: Inscribir a un no socio a una actividad");
+        
         panel.add(cbHistorias, BorderLayout.CENTER);
 
         JButton btnEjecutar = new JButton("Ejecutar Historia de Usuario");
@@ -139,10 +143,18 @@ public class AdminView {
     				controladorlista.initController();
                 	break;
                 case 7:
+                	InformeDetalladoSociosController controllerInforme = new InformeDetalladoSociosController(new InformeDetalladoSociosModel(), new InformeDetalladoSociosView());
+                	controllerInforme.initController();
+                	break;
+                case 8:
                 	ContabilidadSociosView viewContab = new ContabilidadSociosView();
                 	ContabilidadSociosModel modelContab = new ContabilidadSociosModel();
                 	ContabilidadSociosController controllerContab = new ContabilidadSociosController(modelContab, viewContab);
                 	controllerContab.initController();
+                	break;
+                case 9:
+                	InscripcionNoSocioController controllerInscripcionNoSocio = new InscripcionNoSocioController(new InscripcionNoSocioModel(), new InscripcionNoSocioView());
+                	controllerInscripcionNoSocio.initController();
                 	break;
                 }
             }

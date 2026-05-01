@@ -24,10 +24,6 @@ public class ReservaControllerAdmin {
 	
 	private Integer idSocioActual = null;
 	private String nombreSocioActual = null;
-	private final int HORAS_MAXIMAS_SEGUIDAS = 2;
-	private final int HORAS_MAXIMAS_DIA = 3;
-	private final int HORAS_MAXIMAS_MES = 8;
-	private final int DIAS_MAXIMOS_ANTELACION = 30;
 	
 	public ReservaControllerAdmin(ReservaModelAdmin m, ReservaViewAdmin v) {
 		model = m;
@@ -43,7 +39,7 @@ public class ReservaControllerAdmin {
 	    
 	    Calendar cal = Calendar.getInstance();
 	    cal.setTime(hoy);
-	    cal.add(Calendar.DAY_OF_MONTH, DIAS_MAXIMOS_ANTELACION); 
+	    cal.add(Calendar.DAY_OF_MONTH, model.getDiasMaximosAntelacion()); 
 	    Date fechaMaxima = cal.getTime();
 	    
 	    view.getCalendarFecha().setMinSelectableDate(hoy);
@@ -122,38 +118,6 @@ public class ReservaControllerAdmin {
 	    }
 	}
 	
-	private boolean superaHorasSeguidas(List<ReservaEntity> reservasDia, int nuevaHoraInicio, int nuevaHoraFin) {
-		boolean[] horasActivas = new boolean[24];
-		
-		// 1. Marcamos las horas que el socio ya tiene reservadas ese día
-		for (ReservaEntity r : reservasDia) {
-			for (int i = r.getHoraInicio(); i < r.getHoraFin(); i++) {
-				horasActivas[i] = true;
-			}
-		}
-		
-		// 2. Marcamos las horas que el socio quiere reservar ahora
-		for (int i = nuevaHoraInicio; i < nuevaHoraFin; i++) {
-			horasActivas[i] = true;
-		}
-		
-		// 3. Contamos cuál es el bloque máximo de horas consecutivas
-		int maxConsecutivas = 0;
-		int actualesConsecutivas = 0;
-		
-		for (int i = 0; i < 24; i++) {
-			if (horasActivas[i]) {
-				actualesConsecutivas++;
-				if (actualesConsecutivas > maxConsecutivas) {
-					maxConsecutivas = actualesConsecutivas;
-				}
-			} else {
-				actualesConsecutivas = 0;
-			}
-		}
-		
-		return maxConsecutivas > HORAS_MAXIMAS_SEGUIDAS;
-	}
 	
 	private void buscarSocio() {
 		String dni = view.getDniBusqueda();
@@ -216,16 +180,6 @@ public class ReservaControllerAdmin {
 		}
 		
 		Date fechaDate = view.getCalendarFecha().getDate();
-		
-		LocalDate fechaSeleccionadaLocal = fechaDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        LocalDate hoy = LocalDate.now();
-        
-        int horaActual = LocalTime.now().getHour();
-        
-        long diasAntelacion = ChronoUnit.DAYS.between(hoy, fechaSeleccionadaLocal);
-		
-		String fechaSeleccionada = Util.dateToIsoString(fechaDate);
-		
 		InstalacionEntity instalacionSeleccionada = (InstalacionEntity) view.getCbInstalaciones().getSelectedItem();
 		
 		if (instalacionSeleccionada == null) {
@@ -236,100 +190,56 @@ public class ReservaControllerAdmin {
 		int idInstalacionSeleccionada = instalacionSeleccionada.getIdInstalacion();
 		int horaInicioSeleccionada = view.getHoraInicio();
 		int horaFinSeleccionada = view.getHoraFin();
-		String metodoPago;
 		
-		// Extraemos el mes actual (YYYY-MM) a partir de la fecha seleccionada
-		String mesAnio = fechaSeleccionada.substring(0, 7); 
+		String errorValidacion = model.validarReglas(idSocioActual, fechaDate, horaInicioSeleccionada, horaFinSeleccionada, idInstalacionSeleccionada);
 		
-		// Obtenemos el historial de reservas de este socio para hoy y este mes
-		List<ReservaEntity> reservasSocioDia = model.getReservasSocioEnDia(idSocioActual, fechaSeleccionada);
-		List<ReservaEntity> reservasSocioMes = model.getReservasSocioEnMes(idSocioActual, mesAnio);
-		
-		// Calculamos las horas totales
-		int horasAReservar = horaFinSeleccionada - horaInicioSeleccionada;
-		
-		// Calculamos las horas totales ya reservadas en el día
-		int horasYaReservadasDia = 0;
-		for (ReservaEntity r : reservasSocioDia) {
-			horasYaReservadasDia += (r.getHoraFin() - r.getHoraInicio());
-		}
-
-		// Calculamos las horas totales ya reservadas en el mes
-		int horasYaReservadasMes = 0;
-		for (ReservaEntity r : reservasSocioMes) {
-			horasYaReservadasMes += (r.getHoraFin() - r.getHoraInicio());
+		if (errorValidacion != null) {
+		    view.setTextoInformacion(errorValidacion);
+		    return;
 		}
 		
-		if (view.esPagoInmediato()) {
-			metodoPago = "Pago inmediato";
+		view.setTextoInformacion("");
+		
+		String metodoPago = view.esPagoInmediato() ? "Pago inmediato" : "Cuota mensual";
+		String fechaSeleccionada = Util.dateToIsoString(fechaDate);
+		float costeReserva = model.getPrecioReserva(idInstalacionSeleccionada, horaInicioSeleccionada, horaFinSeleccionada);
+		
+		ReservaEntity reserva = new ReservaEntity();
+		reserva.setIdInstalacion(idInstalacionSeleccionada);
+		reserva.setFecha(fechaSeleccionada);
+		reserva.setHoraInicio(horaInicioSeleccionada);
+		reserva.setHoraFin(horaFinSeleccionada);
+		reserva.setIdSocio(idSocioActual);
+		reserva.setCosteReserva(costeReserva);
+		reserva.setMetodoPago(metodoPago);
+		
+		if ("Pago inmediato".equals(metodoPago)) {
+		    reserva.setEstadoPago("Pagado");
 		} else {
-			metodoPago = "Cuota mensual";
+		    reserva.setEstadoPago("Pendiente");
 		}
 		
-		if(!model.estaAlCorriente(idSocioActual)) {
-			view.setTextoInformacion("SOCIO CON PAGOS PENDIENTES. NO PUEDE RESERVAR");
-		} else if (diasAntelacion < 0) {
-			view.setTextoInformacion("NO SE PUEDE RESERVAR EN FECHAS PASADAS");
-		} else if (diasAntelacion == 0 && horaInicioSeleccionada <= horaActual) {  
-			view.setTextoInformacion("NO PUEDES RESERVAR EN UNA HORA QUE YA HA PASADO");
-		} else if (diasAntelacion > DIAS_MAXIMOS_ANTELACION) {
-			view.setTextoInformacion("SÓLO SE PUEDE RESERVAR CON " + DIAS_MAXIMOS_ANTELACION + " DÍAS DE ANTELACIÓN");
-		} else if (horasAReservar > HORAS_MAXIMAS_SEGUIDAS) {
-			view.setTextoInformacion("NO SE PERMITE RESERVAR MAS DE " + HORAS_MAXIMAS_SEGUIDAS + " HORAS SEGUIDAS");
-		} else if (superaHorasSeguidas(reservasSocioDia, horaInicioSeleccionada, horaFinSeleccionada)) {	
-			view.setTextoInformacion("NO SE PERMITE RESERVAR MÁS DE " + HORAS_MAXIMAS_SEGUIDAS + " HORAS SEGUIDAS");
-		} else if ((horasYaReservadasDia + horasAReservar) > HORAS_MAXIMAS_DIA) {							
-			view.setTextoInformacion("LÍMITE DIARIO: NO SE PUEDEN RESERVAR MÁS DE " + HORAS_MAXIMAS_DIA + " HORAS AL DÍA");
-		} else if ((horasYaReservadasMes + horasAReservar) > HORAS_MAXIMAS_MES) {							
-			view.setTextoInformacion("LÍMITE MENSUAL: NO SE PUEDEN RESERVAR MÁS DE " + HORAS_MAXIMAS_MES + " HORAS AL MES");
-		} else if (!model.estaLibreAEsasHoras(fechaSeleccionada, horaInicioSeleccionada, horaFinSeleccionada, idInstalacionSeleccionada)) {
-			view.setTextoInformacion("LA INSTALACIÓN NO ESTÁ DISPONIBLE EN ESE HORARIO");
-		} else {
-			
-			// Si aprueba todas las validaciones, creamos la reserva y la insertamos en la base de datos
-			
-			float costeReserva = model.getPrecioReserva(idInstalacionSeleccionada, horaInicioSeleccionada, horaFinSeleccionada);
-			view.setTextoInformacion("");
-			
-			ReservaEntity reserva = new ReservaEntity();
-			reserva.setIdInstalacion(idInstalacionSeleccionada);
-			reserva.setFecha(fechaSeleccionada);
-			reserva.setHoraInicio(horaInicioSeleccionada);
-			reserva.setHoraFin(horaFinSeleccionada);
-			reserva.setIdSocio(idSocioActual);
-			reserva.setCosteReserva(costeReserva);
-			reserva.setMetodoPago(metodoPago);
-			
-			if ("Pago inmediato".equals(metodoPago)) {
-			    reserva.setEstadoPago("Pagado");
-			} else {
-			    reserva.setEstadoPago("Pendiente");
-			}
-			
-			// Creamos dialogo de confirmacion
-			String mensajeConfirmacion = String.format(
-		            "¿Estás seguro de que deseas reservar la instalación %s para el socio %s?\nEl coste de %.2f € se gestionará como: %s.",
-		            instalacionSeleccionada.getNombre(), nombreSocioActual, costeReserva, metodoPago
-		    );
-			
-			int confirmacion = JOptionPane.showConfirmDialog(
-		            view.getFrame(),
-		            mensajeConfirmacion,
-		            "Confirmar Reserva",
-		            JOptionPane.YES_NO_OPTION,
-		            JOptionPane.QUESTION_MESSAGE
-		    );
-			
-			// Solo si el administrador pulsa "Sí", ejecutamos el guardado
-		    if (confirmacion == JOptionPane.YES_OPTION) {
-		        model.realizarReserva(reserva, instalacionSeleccionada.getNombre());
-		        
-		        String textoResguardo = model.generarResguardo(reserva, instalacionSeleccionada.getNombre(), nombreSocioActual);
-		        view.setTextoResumen(textoResguardo);
-		        
-		        SwingUtil.showMessage("Reserva realizada con éxito.\n\n" + textoResguardo, 
-		                "Reserva Confirmada", JOptionPane.INFORMATION_MESSAGE);
-		    }
-		}
+		String mensajeConfirmacion = String.format(
+	            "¿Estás seguro de que deseas reservar la instalación %s para el socio %s?\nEl coste de %.2f € se gestionará como: %s.",
+	            instalacionSeleccionada.getNombre(), nombreSocioActual, costeReserva, metodoPago
+	    );
+		
+		int confirmacion = JOptionPane.showConfirmDialog(
+	            view.getFrame(),
+	            mensajeConfirmacion,
+	            "Confirmar Reserva",
+	            JOptionPane.YES_NO_OPTION,
+	            JOptionPane.QUESTION_MESSAGE
+	    );
+		
+	    if (confirmacion == JOptionPane.YES_OPTION) {
+	        model.realizarReserva(reserva, instalacionSeleccionada.getNombre());
+	        
+	        String textoResguardo = model.generarResguardo(reserva, instalacionSeleccionada.getNombre(), nombreSocioActual);
+	        view.setTextoResumen(textoResguardo);
+	        
+	        SwingUtil.showMessage("Reserva realizada con éxito.\n\n" + textoResguardo, 
+	                "Reserva Confirmada", JOptionPane.INFORMATION_MESSAGE);
+	    }
 	}
 }

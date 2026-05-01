@@ -11,6 +11,7 @@ public class ActividadInscripcionDTO {
     private String fechaInicio;
     private String fechaFin;
     private double precioSocio;
+    private double precioNoSocio;
     private String descripcion;
 
     public int getIdActividad() { return idActividad; }
@@ -29,6 +30,13 @@ public class ActividadInscripcionDTO {
     public void setFechaFin(String fechaFin) { this.fechaFin = fechaFin; }
     public double getPrecioSocio() { return precioSocio; }
     public void setPrecioSocio(double precioSocio) { this.precioSocio = precioSocio; }
+    public double getPrecioNoSocio() {
+        return precioNoSocio;
+    }
+
+    public void setPrecioNoSocio(double precioNoSocio) {
+        this.precioNoSocio = precioNoSocio;
+    }
     public String getDescripcion() { return descripcion; }
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
 }
