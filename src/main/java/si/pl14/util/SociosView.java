@@ -17,6 +17,9 @@ import si.pl14.estadoPagosSocio.EstadoPagosSocioModel;
 import si.pl14.inscripcionesSocio.InscripcionSocioController;
 import si.pl14.inscripcionesSocio.InscripcionSocioModel;
 import si.pl14.inscripcionesSocio.InscripcionSocioView;
+import si.pl14.listaEsperaSocio.ListaEsperaSocioController;
+import si.pl14.listaEsperaSocio.ListaEsperaSocioModel;
+import si.pl14.listaEsperaSocio.ListaEsperaSocioView;
 import si.pl14.reservasSocio.ReservaController;
 // Importa aquí tus clases del MVC
 import si.pl14.reservasSocio.ReservaModel;
@@ -59,6 +62,7 @@ public class SociosView {
         cbHistorias.addItem("HU3: Visualizar mis reservas en un periodo de tiempo");
         cbHistorias.addItem("HU4: Ver estado de mis pagos de reservas y actividades");
         cbHistorias.addItem("HU5: Inscribirse a una actividad");
+        cbHistorias.addItem("HU6: Inscribirse a una actividad con lista de espera");
         
         panel.add(cbHistorias, BorderLayout.CENTER);
 
@@ -91,6 +95,11 @@ public class SociosView {
                 case 5:
                 	InscripcionSocioController controllerInscripcion = new InscripcionSocioController(new InscripcionSocioModel(), new InscripcionSocioView());
                 	controllerInscripcion.initController();
+                	break;
+                case 6:
+                	ListaEsperaSocioController controllerListaEspera = new ListaEsperaSocioController(new ListaEsperaSocioModel(), new ListaEsperaSocioView());
+                	controllerListaEspera.initController();
+                	break;
                 }
             }
         });
